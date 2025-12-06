@@ -1,8 +1,18 @@
 import Link from 'next/link'
 import { Crown, Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
-export default function HomePage() {
+async function getMemberCount() {
+  const { count } = await supabaseAdmin
+    .from('members')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_active', true)
+  return count || 0
+}
+
+export default async function HomePage() {
+  const memberCount = await getMemberCount()
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -57,7 +67,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">150+</div>
+              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">{memberCount}+</div>
               <div className="text-zinc-500 uppercase tracking-wider text-sm">Members</div>
             </div>
             <div className="text-center">
@@ -93,7 +103,7 @@ export default function HomePage() {
               <Users className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="text-xl font-bold mb-2">The Crew</h3>
               <p className="text-zinc-500 text-sm">
-                Connect with 150+ members who share your passion. Real friendships, real builds.
+                Connect with {memberCount}+ members who share your passion. Real friendships, real builds.
               </p>
             </div>
 
