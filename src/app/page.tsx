@@ -1,0 +1,222 @@
+import Link from 'next/link'
+import { Crown, Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+
+export default function HomePage() {
+  return (
+    <div className="flex flex-col">
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900 to-black" />
+        <div className="absolute inset-0 texture-overlay" />
+
+        {/* Amber glow effect */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[150px]" />
+
+        {/* Content */}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+          <div className="flex justify-center mb-6">
+            <Crown className="w-20 h-20 text-amber-500 animate-pulse-glow" />
+          </div>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6">
+            CRE<span className="text-amber-500">8</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-zinc-400 mb-4 font-light">
+            TRUCK CLUB
+          </p>
+          <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto">
+            The edgiest truck club for young enthusiasts.
+            Chevy. Ford. Dodge. We don&apos;t discriminate.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup">
+              <Button size="lg" className="w-full sm:w-auto">
+                Join the Club
+                <ChevronRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+            <Link href="/shop">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                Shop Merch
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-zinc-600 rounded-full flex justify-center pt-2">
+            <div className="w-1 h-2 bg-amber-500 rounded-full" />
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-zinc-900 border-y border-zinc-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">150+</div>
+              <div className="text-zinc-500 uppercase tracking-wider text-sm">Members</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">50+</div>
+              <div className="text-zinc-500 uppercase tracking-wider text-sm">Events/Year</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">3</div>
+              <div className="text-zinc-500 uppercase tracking-wider text-sm">Brands</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">1</div>
+              <div className="text-zinc-500 uppercase tracking-wider text-sm">Family</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black mb-4">
+              WHY <span className="text-amber-500">CRE8</span>?
+            </h2>
+            <p className="text-zinc-500 max-w-2xl mx-auto">
+              More than a club - we&apos;re a community of truck enthusiasts who live and breathe the lifestyle.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
+              <Users className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-xl font-bold mb-2">The Crew</h3>
+              <p className="text-zinc-500 text-sm">
+                Connect with 150+ members who share your passion. Real friendships, real builds.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
+              <Calendar className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-xl font-bold mb-2">Events</h3>
+              <p className="text-zinc-500 text-sm">
+                Weekly meets, monthly cruises, and exclusive member-only events. We stay active.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
+              <ShoppingBag className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-xl font-bold mb-2">Exclusive Merch</h3>
+              <p className="text-zinc-500 text-sm">
+                Member pricing on all gear. Rep the crown with exclusive drops.
+              </p>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
+              <Truck className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="text-xl font-bold mb-2">Build Support</h3>
+              <p className="text-zinc-500 text-sm">
+                Get advice, resources, and help with your build from experienced members.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fleet Gallery Preview */}
+      <section className="py-24 bg-zinc-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black mb-2">
+                THE <span className="text-amber-500">FLEET</span>
+              </h2>
+              <p className="text-zinc-500">Check out what our members are rolling in.</p>
+            </div>
+            <Link href="/gallery" className="text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider hidden md:flex items-center gap-2">
+              View All <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {/* Placeholder gallery items */}
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div
+                key={i}
+                className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden"
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
+                  <Truck className="w-12 h-12" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                  <div>
+                    <p className="text-white font-bold text-sm">2023 Silverado</p>
+                    <p className="text-zinc-400 text-xs">@member{i}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Link href="/gallery" className="mt-8 text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider flex md:hidden items-center justify-center gap-2">
+            View All <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-amber-500/10" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Crown className="w-16 h-16 text-amber-500 mx-auto mb-6" />
+          <h2 className="text-3xl md:text-5xl font-black mb-6">
+            READY TO <span className="text-amber-500">CRE8</span>?
+          </h2>
+          <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
+            $50/year gets you access to everything. Exclusive events, member pricing on merch,
+            and a community that&apos;s got your back.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup">
+              <Button size="lg">
+                Join Now - $50/year
+              </Button>
+            </Link>
+            <Link href="/about">
+              <Button variant="ghost" size="lg">
+                Learn More
+              </Button>
+            </Link>
+          </div>
+          <p className="text-zinc-600 text-sm mt-6">
+            Invite code required. Know a member? Get yours.
+          </p>
+        </div>
+      </section>
+
+      {/* Brands Section */}
+      <section className="py-16 bg-zinc-900 border-t border-zinc-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-zinc-600 uppercase tracking-wider text-sm mb-8">
+            We Roll With
+          </p>
+          <div className="flex justify-center items-center gap-12 md:gap-24 flex-wrap">
+            <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+              CHEVY
+            </div>
+            <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+              FORD
+            </div>
+            <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+              DODGE
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
