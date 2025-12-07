@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       price,
       memberPrice,
       imageUrl,
+      images,
       category,
       sizes,
       colors,
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
         price: parseFloat(price),
         member_price: memberPrice ? parseFloat(memberPrice) : null,
         image_url: imageUrl || null,
+        images: images || [],
         category: category || 'general',
         sizes: sizes || [],
         colors: colors || [],
@@ -93,6 +95,7 @@ export async function PUT(request: NextRequest) {
     if (updates.price !== undefined) dbUpdates.price = parseFloat(updates.price)
     if (updates.memberPrice !== undefined) dbUpdates.member_price = updates.memberPrice ? parseFloat(updates.memberPrice) : null
     if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl
+    if (updates.images !== undefined) dbUpdates.images = updates.images
     if (updates.category !== undefined) dbUpdates.category = updates.category
     if (updates.sizes !== undefined) dbUpdates.sizes = updates.sizes
     if (updates.colors !== undefined) dbUpdates.colors = updates.colors

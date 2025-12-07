@@ -39,6 +39,7 @@ export default function AdminProductsPage() {
     price: '',
     memberPrice: '',
     imageUrl: '',
+    images: [] as string[],
     category: 'apparel',
     sizes: '',
     colors: '',
@@ -71,6 +72,7 @@ export default function AdminProductsPage() {
       price: '',
       memberPrice: '',
       imageUrl: '',
+      images: [],
       category: 'apparel',
       sizes: '',
       colors: '',
@@ -89,6 +91,7 @@ export default function AdminProductsPage() {
       price: product.price.toString(),
       memberPrice: product.member_price?.toString() || '',
       imageUrl: product.image_url || '',
+      images: product.images || [],
       category: product.category,
       sizes: product.sizes.join(', '),
       colors: product.colors.join(', '),
@@ -109,7 +112,8 @@ export default function AdminProductsPage() {
         description: formData.description,
         price: formData.price,
         memberPrice: formData.memberPrice || null,
-        imageUrl: formData.imageUrl,
+        imageUrl: formData.imageUrl || formData.images[0] || null,
+        images: formData.images,
         category: formData.category,
         sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
         colors: formData.colors.split(',').map(s => s.trim()).filter(Boolean),
@@ -290,7 +294,11 @@ export default function AdminProductsPage() {
 
       if (res.ok) {
         const { url } = await res.json()
-        setFormData({ ...formData, imageUrl: url })
+        setFormData({
+          ...formData,
+          images: [...formData.images, url],
+          imageUrl: formData.imageUrl || url
+        })
       } else {
         const error = await res.json()
         alert(error.error || 'Upload failed')
@@ -359,58 +367,80 @@ export default function AdminProductsPage() {
                     onChange={(e) => setFormData({ ...formData, memberPrice: e.target.value })}
                   />
                 </div>
-                {/* Image Upload */}
+                {/* Image Gallery Upload */}
                 <div>
                   <label className="block text-sm font-medium text-zinc-400 mb-2">
-                    Product Image
+                    Product Images
                   </label>
-                  <div className="flex gap-4 items-start">
-                    {/* Preview */}
-                    <div className="w-32 h-32 bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {formData.imageUrl ? (
-                        <img
-                          src={formData.imageUrl}
-                          alt="Product preview"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <ImageIcon className="w-8 h-8 text-zinc-600" />
-                      )}
-                    </div>
 
-                    {/* Upload Controls */}
-                    <div className="flex-1 space-y-2">
-                      <label className="block">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                          disabled={isUploading}
-                        />
-                        <div className={`flex items-center justify-center gap-2 px-4 py-2 border border-zinc-700 hover:border-amber-500 cursor-pointer transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                          <Upload className="w-4 h-4" />
-                          <span className="text-sm">
-                            {isUploading ? 'Uploading...' : 'Upload Image'}
-                          </span>
+                  {/* Image Grid */}
+                  <div className="grid grid-cols-4 gap-2 mb-3">
+                    {formData.images.map((img, index) => (
+                      <div key={index} className="relative aspect-square bg-zinc-800 border border-zinc-700 overflow-hidden group">
+                        <img src={img} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                          {index !== 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newImages = [...formData.images]
+                                const temp = newImages[0]
+                                newImages[0] = newImages[index]
+                                newImages[index] = temp
+                                setFormData({ ...formData, images: newImages, imageUrl: newImages[0] })
+                              }}
+                              className="p-1 bg-amber-500 text-black text-xs"
+                              title="Set as primary"
+                            >
+                              ★
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newImages = formData.images.filter((_, i) => i !== index)
+                              setFormData({
+                                ...formData,
+                                images: newImages,
+                                imageUrl: newImages[0] || ''
+                              })
+                            }}
+                            className="p-1 bg-red-500 text-white text-xs"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
                         </div>
-                      </label>
+                        {index === 0 && (
+                          <div className="absolute top-1 left-1 bg-amber-500 text-black text-xs px-1">
+                            Primary
+                          </div>
+                        )}
+                      </div>
+                    ))}
 
-                      {formData.imageUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, imageUrl: '' })}
-                          className="text-xs text-red-500 hover:text-red-400"
-                        >
-                          Remove image
-                        </button>
+                    {/* Upload Button */}
+                    <label className={`aspect-square bg-zinc-800 border border-dashed border-zinc-600 hover:border-amber-500 flex flex-col items-center justify-center cursor-pointer transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                      {isUploading ? (
+                        <span className="text-xs text-zinc-500">Uploading...</span>
+                      ) : (
+                        <>
+                          <Plus className="w-6 h-6 text-zinc-500" />
+                          <span className="text-xs text-zinc-500 mt-1">Add</span>
+                        </>
                       )}
-
-                      <p className="text-xs text-zinc-600">
-                        Max 5MB. JPG, PNG, or WebP recommended.
-                      </p>
-                    </div>
+                    </label>
                   </div>
+
+                  <p className="text-xs text-zinc-600">
+                    First image is the primary. Click ★ to set as primary. Max 5MB each.
+                  </p>
                 </div>
                 <Select
                   label="Category"
@@ -646,18 +676,31 @@ export default function AdminProductsPage() {
                   <tr key={product.id} className="border-t border-zinc-800 hover:bg-zinc-800/50">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-zinc-800 flex items-center justify-center">
+                        <div className="w-12 h-12 bg-zinc-800 flex items-center justify-center relative">
                           {product.image_url ? (
                             <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
                             <ShoppingBag className="w-6 h-6 text-zinc-600" />
                           )}
+                          {product.images && product.images.length > 1 && (
+                            <div className="absolute -bottom-1 -right-1 bg-zinc-700 text-xs px-1 rounded">
+                              +{product.images.length - 1}
+                            </div>
+                          )}
                         </div>
                         <div>
                           <p className="font-bold">{product.name}</p>
-                          {product.is_members_only && (
-                            <Badge variant="amber" className="mt-1">Members Only</Badge>
-                          )}
+                          <div className="flex gap-1 mt-1 flex-wrap">
+                            {product.is_members_only && (
+                              <Badge variant="amber">Members Only</Badge>
+                            )}
+                            {product.sizes?.length > 0 && (
+                              <span className="text-xs text-zinc-500">{product.sizes.length} sizes</span>
+                            )}
+                            {product.colors?.length > 0 && (
+                              <span className="text-xs text-zinc-500">{product.colors.length} colors</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>
