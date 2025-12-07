@@ -14,10 +14,12 @@ import {
   Truck,
   CheckCircle,
   AlertCircle,
+  User,
+  Camera,
 } from 'lucide-react'
 import { formatDate, formatCurrency, getDuesStatus } from '@/lib/utils'
 import Link from 'next/link'
-import { MembershipDues, Event, EventRSVP } from '@/types'
+import { MembershipDues, Event, EventRSVP, MemberMedia } from '@/types'
 
 function DashboardContent() {
   const router = useRouter()
@@ -28,6 +30,7 @@ function DashboardContent() {
   const [upcomingEvents, setUpcomingEvents] = useState<(Event & { rsvp?: EventRSVP })[]>([])
   const [isPayingDues, setIsPayingDues] = useState(false)
   const [showDuesSuccess, setShowDuesSuccess] = useState(false)
+  const [truckPhoto, setTruckPhoto] = useState<string | null>(null)
 
   useEffect(() => {
     checkAuth()
@@ -54,9 +57,10 @@ function DashboardContent() {
 
   const fetchDashboardData = async () => {
     try {
-      const [duesRes, eventsRes] = await Promise.all([
+      const [duesRes, eventsRes, mediaRes] = await Promise.all([
         fetch('/api/member/dues'),
         fetch('/api/member/events'),
+        fetch('/api/member/media'),
       ])
 
       if (duesRes.ok) {
@@ -67,6 +71,15 @@ function DashboardContent() {
       if (eventsRes.ok) {
         const eventsData = await eventsRes.json()
         setUpcomingEvents(eventsData.events)
+      }
+
+      if (mediaRes.ok) {
+        const mediaData = await mediaRes.json()
+        // Get first image as truck photo (most recent)
+        const firstImage = mediaData.media?.find((m: MemberMedia) => m.type === 'image')
+        if (firstImage) {
+          setTruckPhoto(firstImage.url)
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -125,8 +138,16 @@ function DashboardContent() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-amber-500 flex items-center justify-center">
-              <Crown className="w-8 h-8 text-black" />
+            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-amber-500 overflow-hidden flex items-center justify-center">
+              {member.profile_photo_url ? (
+                <img
+                  src={member.profile_photo_url}
+                  alt={member.first_name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-8 h-8 text-zinc-600" />
+              )}
             </div>
             <div>
               <h1 className="text-2xl font-black">
@@ -244,29 +265,51 @@ function DashboardContent() {
           </Card>
 
           {/* Truck Info */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader>
               <h2 className="text-lg font-bold flex items-center gap-2">
                 <Truck className="w-5 h-5 text-amber-500" />
                 Your Truck
               </h2>
             </CardHeader>
-            <CardContent>
-              {member.truck_make ? (
-                <div className="space-y-2">
-                  <p className="text-xl font-bold">
-                    {member.truck_year} {member.truck_make}
-                  </p>
-                  <p className="text-zinc-400">{member.truck_model}</p>
-                </div>
-              ) : (
-                <p className="text-zinc-500">No truck info added yet</p>
-              )}
-              <Link href="/dashboard/profile">
-                <Button variant="ghost" size="sm" className="mt-4">
-                  Edit Profile
-                </Button>
-              </Link>
+            <CardContent className="p-0">
+              {/* Truck Photo */}
+              <div className="aspect-video bg-zinc-800 relative group">
+                {truckPhoto ? (
+                  <img
+                    src={truckPhoto}
+                    alt={member.truck_make ? `${member.truck_year} ${member.truck_make} ${member.truck_model}` : 'Your truck'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600">
+                    <Camera className="w-12 h-12 mb-2" />
+                    <p className="text-sm">No photo yet</p>
+                  </div>
+                )}
+                {/* Overlay with truck info */}
+                {member.truck_make && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <p className="text-lg font-bold text-white">
+                      {member.truck_year} {member.truck_make}
+                    </p>
+                    <p className="text-zinc-300 text-sm">{member.truck_model}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="p-4">
+                {!member.truck_make && (
+                  <p className="text-zinc-500 text-sm mb-3">Add your truck info to show off your build!</p>
+                )}
+                <Link href="/dashboard/profile">
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Camera className="w-4 h-4 mr-2" />
+                    {member.truck_make ? 'Edit Truck Info & Photos' : 'Add Truck Info'}
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
