@@ -123,14 +123,10 @@ export default async function EventsPage() {
                       </div>
                     </div>
 
-                    {/* RSVP Button */}
+                    {/* Event Type */}
                     <div className="flex-shrink-0 flex items-center">
-                      {event.is_members_only ? (
-                        <Link href="/login">
-                          <Button variant="outline">Login to RSVP</Button>
-                        </Link>
-                      ) : (
-                        <Button variant="secondary">Free Event</Button>
+                      {!event.is_members_only && (
+                        <span className="text-sm text-zinc-500 border border-zinc-700 px-3 py-1">Open to All</span>
                       )}
                     </div>
                   </div>
