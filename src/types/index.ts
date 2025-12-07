@@ -8,12 +8,25 @@ export interface Member {
   truck_make?: 'Chevy' | 'Ford' | 'Dodge'
   truck_model?: string
   truck_photo_url?: string
+  profile_photo_url?: string
   bio?: string
   instagram_handle?: string
+  snapchat_handle?: string
+  tiktok_handle?: string
   is_admin: boolean
   is_active: boolean
   created_at: string
   updated_at: string
+}
+
+export interface MemberMedia {
+  id: string
+  member_id: string
+  url: string
+  type: 'image' | 'video'
+  caption?: string
+  is_profile: boolean
+  created_at: string
 }
 
 export interface InviteCode {

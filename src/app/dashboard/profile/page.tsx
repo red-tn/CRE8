@@ -1,18 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
-import { ArrowLeft, Save, Truck, User } from 'lucide-react'
+import { ArrowLeft, Save, Truck, User, Camera, Instagram, Upload, X, Play, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
+import { MemberMedia } from '@/types'
 
 export default function ProfilePage() {
   const router = useRouter()
   const { member, isLoading, checkAuth, setMember } = useAuthStore()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -22,10 +24,16 @@ export default function ProfilePage() {
     truck_make: '',
     truck_model: '',
     instagram_handle: '',
+    snapchat_handle: '',
+    tiktok_handle: '',
     bio: '',
+    profile_photo_url: '',
   })
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [media, setMedia] = useState<MemberMedia[]>([])
+  const [loadingMedia, setLoadingMedia] = useState(true)
 
   useEffect(() => {
     checkAuth()
@@ -47,10 +55,28 @@ export default function ProfilePage() {
         truck_make: member.truck_make || '',
         truck_model: member.truck_model || '',
         instagram_handle: member.instagram_handle || '',
+        snapchat_handle: member.snapchat_handle || '',
+        tiktok_handle: member.tiktok_handle || '',
         bio: member.bio || '',
+        profile_photo_url: member.profile_photo_url || '',
       })
+      fetchMedia()
     }
   }, [member])
+
+  const fetchMedia = async () => {
+    try {
+      const response = await fetch('/api/member/media')
+      if (response.ok) {
+        const data = await response.json()
+        setMedia(data.media || [])
+      }
+    } catch (error) {
+      console.error('Error fetching media:', error)
+    } finally {
+      setLoadingMedia(false)
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -86,6 +112,88 @@ export default function ProfilePage() {
     }
   }
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+    setMessage(null)
+
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+
+      const uploadResponse = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      const uploadData = await uploadResponse.json()
+
+      if (!uploadResponse.ok) {
+        throw new Error(uploadData.error || 'Failed to upload')
+      }
+
+      // Save to media library
+      const mediaResponse = await fetch('/api/member/media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: uploadData.url,
+          type: uploadData.type,
+        }),
+      })
+
+      if (mediaResponse.ok) {
+        const mediaData = await mediaResponse.json()
+        setMedia([mediaData.media, ...media])
+        setMessage({ type: 'success', text: 'Media uploaded successfully!' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: (error as Error).message || 'Failed to upload file' })
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleSetProfilePhoto = async (url: string) => {
+    setFormData({ ...formData, profile_photo_url: url })
+
+    try {
+      const response = await fetch('/api/member/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile_photo_url: url }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setMember(data.member)
+        setMessage({ type: 'success', text: 'Profile photo updated!' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to set profile photo' })
+    }
+  }
+
+  const handleDeleteMedia = async (mediaId: string) => {
+    try {
+      const response = await fetch(`/api/member/media?id=${mediaId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        setMedia(media.filter(m => m.id !== mediaId))
+        setMessage({ type: 'success', text: 'Media deleted!' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to delete media' })
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -103,7 +211,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-[60vh] py-12">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link href="/dashboard" className="inline-flex items-center text-zinc-400 hover:text-white mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
@@ -123,109 +231,261 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <User className="w-5 h-5 text-amber-500" />
-                Personal Info
-              </h2>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="First Name"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  label="Last Name"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <Input
-                label="Phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="(555) 123-4567"
-              />
-              <Input
-                label="Instagram Handle"
-                name="instagram_handle"
-                value={formData.instagram_handle}
-                onChange={handleChange}
-                placeholder="@yourusername"
-              />
-              <div>
-                <label className="block text-sm font-medium text-zinc-400 mb-2">Bio</label>
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none transition-colors"
-                  placeholder="Tell us about yourself..."
-                />
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Form */}
+          <div className="lg:col-span-2 space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Profile Photo */}
+              <Card>
+                <CardHeader>
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Camera className="w-5 h-5 text-amber-500" />
+                    Profile Photo
+                  </h2>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-6">
+                    <div className="w-24 h-24 bg-zinc-800 border border-zinc-700 rounded-full overflow-hidden flex items-center justify-center">
+                      {formData.profile_photo_url ? (
+                        <img
+                          src={formData.profile_photo_url}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <User className="w-10 h-10 text-zinc-600" />
+                      )}
+                    </div>
+                    <div className="text-sm text-zinc-500">
+                      <p>Upload a photo or select from your media library below.</p>
+                      <p className="mt-1">Recommended: Square image, at least 200x200px</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card>
-            <CardHeader>
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <Truck className="w-5 h-5 text-amber-500" />
-                Truck Info
-              </h2>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  label="Year"
-                  name="truck_year"
-                  value={formData.truck_year}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Year</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </Select>
-                <Select
-                  label="Make"
-                  name="truck_make"
-                  value={formData.truck_make}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Make</option>
-                  <option value="Chevy">Chevy</option>
-                  <option value="Ford">Ford</option>
-                  <option value="Dodge">Dodge</option>
-                </Select>
-              </div>
-              <Input
-                label="Model"
-                name="truck_model"
-                value={formData.truck_model}
-                onChange={handleChange}
-                placeholder="e.g., Silverado 1500, F-150, Ram 1500"
-              />
-            </CardContent>
-          </Card>
+              {/* Personal Info */}
+              <Card>
+                <CardHeader>
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <User className="w-5 h-5 text-amber-500" />
+                    Personal Info
+                  </h2>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="First Name"
+                      name="first_name"
+                      value={formData.first_name}
+                      onChange={handleChange}
+                      required
+                    />
+                    <Input
+                      label="Last Name"
+                      name="last_name"
+                      value={formData.last_name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <Input
+                    label="Phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="(555) 123-4567"
+                  />
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Bio</label>
+                    <textarea
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none transition-colors"
+                      placeholder="Tell us about yourself..."
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Button type="submit" isLoading={isSaving} className="w-full">
-            <Save className="w-4 h-4 mr-2" />
-            Save Changes
-          </Button>
-        </form>
+              {/* Social Media */}
+              <Card>
+                <CardHeader>
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Instagram className="w-5 h-5 text-amber-500" />
+                    Social Media
+                  </h2>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Input
+                    label="Instagram"
+                    name="instagram_handle"
+                    value={formData.instagram_handle}
+                    onChange={handleChange}
+                    placeholder="@yourusername"
+                  />
+                  <Input
+                    label="Snapchat"
+                    name="snapchat_handle"
+                    value={formData.snapchat_handle}
+                    onChange={handleChange}
+                    placeholder="yourusername"
+                  />
+                  <Input
+                    label="TikTok"
+                    name="tiktok_handle"
+                    value={formData.tiktok_handle}
+                    onChange={handleChange}
+                    placeholder="@yourusername"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Truck Info */}
+              <Card>
+                <CardHeader>
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-amber-500" />
+                    Truck Info
+                  </h2>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Select
+                      label="Year"
+                      name="truck_year"
+                      value={formData.truck_year}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Year</option>
+                      {years.map((year) => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </Select>
+                    <Select
+                      label="Make"
+                      name="truck_make"
+                      value={formData.truck_make}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Make</option>
+                      <option value="Chevy">Chevy</option>
+                      <option value="Ford">Ford</option>
+                      <option value="Dodge">Dodge</option>
+                    </Select>
+                  </div>
+                  <Input
+                    label="Model"
+                    name="truck_model"
+                    value={formData.truck_model}
+                    onChange={handleChange}
+                    placeholder="e.g., Silverado 1500, F-150, Ram 1500"
+                  />
+                </CardContent>
+              </Card>
+
+              <Button type="submit" isLoading={isSaving} className="w-full">
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </Button>
+            </form>
+          </div>
+
+          {/* Media Library Sidebar */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-amber-500" />
+                  Media Library
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full mb-4"
+                  onClick={() => fileInputRef.current?.click()}
+                  isLoading={isUploading}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload Photo/Video
+                </Button>
+
+                {loadingMedia ? (
+                  <div className="text-center text-zinc-500 py-4">Loading...</div>
+                ) : media.length === 0 ? (
+                  <div className="text-center text-zinc-500 py-4">
+                    <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No media uploaded yet</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {media.map((item) => (
+                      <div
+                        key={item.id}
+                        className="relative aspect-square bg-zinc-800 border border-zinc-700 overflow-hidden group"
+                      >
+                        {item.type === 'video' ? (
+                          <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+                            <Play className="w-8 h-8 text-zinc-500" />
+                          </div>
+                        ) : (
+                          <img
+                            src={item.url}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+
+                        {/* Overlay actions */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          {item.type === 'image' && (
+                            <button
+                              type="button"
+                              onClick={() => handleSetProfilePhoto(item.url)}
+                              className="p-2 bg-amber-500 text-black hover:bg-amber-400 transition-colors"
+                              title="Set as profile photo"
+                            >
+                              <User className="w-4 h-4" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMedia(item.id)}
+                            className="p-2 bg-red-500 text-white hover:bg-red-400 transition-colors"
+                            title="Delete"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Profile indicator */}
+                        {formData.profile_photo_url === item.url && (
+                          <div className="absolute top-1 right-1 bg-amber-500 text-black px-1 py-0.5 text-xs font-bold">
+                            PROFILE
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -29,6 +29,9 @@ export async function PUT(request: NextRequest) {
       'truck_model',
       'bio',
       'instagram_handle',
+      'snapchat_handle',
+      'tiktok_handle',
+      'profile_photo_url',
     ]
 
     const updates: Record<string, unknown> = {}
