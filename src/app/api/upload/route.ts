@@ -6,8 +6,8 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getSession()
 
-    // Must be logged in as member or admin
-    if (!session?.member && !session?.admin) {
+    // Must be logged in
+    if (!session?.member) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -39,20 +39,17 @@ export async function POST(request: NextRequest) {
     const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`
 
     // Determine storage path based on folder type
-    let storageBucket = 'member-media'
+    const storageBucket = 'member-media'
     let path = ''
 
     if (folder === 'products') {
       // Admin uploading product images - need admin access
-      if (!session.admin) {
+      if (!session.member.is_admin) {
         return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 401 })
       }
       path = `products/${filename}`
     } else {
       // Member uploading their own media
-      if (!session.member) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
       path = `${session.member.id}/${filename}`
     }
 
