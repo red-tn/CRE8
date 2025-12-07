@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getSession } from '@/lib/auth'
-import { Crown, Truck, Instagram, Phone, Mail, ArrowLeft } from 'lucide-react'
+import { Crown, Truck, Instagram, Phone, Mail, ArrowLeft, Ghost, Music2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { notFound } from 'next/navigation'
@@ -169,13 +169,35 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
               <div className="flex flex-wrap gap-4 mb-4">
                 {member.instagram_handle && (
                   <a
-                    href={`https://instagram.com/${member.instagram_handle}`}
+                    href={`https://instagram.com/${member.instagram_handle.replace(/^@/, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-zinc-400 hover:text-amber-500 transition-colors"
+                    className="flex items-center gap-2 text-zinc-400 hover:text-pink-500 transition-colors"
                   >
                     <Instagram className="w-5 h-5" />
-                    @{member.instagram_handle}
+                    @{member.instagram_handle.replace(/^@/, '')}
+                  </a>
+                )}
+                {member.snapchat_handle && (
+                  <a
+                    href={`https://snapchat.com/add/${member.snapchat_handle.replace(/^@/, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-zinc-400 hover:text-yellow-400 transition-colors"
+                  >
+                    <Ghost className="w-5 h-5" />
+                    @{member.snapchat_handle.replace(/^@/, '')}
+                  </a>
+                )}
+                {member.tiktok_handle && (
+                  <a
+                    href={`https://tiktok.com/@${member.tiktok_handle.replace(/^@/, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-zinc-400 hover:text-cyan-400 transition-colors"
+                  >
+                    <Music2 className="w-5 h-5" />
+                    @{member.tiktok_handle.replace(/^@/, '')}
                   </a>
                 )}
               </div>
