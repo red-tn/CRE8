@@ -62,7 +62,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[80vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden py-12 md:py-0">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900 to-black" />
         <div className="absolute inset-0 texture-overlay" />
@@ -72,16 +72,16 @@ export default async function HomePage() {
 
         {/* Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <div className="flex justify-center mb-6">
-            <Crown className="w-20 h-20 text-amber-500 animate-pulse-glow" />
+          <div className="flex justify-center mb-4 md:mb-6">
+            <Crown className="w-14 h-14 md:w-20 md:h-20 text-amber-500 animate-pulse-glow" />
           </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-4 md:mb-6">
             CRE<span className="text-amber-500">8</span>
           </h1>
-          <p className="text-xl md:text-2xl text-zinc-400 mb-4 font-light">
+          <p className="text-lg md:text-2xl text-zinc-400 mb-3 md:mb-4 font-light">
             TRUCK CLUB
           </p>
-          <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-zinc-500 mb-8 md:mb-10 max-w-2xl mx-auto px-4">
             The edgiest truck club for young enthusiasts.
             Chevy. Ford. Dodge. We don&apos;t discriminate.
           </p>

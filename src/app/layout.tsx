@@ -16,12 +16,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CRE8 Truck Club | The Edgiest Truck Club",
-  description: "CRE8 Truck Club - The edgiest truck club for 18-25 year olds driving Chevy, Ford, and Dodge pickups. Join the crew.",
+  description: "CRE8 Truck Club - The edgiest truck club for young enthusiasts driving Chevy, Ford, and Dodge pickups. Join the crew.",
   keywords: ["truck club", "chevy trucks", "ford trucks", "dodge trucks", "truck enthusiasts", "car club"],
   openGraph: {
     title: "CRE8 Truck Club",
     description: "The edgiest truck club for young enthusiasts",
     type: "website",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
   },
 };
 
