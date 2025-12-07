@@ -21,7 +21,7 @@ export default function AboutPage() {
             ABOUT <span className="text-amber-500">CRE8</span>
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            We&apos;re not your typical truck club. We&apos;re a community of young enthusiasts
+            We&apos;re not your typical truck club. We&apos;re a community of enthusiasts
             who live for the build, the drive, and the brotherhood.
           </p>
         </div>
@@ -36,18 +36,19 @@ export default function AboutPage() {
                 OUR <span className="text-amber-500">STORY</span>
               </h2>
               <p className="text-zinc-400 mb-4">
-                CRE8 started in 2020 when a group of truck enthusiasts realized there wasn&apos;t
-                a club that truly spoke to younger builders. Everything was either too corporate,
-                too exclusive, or just didn&apos;t get it.
+                CRE8 was born in 2025 from a simple frustration - there wasn&apos;t a truck club
+                that felt right. Everything out there was either too corporate, too gatekeepy,
+                or just didn&apos;t understand what we were about.
               </p>
               <p className="text-zinc-400 mb-4">
-                So we created our own. A place where 18-25 year olds could connect, share their
-                builds, hit events together, and actually have fun doing it.
+                So we built our own. A community where truck enthusiasts could connect, show off
+                their builds, roll out to events together, and actually enjoy the culture without
+                all the nonsense.
               </p>
               <p className="text-zinc-400">
-                The name? CRE8. Because that&apos;s what we do - we create. We create builds,
-                create memories, create a community. The crown? That&apos;s because every member
-                is royalty here.
+                The name? CRE8. Because that&apos;s what we do - we create builds, create memories,
+                create a movement. And the crown? That&apos;s because every member here is royalty.
+                No exceptions.
               </p>
             </div>
             <div className="bg-zinc-900 border border-zinc-800 aspect-video flex items-center justify-center">
@@ -167,10 +168,10 @@ export default function AboutPage() {
 
           <div className="space-y-6">
             <div className="bg-black border border-zinc-800 p-6">
-              <h3 className="text-lg font-bold mb-2">What age do I need to be to join?</h3>
+              <h3 className="text-lg font-bold mb-2">Who can join CRE8?</h3>
               <p className="text-zinc-500">
-                We&apos;re focused on the 18-25 demographic, but we welcome anyone who vibes
-                with our community. It&apos;s more about attitude than age.
+                Anyone who&apos;s passionate about trucks and vibes with our community. It&apos;s
+                about attitude and enthusiasm, not demographics.
               </p>
             </div>
 
