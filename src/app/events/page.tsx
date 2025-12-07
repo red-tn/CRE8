@@ -11,6 +11,9 @@ export const metadata = {
   description: 'Check out upcoming CRE8 Truck Club events, meets, and cruises.',
 }
 
+// Revalidate every 60 seconds to show new/updated events
+export const revalidate = 60
+
 async function getEvents() {
   const { data } = await supabaseAdmin
     .from('events')
