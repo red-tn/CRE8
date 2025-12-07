@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { ShoppingBag, Plus, Pencil, Trash2, X } from 'lucide-react'
+import { ShoppingBag, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { Product } from '@/types'
 
@@ -16,6 +16,7 @@ export default function AdminProductsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -134,6 +135,48 @@ export default function AdminProductsPage() {
     }
   }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be less than 5MB')
+      return
+    }
+
+    setIsUploading(true)
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+      uploadFormData.append('folder', 'products')
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      if (res.ok) {
+        const { url } = await res.json()
+        setFormData({ ...formData, imageUrl: url })
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Upload failed')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload image')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -190,11 +233,59 @@ export default function AdminProductsPage() {
                     onChange={(e) => setFormData({ ...formData, memberPrice: e.target.value })}
                   />
                 </div>
-                <Input
-                  label="Image URL"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                />
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Product Image
+                  </label>
+                  <div className="flex gap-4 items-start">
+                    {/* Preview */}
+                    <div className="w-32 h-32 bg-zinc-800 border border-zinc-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {formData.imageUrl ? (
+                        <img
+                          src={formData.imageUrl}
+                          alt="Product preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon className="w-8 h-8 text-zinc-600" />
+                      )}
+                    </div>
+
+                    {/* Upload Controls */}
+                    <div className="flex-1 space-y-2">
+                      <label className="block">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={isUploading}
+                        />
+                        <div className={`flex items-center justify-center gap-2 px-4 py-2 border border-zinc-700 hover:border-amber-500 cursor-pointer transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                          <Upload className="w-4 h-4" />
+                          <span className="text-sm">
+                            {isUploading ? 'Uploading...' : 'Upload Image'}
+                          </span>
+                        </div>
+                      </label>
+
+                      {formData.imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, imageUrl: '' })}
+                          className="text-xs text-red-500 hover:text-red-400"
+                        >
+                          Remove image
+                        </button>
+                      )}
+
+                      <p className="text-xs text-zinc-600">
+                        Max 5MB. JPG, PNG, or WebP recommended.
+                      </p>
+                    </div>
+                  </div>
+                </div>
                 <Select
                   label="Category"
                   value={formData.category}
