@@ -3,16 +3,62 @@ import { Crown, Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide
 import { Button } from '@/components/ui/Button'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
-async function getMemberCount() {
-  const { count } = await supabaseAdmin
+async function getHomePageData() {
+  // Get member count
+  const { count: memberCount } = await supabaseAdmin
     .from('members')
     .select('*', { count: 'exact', head: true })
     .eq('is_active', true)
-  return count || 0
+
+  // Get truck brand counts
+  const { data: members } = await supabaseAdmin
+    .from('members')
+    .select('truck_make')
+    .eq('is_active', true)
+    .not('truck_make', 'is', null)
+
+  const brandCounts = {
+    Chevy: members?.filter(m => m.truck_make === 'Chevy').length || 0,
+    Ford: members?.filter(m => m.truck_make === 'Ford').length || 0,
+    Dodge: members?.filter(m => m.truck_make === 'Dodge').length || 0,
+  }
+
+  // Get members with profile photos or truck photos for the fleet section
+  const { data: fleetMembers } = await supabaseAdmin
+    .from('members')
+    .select('id, first_name, truck_year, truck_make, truck_model, profile_photo_url, instagram_handle')
+    .eq('is_active', true)
+    .not('truck_make', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(8)
+
+  // Get media for fleet members
+  const memberIds = fleetMembers?.map(m => m.id) || []
+  const { data: memberMedia } = await supabaseAdmin
+    .from('member_media')
+    .select('*')
+    .in('member_id', memberIds)
+    .eq('type', 'image')
+    .order('created_at', { ascending: false })
+
+  // Combine member data with their first media item
+  const fleetData = fleetMembers?.map(member => {
+    const media = memberMedia?.find(m => m.member_id === member.id)
+    return {
+      ...member,
+      display_image: media?.url || member.profile_photo_url || null
+    }
+  }) || []
+
+  return {
+    memberCount: memberCount || 0,
+    brandCounts,
+    fleetData,
+  }
 }
 
 export default async function HomePage() {
-  const memberCount = await getMemberCount()
+  const { memberCount, brandCounts, fleetData } = await getHomePageData()
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -150,23 +196,48 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {/* Placeholder gallery items */}
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div
-                key={i}
-                className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden"
-              >
-                <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                  <Truck className="w-12 h-12" />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <div>
-                    <p className="text-white font-bold text-sm">2023 Silverado</p>
-                    <p className="text-zinc-400 text-xs">@member{i}</p>
+            {fleetData.length > 0 ? (
+              fleetData.map((member) => (
+                <div
+                  key={member.id}
+                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden"
+                >
+                  {member.display_image ? (
+                    <img
+                      src={member.display_image}
+                      alt={`${member.truck_year} ${member.truck_make} ${member.truck_model}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
+                      <Truck className="w-12 h-12" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <div>
+                      <p className="text-white font-bold text-sm">
+                        {member.truck_year} {member.truck_make} {member.truck_model}
+                      </p>
+                      <p className="text-zinc-400 text-xs">
+                        {member.instagram_handle || member.first_name}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              // Placeholder when no members yet
+              Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden"
+                >
+                  <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
+                    <Truck className="w-12 h-12" />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           <Link href="/gallery" className="mt-8 text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider flex md:hidden items-center justify-center gap-2">
@@ -214,15 +285,24 @@ export default async function HomePage() {
           <p className="text-center text-zinc-600 uppercase tracking-wider text-sm mb-8">
             We Roll With
           </p>
-          <div className="flex justify-center items-center gap-12 md:gap-24 flex-wrap">
-            <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
-              CHEVY
+          <div className="flex justify-center items-center gap-8 md:gap-16 flex-wrap">
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+                CHEVY
+              </div>
+              <div className="text-amber-500 font-bold mt-1">{brandCounts.Chevy}</div>
             </div>
-            <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
-              FORD
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+                FORD
+              </div>
+              <div className="text-amber-500 font-bold mt-1">{brandCounts.Ford}</div>
             </div>
-            <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
-              DODGE
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+                DODGE
+              </div>
+              <div className="text-amber-500 font-bold mt-1">{brandCounts.Dodge}</div>
             </div>
           </div>
         </div>

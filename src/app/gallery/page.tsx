@@ -3,31 +3,116 @@ import { Truck, Crown } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { FleetGalleryImage } from '@/types'
 
 export const metadata = {
   title: 'Fleet Gallery | CRE8 Truck Club',
   description: 'Check out the CRE8 Truck Club fleet - Chevy, Ford, and Dodge trucks from our members.',
 }
 
-async function getGalleryImages() {
-  const { data } = await supabaseAdmin
+interface GalleryItem {
+  id: string
+  image_url: string
+  caption?: string
+  is_featured: boolean
+  member: {
+    first_name: string
+    last_name: string
+    instagram_handle?: string
+    truck_year?: number
+    truck_make?: string
+    truck_model?: string
+  }
+}
+
+async function getGalleryImages(): Promise<GalleryItem[]> {
+  // Get members with their media
+  const { data: members } = await supabaseAdmin
+    .from('members')
+    .select('id, first_name, last_name, instagram_handle, truck_year, truck_make, truck_model, profile_photo_url')
+    .eq('is_active', true)
+    .not('truck_make', 'is', null)
+
+  if (!members || members.length === 0) return []
+
+  const memberIds = members.map(m => m.id)
+
+  // Get media from member_media table
+  const { data: memberMedia } = await supabaseAdmin
+    .from('member_media')
+    .select('*')
+    .in('member_id', memberIds)
+    .eq('type', 'image')
+    .order('created_at', { ascending: false })
+
+  // Also get from fleet_gallery table
+  const { data: fleetGallery } = await supabaseAdmin
     .from('fleet_gallery')
     .select('*, member:members(first_name, last_name, instagram_handle, truck_year, truck_make, truck_model)')
     .eq('is_approved', true)
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
 
-  return (data || []) as (FleetGalleryImage & {
-    member: {
-      first_name: string
-      last_name: string
-      instagram_handle?: string
-      truck_year?: number
-      truck_make?: string
-      truck_model?: string
+  const galleryItems: GalleryItem[] = []
+
+  // Add member media items
+  memberMedia?.forEach(media => {
+    const member = members.find(m => m.id === media.member_id)
+    if (member) {
+      galleryItems.push({
+        id: media.id,
+        image_url: media.url,
+        caption: media.caption,
+        is_featured: false,
+        member: {
+          first_name: member.first_name,
+          last_name: member.last_name,
+          instagram_handle: member.instagram_handle,
+          truck_year: member.truck_year,
+          truck_make: member.truck_make,
+          truck_model: member.truck_model,
+        }
+      })
     }
-  })[]
+  })
+
+  // Add fleet gallery items (avoiding duplicates)
+  fleetGallery?.forEach(item => {
+    if (item.member) {
+      galleryItems.push({
+        id: item.id,
+        image_url: item.image_url,
+        caption: item.caption,
+        is_featured: item.is_featured,
+        member: item.member
+      })
+    }
+  })
+
+  // Add members with profile photos but no media uploads
+  members.forEach(member => {
+    const hasMedia = galleryItems.some(item =>
+      item.member.first_name === member.first_name &&
+      item.member.last_name === member.last_name
+    )
+    if (!hasMedia && member.profile_photo_url) {
+      galleryItems.push({
+        id: member.id,
+        image_url: member.profile_photo_url,
+        caption: undefined,
+        is_featured: false,
+        member: {
+          first_name: member.first_name,
+          last_name: member.last_name,
+          instagram_handle: member.instagram_handle,
+          truck_year: member.truck_year,
+          truck_make: member.truck_make,
+          truck_model: member.truck_model,
+        }
+      })
+    }
+  })
+
+  return galleryItems
 }
 
 export default async function GalleryPage() {
