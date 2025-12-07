@@ -69,9 +69,6 @@ export default function CartPage() {
   }
 
   const subtotal = getTotal(!!member)
-  const shipping = subtotal > 100 ? 0 : 9.99
-  const tax = subtotal * 0.0825
-  const total = subtotal + shipping + tax
 
   return (
     <div className="min-h-[60vh] py-12">
@@ -180,15 +177,15 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-zinc-400">
                     <span>Shipping</span>
-                    <span>{shipping === 0 ? 'FREE' : formatCurrency(shipping)}</span>
+                    <span className="text-zinc-500">Calculated at checkout</span>
                   </div>
                   <div className="flex justify-between text-zinc-400">
                     <span>Tax</span>
-                    <span>{formatCurrency(tax)}</span>
+                    <span className="text-zinc-500">Calculated at checkout</span>
                   </div>
                   <div className="border-t border-zinc-800 pt-3 flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span className="text-amber-500">{formatCurrency(total)}</span>
+                    <span>Subtotal</span>
+                    <span className="text-amber-500">{formatCurrency(subtotal)}</span>
                   </div>
                 </div>
 
@@ -198,11 +195,9 @@ export default function CartPage() {
                   </p>
                 )}
 
-                {subtotal < 100 && (
-                  <p className="text-zinc-500 text-sm mb-4">
-                    Add {formatCurrency(100 - subtotal)} more for free shipping!
-                  </p>
-                )}
+                <p className="text-zinc-500 text-sm mb-4">
+                  Ships via FedEx. Rates calculated at checkout.
+                </p>
 
                 <Button
                   onClick={handleCheckout}

@@ -61,48 +61,60 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Calculate if free shipping applies
-    const subtotal = lineItems.reduce(
-      (sum: number, item: { price_data: { unit_amount: number }; quantity: number }) =>
-        sum + (item.price_data.unit_amount * item.quantity) / 100,
-      0
-    )
-    const freeShipping = subtotal >= 100
-
-    // Create Stripe checkout session
+    // Create Stripe checkout session with FedEx shipping options
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: lineItems,
       shipping_address_collection: {
         allowed_countries: ['US'],
       },
-      shipping_options: freeShipping
-        ? [
-            {
-              shipping_rate_data: {
-                type: 'fixed_amount',
-                fixed_amount: { amount: 0, currency: 'usd' },
-                display_name: 'Free Shipping',
-                delivery_estimate: {
-                  minimum: { unit: 'business_day', value: 5 },
-                  maximum: { unit: 'business_day', value: 7 },
-                },
-              },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 899, currency: 'usd' },
+            display_name: 'FedEx Ground',
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 5 },
+              maximum: { unit: 'business_day', value: 7 },
             },
-          ]
-        : [
-            {
-              shipping_rate_data: {
-                type: 'fixed_amount',
-                fixed_amount: { amount: 999, currency: 'usd' },
-                display_name: 'Standard Shipping',
-                delivery_estimate: {
-                  minimum: { unit: 'business_day', value: 5 },
-                  maximum: { unit: 'business_day', value: 7 },
-                },
-              },
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 1499, currency: 'usd' },
+            display_name: 'FedEx Express Saver',
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 3 },
+              maximum: { unit: 'business_day', value: 4 },
             },
-          ],
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 2499, currency: 'usd' },
+            display_name: 'FedEx 2Day',
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 2 },
+              maximum: { unit: 'business_day', value: 2 },
+            },
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: { amount: 3999, currency: 'usd' },
+            display_name: 'FedEx Overnight',
+            delivery_estimate: {
+              minimum: { unit: 'business_day', value: 1 },
+              maximum: { unit: 'business_day', value: 1 },
+            },
+          },
+        },
+      ],
+      automatic_tax: { enabled: true },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/shop/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
       metadata: {
