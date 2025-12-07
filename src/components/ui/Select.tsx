@@ -1,16 +1,17 @@
 'use client'
 
-import { forwardRef, SelectHTMLAttributes } from 'react'
+import { forwardRef, SelectHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string
   error?: string
-  options: { value: string; label: string }[]
+  options?: { value: string; label: string }[]
+  children?: ReactNode
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, id, options, ...props }, ref) => {
+  ({ className, label, error, id, options, children, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -30,7 +31,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           )}
           {...props}
         >
-          {options.map((option) => (
+          {children ? children : options?.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
