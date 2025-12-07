@@ -47,13 +47,17 @@ export async function POST(request: NextRequest) {
         item.color && `Color: ${item.color}`,
       ].filter(Boolean).join(', ')
 
+      // Only include image if it's a valid absolute URL
+      const hasValidImage = product.image_url &&
+        (product.image_url.startsWith('http://') || product.image_url.startsWith('https://'))
+
       return {
         price_data: {
           currency: 'usd',
           product_data: {
             name: product.name,
             description: description || product.description || undefined,
-            images: product.image_url ? [product.image_url] : undefined,
+            ...(hasValidImage && { images: [product.image_url] }),
           },
           unit_amount: Math.round(price * 100),
         },
