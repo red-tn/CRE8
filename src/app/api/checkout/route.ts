@@ -65,6 +65,13 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    console.log('APP URL:', appUrl)
+
+    if (!appUrl) {
+      return NextResponse.json({ error: 'APP_URL not configured' }, { status: 500 })
+    }
+
     // Create Stripe checkout session with FedEx shipping options
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'payment',

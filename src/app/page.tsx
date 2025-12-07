@@ -198,9 +198,10 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {fleetData.length > 0 ? (
               fleetData.map((member) => (
-                <div
+                <Link
                   key={member.id}
-                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden"
+                  href={`/member/${member.id}`}
+                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden block"
                 >
                   {member.display_image ? (
                     <img
@@ -223,7 +224,7 @@ export default async function HomePage() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))
             ) : (
               // Placeholder when no members yet

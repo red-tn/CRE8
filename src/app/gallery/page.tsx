@@ -11,6 +11,7 @@ export const metadata = {
 
 interface GalleryItem {
   id: string
+  member_id: string
   image_url: string
   caption?: string
   is_featured: boolean
@@ -60,6 +61,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
     if (member) {
       galleryItems.push({
         id: media.id,
+        member_id: member.id,
         image_url: media.url,
         caption: media.caption,
         is_featured: false,
@@ -80,6 +82,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
     if (item.member) {
       galleryItems.push({
         id: item.id,
+        member_id: item.member_id,
         image_url: item.image_url,
         caption: item.caption,
         is_featured: item.is_featured,
@@ -97,6 +100,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
     if (!hasMedia && member.profile_photo_url) {
       galleryItems.push({
         id: member.id,
+        member_id: member.id,
         image_url: member.profile_photo_url,
         caption: undefined,
         is_featured: false,
@@ -167,9 +171,10 @@ export default async function GalleryPage() {
           {images.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {images.map((image) => (
-                <div
+                <Link
                   key={image.id}
-                  className="group relative aspect-square bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-all duration-300 overflow-hidden"
+                  href={`/member/${image.member_id}`}
+                  className="group relative aspect-square bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-all duration-300 overflow-hidden block"
                 >
                   {/* Placeholder - replace with actual image */}
                   {image.image_url ? (
@@ -212,7 +217,7 @@ export default async function GalleryPage() {
                       )}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
