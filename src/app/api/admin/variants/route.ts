@@ -1,0 +1,140 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/auth'
+
+// GET - Fetch variants for a product
+export async function GET(request: NextRequest) {
+  try {
+    await requireAdmin()
+
+    const productId = request.nextUrl.searchParams.get('productId')
+
+    if (!productId) {
+      return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
+    }
+
+    const { data: variants, error } = await supabaseAdmin
+      .from('product_variants')
+      .select('*')
+      .eq('product_id', productId)
+      .order('size', { ascending: true })
+      .order('color', { ascending: true })
+
+    if (error) throw error
+
+    return NextResponse.json({ variants })
+  } catch (error) {
+    if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    console.error('Error fetching variants:', error)
+    return NextResponse.json({ error: 'Failed to fetch variants' }, { status: 500 })
+  }
+}
+
+// POST - Create a new variant
+export async function POST(request: NextRequest) {
+  try {
+    await requireAdmin()
+
+    const body = await request.json()
+    const { productId, size, color, stockQuantity, priceAdjustment, sku } = body
+
+    if (!productId) {
+      return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
+    }
+
+    const { data: variant, error } = await supabaseAdmin
+      .from('product_variants')
+      .insert({
+        product_id: productId,
+        size: size || null,
+        color: color || null,
+        stock_quantity: stockQuantity || 0,
+        price_adjustment: priceAdjustment || 0,
+        sku: sku || null,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'This size/color combination already exists' }, { status: 400 })
+      }
+      throw error
+    }
+
+    return NextResponse.json({ variant })
+  } catch (error) {
+    if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    console.error('Error creating variant:', error)
+    return NextResponse.json({ error: 'Failed to create variant' }, { status: 500 })
+  }
+}
+
+// PUT - Update a variant
+export async function PUT(request: NextRequest) {
+  try {
+    await requireAdmin()
+
+    const body = await request.json()
+    const { id, stockQuantity, priceAdjustment, sku, isActive } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'Variant ID required' }, { status: 400 })
+    }
+
+    const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
+    if (stockQuantity !== undefined) updateData.stock_quantity = stockQuantity
+    if (priceAdjustment !== undefined) updateData.price_adjustment = priceAdjustment
+    if (sku !== undefined) updateData.sku = sku
+    if (isActive !== undefined) updateData.is_active = isActive
+
+    const { data: variant, error } = await supabaseAdmin
+      .from('product_variants')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json({ variant })
+  } catch (error) {
+    if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    console.error('Error updating variant:', error)
+    return NextResponse.json({ error: 'Failed to update variant' }, { status: 500 })
+  }
+}
+
+// DELETE - Delete a variant
+export async function DELETE(request: NextRequest) {
+  try {
+    await requireAdmin()
+
+    const id = request.nextUrl.searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'Variant ID required' }, { status: 400 })
+    }
+
+    const { error } = await supabaseAdmin
+      .from('product_variants')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    console.error('Error deleting variant:', error)
+    return NextResponse.json({ error: 'Failed to delete variant' }, { status: 500 })
+  }
+}

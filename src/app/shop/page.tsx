@@ -9,13 +9,27 @@ export const metadata = {
 }
 
 async function getProducts() {
-  const { data } = await supabaseAdmin
+  const { data: products } = await supabaseAdmin
     .from('products')
     .select('*')
     .eq('is_active', true)
     .order('created_at', { ascending: false })
 
-  return (data || []) as Product[]
+  if (!products) return []
+
+  // Fetch variants for all products
+  const productIds = products.map(p => p.id)
+  const { data: variants } = await supabaseAdmin
+    .from('product_variants')
+    .select('*')
+    .in('product_id', productIds)
+    .eq('is_active', true)
+
+  // Attach variants to products
+  return products.map(product => ({
+    ...product,
+    variants: variants?.filter(v => v.product_id === product.id) || []
+  })) as Product[]
 }
 
 export default async function ShopPage() {

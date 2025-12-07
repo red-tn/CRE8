@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Product } from '@/types'
+import { useState, useMemo } from 'react'
+import { Product, ProductVariant } from '@/types'
 import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
 import { Button } from '@/components/ui/Button'
@@ -29,8 +29,45 @@ export function ProductCard({ product }: ProductCardProps) {
   const displayPrice = member && product.member_price ? product.member_price : product.price
   const hasDiscount = member && product.member_price && product.member_price < product.price
 
+  // Check variant stock
+  const hasVariants = product.variants && product.variants.length > 0
+
+  const getVariantStock = (size?: string, color?: string): number => {
+    if (!hasVariants) {
+      return product.stock_quantity
+    }
+    const variant = product.variants?.find(v =>
+      (v.size || null) === (size || null) &&
+      (v.color || null) === (color || null)
+    )
+    return variant?.stock_quantity ?? 0
+  }
+
+  const currentStock = useMemo(() => {
+    return getVariantStock(selectedSize, selectedColor)
+  }, [selectedSize, selectedColor, product.variants])
+
+  const isSoldOut = currentStock <= 0
+
+  // Check if a specific size is sold out (for all colors or if no colors)
+  const isSizeSoldOut = (size: string): boolean => {
+    if (!hasVariants) return product.stock_quantity <= 0
+    if (product.colors.length === 0) {
+      return getVariantStock(size, undefined) <= 0
+    }
+    // Check if any color has stock for this size
+    return !product.colors.some(color => getVariantStock(size, color) > 0)
+  }
+
+  // Check if a specific color is sold out (for current size)
+  const isColorSoldOut = (color: string): boolean => {
+    if (!hasVariants) return product.stock_quantity <= 0
+    return getVariantStock(selectedSize, color) <= 0
+  }
+
   const handleAddToCart = () => {
     if (product.is_members_only && !member) return
+    if (isSoldOut) return
 
     addItem(product, 1, selectedSize, selectedColor)
     setIsAdded(true)
@@ -88,19 +125,25 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="mb-4">
             <p className="text-xs text-zinc-500 mb-2">Size</p>
             <div className="flex flex-wrap gap-2">
-              {product.sizes.map(size => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`px-3 py-1 text-xs font-bold transition-colors ${
-                    selectedSize === size
-                      ? 'bg-amber-500 text-black'
-                      : 'bg-zinc-800 text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
+              {product.sizes.map(size => {
+                const soldOut = isSizeSoldOut(size)
+                return (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    disabled={soldOut}
+                    className={`px-3 py-1 text-xs font-bold transition-colors relative ${
+                      selectedSize === size
+                        ? 'bg-amber-500 text-black'
+                        : soldOut
+                        ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
+                        : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -110,19 +153,25 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="mb-4">
             <p className="text-xs text-zinc-500 mb-2">Color</p>
             <div className="flex flex-wrap gap-2">
-              {product.colors.map(color => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`px-3 py-1 text-xs font-bold transition-colors ${
-                    selectedColor === color
-                      ? 'bg-amber-500 text-black'
-                      : 'bg-zinc-800 text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {color}
-                </button>
-              ))}
+              {product.colors.map(color => {
+                const soldOut = isColorSoldOut(color)
+                return (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    disabled={soldOut}
+                    className={`px-3 py-1 text-xs font-bold transition-colors ${
+                      selectedColor === color
+                        ? 'bg-amber-500 text-black'
+                        : soldOut
+                        ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
+                        : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {color}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -135,6 +184,10 @@ export function ProductCard({ product }: ProductCardProps) {
               Login to Purchase
             </Button>
           </Link>
+        ) : isSoldOut ? (
+          <Button disabled className="w-full opacity-50 cursor-not-allowed">
+            Sold Out
+          </Button>
         ) : (
           <Button
             onClick={handleAddToCart}

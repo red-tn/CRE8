@@ -55,6 +55,19 @@ export interface MembershipDues {
   member?: Member
 }
 
+export interface ProductVariant {
+  id: string
+  product_id: string
+  size?: string
+  color?: string
+  stock_quantity: number
+  price_adjustment: number
+  sku?: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface Product {
   id: string
   name: string
@@ -73,6 +86,7 @@ export interface Product {
   stripe_product_id?: string
   created_at: string
   updated_at: string
+  variants?: ProductVariant[]
 }
 
 export interface CartItem {

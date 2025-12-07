@@ -26,6 +26,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Products not found' }, { status: 404 })
     }
 
+    // Fetch variants for products
+    const { data: variants } = await supabaseAdmin
+      .from('product_variants')
+      .select('*')
+      .in('product_id', productIds)
+      .eq('is_active', true)
+
     // Check for members-only products
     const membersOnlyProducts = products.filter(p => p.is_members_only)
     if (membersOnlyProducts.length > 0 && !isMember) {
@@ -33,6 +40,43 @@ export async function POST(request: NextRequest) {
         { error: 'Some items are for members only. Please login to purchase.' },
         { status: 403 }
       )
+    }
+
+    // Validate stock for each item
+    for (const item of items) {
+      const product = products.find(p => p.id === item.productId)
+      if (!product) continue
+
+      const productVariants = variants?.filter(v => v.product_id === item.productId) || []
+      const hasVariants = productVariants.length > 0
+
+      if (hasVariants) {
+        // Check variant stock
+        const variant = productVariants.find(v =>
+          (v.size || null) === (item.size || null) &&
+          (v.color || null) === (item.color || null)
+        )
+        if (!variant) {
+          return NextResponse.json(
+            { error: `${product.name} (${[item.size, item.color].filter(Boolean).join(', ')}) is no longer available` },
+            { status: 400 }
+          )
+        }
+        if (variant.stock_quantity < item.quantity) {
+          return NextResponse.json(
+            { error: `Not enough stock for ${product.name} (${[item.size, item.color].filter(Boolean).join(', ')}). Only ${variant.stock_quantity} available.` },
+            { status: 400 }
+          )
+        }
+      } else {
+        // Check base product stock
+        if (product.stock_quantity < item.quantity) {
+          return NextResponse.json(
+            { error: `Not enough stock for ${product.name}. Only ${product.stock_quantity} available.` },
+            { status: 400 }
+          )
+        }
+      }
     }
 
     // Build line items for Stripe

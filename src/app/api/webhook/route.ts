@@ -112,14 +112,47 @@ export async function POST(request: NextRequest) {
 
               await supabaseAdmin.from('order_items').insert(orderItems)
 
-              // Update product stock
+              // Fetch variants for products
+              const { data: variants } = await supabaseAdmin
+                .from('product_variants')
+                .select('*')
+                .in('product_id', productIds)
+                .eq('is_active', true)
+
+              // Update stock (variant or base product)
               for (const item of items) {
                 const product = products.find(p => p.id === item.productId)
-                if (product && product.stock_quantity > 0) {
-                  await supabaseAdmin
-                    .from('products')
-                    .update({ stock_quantity: product.stock_quantity - item.quantity })
-                    .eq('id', item.productId)
+                if (!product) continue
+
+                const productVariants = variants?.filter(v => v.product_id === item.productId) || []
+                const hasVariants = productVariants.length > 0
+
+                if (hasVariants) {
+                  // Decrement variant stock
+                  const variant = productVariants.find(v =>
+                    (v.size || null) === (item.size || null) &&
+                    (v.color || null) === (item.color || null)
+                  )
+                  if (variant && variant.stock_quantity > 0) {
+                    await supabaseAdmin
+                      .from('product_variants')
+                      .update({
+                        stock_quantity: Math.max(0, variant.stock_quantity - item.quantity),
+                        updated_at: new Date().toISOString()
+                      })
+                      .eq('id', variant.id)
+                  }
+                } else {
+                  // Decrement base product stock
+                  if (product.stock_quantity > 0) {
+                    await supabaseAdmin
+                      .from('products')
+                      .update({
+                        stock_quantity: Math.max(0, product.stock_quantity - item.quantity),
+                        updated_at: new Date().toISOString()
+                      })
+                      .eq('id', item.productId)
+                  }
                 }
               }
             }

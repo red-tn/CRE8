@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { ShoppingBag, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { ShoppingBag, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon, Package } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
-import { Product } from '@/types'
+import { Product, ProductVariant } from '@/types'
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -17,6 +17,21 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+
+  // Variant management state
+  const [showVariants, setShowVariants] = useState(false)
+  const [variantProduct, setVariantProduct] = useState<Product | null>(null)
+  const [variants, setVariants] = useState<ProductVariant[]>([])
+  const [isLoadingVariants, setIsLoadingVariants] = useState(false)
+  const [showVariantForm, setShowVariantForm] = useState(false)
+  const [variantFormData, setVariantFormData] = useState({
+    size: '',
+    color: '',
+    stockQuantity: '0',
+    priceAdjustment: '0',
+    sku: '',
+  })
+  const [isSavingVariant, setIsSavingVariant] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -132,6 +147,117 @@ export default function AdminProductsPage() {
       }
     } catch (error) {
       console.error('Error deleting product:', error)
+    }
+  }
+
+  // Variant management functions
+  const openVariantManager = async (product: Product) => {
+    setVariantProduct(product)
+    setShowVariants(true)
+    setIsLoadingVariants(true)
+
+    try {
+      const res = await fetch(`/api/admin/variants?productId=${product.id}`)
+      if (res.ok) {
+        const data = await res.json()
+        setVariants(data.variants || [])
+      }
+    } catch (error) {
+      console.error('Error fetching variants:', error)
+    } finally {
+      setIsLoadingVariants(false)
+    }
+  }
+
+  const closeVariantManager = () => {
+    setShowVariants(false)
+    setVariantProduct(null)
+    setVariants([])
+    setShowVariantForm(false)
+    resetVariantForm()
+  }
+
+  const resetVariantForm = () => {
+    setVariantFormData({
+      size: '',
+      color: '',
+      stockQuantity: '0',
+      priceAdjustment: '0',
+      sku: '',
+    })
+  }
+
+  const handleVariantSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!variantProduct) return
+
+    setIsSavingVariant(true)
+
+    try {
+      const res = await fetch('/api/admin/variants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: variantProduct.id,
+          size: variantFormData.size || null,
+          color: variantFormData.color || null,
+          stockQuantity: parseInt(variantFormData.stockQuantity) || 0,
+          priceAdjustment: parseFloat(variantFormData.priceAdjustment) || 0,
+          sku: variantFormData.sku || null,
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setVariants([...variants, data.variant])
+        setShowVariantForm(false)
+        resetVariantForm()
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Failed to create variant')
+      }
+    } catch (error) {
+      console.error('Error creating variant:', error)
+      alert('Failed to create variant')
+    } finally {
+      setIsSavingVariant(false)
+    }
+  }
+
+  const updateVariantStock = async (variantId: string, newStock: number) => {
+    try {
+      const res = await fetch('/api/admin/variants', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: variantId,
+          stockQuantity: newStock,
+        }),
+      })
+
+      if (res.ok) {
+        setVariants(variants.map(v =>
+          v.id === variantId ? { ...v, stock_quantity: newStock } : v
+        ))
+      }
+    } catch (error) {
+      console.error('Error updating variant:', error)
+    }
+  }
+
+  const deleteVariant = async (variantId: string) => {
+    if (!confirm('Delete this variant?')) return
+
+    try {
+      const res = await fetch(`/api/admin/variants?id=${variantId}`, {
+        method: 'DELETE',
+      })
+
+      if (res.ok) {
+        setVariants(variants.filter(v => v.id !== variantId))
+      }
+    } catch (error) {
+      console.error('Error deleting variant:', error)
     }
   }
 
@@ -339,6 +465,160 @@ export default function AdminProductsPage() {
         </div>
       )}
 
+      {/* Variant Management Modal */}
+      {showVariants && variantProduct && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-bold">Manage Inventory</h2>
+                  <p className="text-sm text-zinc-500">{variantProduct.name}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={closeVariantManager}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Add Variant Button */}
+              {!showVariantForm && (
+                <Button
+                  onClick={() => setShowVariantForm(true)}
+                  className="mb-4"
+                  size="sm"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Size/Color Variant
+                </Button>
+              )}
+
+              {/* New Variant Form */}
+              {showVariantForm && (
+                <form onSubmit={handleVariantSubmit} className="bg-zinc-800 p-4 mb-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input
+                      label="Size"
+                      value={variantFormData.size}
+                      onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
+                      placeholder="e.g., S, M, L, XL"
+                    />
+                    <Input
+                      label="Color"
+                      value={variantFormData.color}
+                      onChange={(e) => setVariantFormData({ ...variantFormData, color: e.target.value })}
+                      placeholder="e.g., Black, White"
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <Input
+                      label="Stock Qty"
+                      type="number"
+                      value={variantFormData.stockQuantity}
+                      onChange={(e) => setVariantFormData({ ...variantFormData, stockQuantity: e.target.value })}
+                    />
+                    <Input
+                      label="Price Adj. ($)"
+                      type="number"
+                      step="0.01"
+                      value={variantFormData.priceAdjustment}
+                      onChange={(e) => setVariantFormData({ ...variantFormData, priceAdjustment: e.target.value })}
+                      placeholder="0.00"
+                    />
+                    <Input
+                      label="SKU (optional)"
+                      value={variantFormData.sku}
+                      onChange={(e) => setVariantFormData({ ...variantFormData, sku: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { setShowVariantForm(false); resetVariantForm(); }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" size="sm" isLoading={isSavingVariant}>
+                      Add Variant
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {/* Variants List */}
+              {isLoadingVariants ? (
+                <div className="text-center py-8 text-zinc-500">Loading variants...</div>
+              ) : variants.length === 0 ? (
+                <div className="text-center py-8 text-zinc-500">
+                  <Package className="w-12 h-12 mx-auto mb-4 text-zinc-700" />
+                  <p>No variants yet. Add size/color combinations to track inventory.</p>
+                  <p className="text-xs mt-2">
+                    Base stock: {variantProduct.stock_quantity} (used when no variants exist)
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-zinc-500 mb-3">
+                    When variants exist, stock is tracked per variant instead of the base product.
+                  </p>
+                  <table className="w-full text-sm">
+                    <thead className="bg-zinc-800">
+                      <tr>
+                        <th className="text-left p-2 font-bold text-zinc-400">Size</th>
+                        <th className="text-left p-2 font-bold text-zinc-400">Color</th>
+                        <th className="text-left p-2 font-bold text-zinc-400">Stock</th>
+                        <th className="text-left p-2 font-bold text-zinc-400">Price Adj.</th>
+                        <th className="text-left p-2 font-bold text-zinc-400">SKU</th>
+                        <th className="text-right p-2 font-bold text-zinc-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {variants.map((variant) => (
+                        <tr key={variant.id} className="border-t border-zinc-800">
+                          <td className="p-2">{variant.size || '-'}</td>
+                          <td className="p-2">{variant.color || '-'}</td>
+                          <td className="p-2">
+                            <input
+                              type="number"
+                              value={variant.stock_quantity}
+                              onChange={(e) => updateVariantStock(variant.id, parseInt(e.target.value) || 0)}
+                              className="w-16 bg-zinc-800 border border-zinc-700 px-2 py-1 text-center"
+                              min="0"
+                            />
+                          </td>
+                          <td className="p-2">
+                            {variant.price_adjustment !== 0 && (
+                              <span className={variant.price_adjustment > 0 ? 'text-green-500' : 'text-red-500'}>
+                                {variant.price_adjustment > 0 ? '+' : ''}{formatCurrency(variant.price_adjustment)}
+                              </span>
+                            )}
+                            {variant.price_adjustment === 0 && <span className="text-zinc-600">-</span>}
+                          </td>
+                          <td className="p-2 text-zinc-500">{variant.sku || '-'}</td>
+                          <td className="p-2 text-right">
+                            <button
+                              onClick={() => deleteVariant(variant.id)}
+                              className="text-zinc-500 hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="pt-4 text-xs text-zinc-500">
+                    Total inventory: {variants.reduce((sum, v) => sum + v.stock_quantity, 0)} units
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Products List */}
       <Card>
         <CardContent className="p-0">
@@ -400,6 +680,14 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openVariantManager(product)}
+                          title="Manage Inventory"
+                        >
+                          <Package className="w-4 h-4 text-amber-500" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
