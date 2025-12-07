@@ -23,12 +23,6 @@ export const metadata: Metadata = {
     description: "The edgiest truck club for young enthusiasts",
     type: "website",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
 };
 
 export default function RootLayout({
