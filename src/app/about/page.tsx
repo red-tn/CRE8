@@ -194,8 +194,8 @@ export default function AboutPage() {
             <div className="bg-black border border-zinc-800 p-6">
               <h3 className="text-lg font-bold mb-2">Where are you located?</h3>
               <p className="text-zinc-500">
-                We&apos;re based in Texas but have members nationwide. Most events are in the
-                Austin/Dallas/Houston areas, but we&apos;re expanding.
+                We&apos;re based in Middle Tennessee but have members nationwide. Most events are in the
+                Nashville area, but we&apos;re expanding.
               </p>
             </div>
           </div>

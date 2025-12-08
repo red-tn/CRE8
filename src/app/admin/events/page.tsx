@@ -185,7 +185,7 @@ export default function AdminEventsPage() {
                     label="Address"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="123 Main St, Austin TX"
+                    placeholder="123 Main St, Nashville TN"
                   />
                 </div>
                 <Input
