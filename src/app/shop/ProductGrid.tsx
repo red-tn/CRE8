@@ -79,12 +79,12 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
 
       {/* Products Grid */}
       {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
           {filteredProducts.map(product => (
             <div
               key={product.id}
               ref={(el) => { productRefs.current[product.id] = el }}
-              className={highlightedProductId === product.id ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-black rounded-sm' : ''}
+              className={`h-full ${highlightedProductId === product.id ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-black rounded-sm' : ''}`}
             >
               <ProductCard product={product} />
             </div>

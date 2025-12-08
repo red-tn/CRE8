@@ -75,9 +75,9 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-all duration-300 group">
+    <div className="bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-all duration-300 group h-full flex flex-col">
       {/* Image */}
-      <div className="relative aspect-square bg-zinc-800 overflow-hidden">
+      <div className="relative aspect-square bg-zinc-800 overflow-hidden flex-shrink-0">
         {product.images?.[0] || product.image_url ? (
           <img
             src={product.images?.[0] || product.image_url}
@@ -104,9 +104,12 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <h3 className="font-bold text-lg mb-1 line-clamp-1">{product.name}</h3>
-        <p className="text-zinc-500 text-sm mb-3 line-clamp-2">{product.description}</p>
+      <div className="p-4 flex flex-col flex-1">
+        {/* Fixed height header area */}
+        <div className="mb-3">
+          <h3 className="font-bold text-lg mb-1 line-clamp-1">{product.name}</h3>
+          <p className="text-zinc-500 text-sm line-clamp-2 min-h-[2.5rem]">{product.description}</p>
+        </div>
 
         {/* Price */}
         <div className="flex items-center gap-2 mb-4">
@@ -120,61 +123,68 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Size selector */}
-        {product.sizes.length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs text-zinc-500 mb-2">Size</p>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map(size => {
-                const soldOut = isSizeSoldOut(size)
-                return (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    disabled={soldOut}
-                    className={`px-3 py-1 text-xs font-bold transition-colors relative ${
-                      selectedSize === size
-                        ? 'bg-amber-500 text-black'
-                        : soldOut
-                        ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
-                        : 'bg-zinc-800 text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        {/* Size selector - fixed height area */}
+        <div className="mb-4 min-h-[3.5rem]">
+          {product.sizes.length > 0 && (
+            <>
+              <p className="text-xs text-zinc-500 mb-2">Size</p>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map(size => {
+                  const soldOut = isSizeSoldOut(size)
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      disabled={soldOut}
+                      className={`px-3 py-1 text-xs font-bold transition-colors relative ${
+                        selectedSize === size
+                          ? 'bg-amber-500 text-black'
+                          : soldOut
+                          ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
+                          : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
 
-        {/* Color selector */}
-        {product.colors.length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs text-zinc-500 mb-2">Color</p>
-            <div className="flex flex-wrap gap-2">
-              {product.colors.map(color => {
-                const soldOut = isColorSoldOut(color)
-                return (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    disabled={soldOut}
-                    className={`px-3 py-1 text-xs font-bold transition-colors ${
-                      selectedColor === color
-                        ? 'bg-amber-500 text-black'
-                        : soldOut
-                        ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
-                        : 'bg-zinc-800 text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    {color}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        {/* Color selector - fixed height area */}
+        <div className="mb-4 min-h-[3.5rem]">
+          {product.colors.length > 0 && (
+            <>
+              <p className="text-xs text-zinc-500 mb-2">Color</p>
+              <div className="flex flex-wrap gap-2">
+                {product.colors.map(color => {
+                  const soldOut = isColorSoldOut(color)
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      disabled={soldOut}
+                      className={`px-3 py-1 text-xs font-bold transition-colors ${
+                        selectedColor === color
+                          ? 'bg-amber-500 text-black'
+                          : soldOut
+                          ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
+                          : 'bg-zinc-800 text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Spacer to push button to bottom */}
+        <div className="flex-1" />
 
         {/* Add to Cart */}
         {product.is_members_only && !member ? (
