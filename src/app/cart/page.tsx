@@ -100,9 +100,9 @@ export default function CartPage() {
                   >
                     {/* Image */}
                     <div className="w-24 h-24 bg-zinc-800 flex-shrink-0">
-                      {item.product.image_url ? (
+                      {item.product.images?.[0] || item.product.image_url ? (
                         <img
-                          src={item.product.image_url}
+                          src={item.product.images?.[0] || item.product.image_url}
                           alt={item.product.name}
                           className="w-full h-full object-cover"
                         />
