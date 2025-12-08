@@ -282,17 +282,17 @@ export default async function HomePage() {
 
           {/* Scrolling product strip */}
           <div className="relative">
-            {/* Gradient fades */}
+            {/* Gradient fades - only show when scrollable */}
             <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
             <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
 
             {/* Scrollable container */}
             <div className="overflow-x-auto no-scrollbar">
-              <div className="flex gap-4 px-4 sm:px-6 lg:px-8 pb-4" style={{ width: 'max-content' }}>
+              <div className="flex gap-4 px-4 sm:px-6 lg:px-8 pb-4 justify-center min-w-max">
                 {products.map((product) => (
                   <Link
                     key={product.id}
-                    href="/shop"
+                    href={`/shop?product=${product.id}`}
                     className="flex-shrink-0 w-48 sm:w-56 group"
                   >
                     {/* Product Image */}

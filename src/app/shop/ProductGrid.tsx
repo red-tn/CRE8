@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Product } from '@/types'
 import { ProductCard } from './ProductCard'
 import { ShoppingBag } from 'lucide-react'
@@ -13,6 +14,21 @@ interface ProductGridProps {
 export function ProductGrid({ products, categories }: ProductGridProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [showMembersOnly, setShowMembersOnly] = useState(false)
+  const searchParams = useSearchParams()
+  const highlightedProductId = searchParams.get('product')
+  const productRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+
+  // Scroll to highlighted product on mount
+  useEffect(() => {
+    if (highlightedProductId && productRefs.current[highlightedProductId]) {
+      setTimeout(() => {
+        productRefs.current[highlightedProductId]?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        })
+      }, 100)
+    }
+  }, [highlightedProductId])
 
   const filteredProducts = products.filter(product => {
     if (activeCategory && product.category !== activeCategory) return false
@@ -65,7 +81,13 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <div
+              key={product.id}
+              ref={(el) => { productRefs.current[product.id] = el }}
+              className={highlightedProductId === product.id ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-black rounded-sm' : ''}
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       ) : (

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { ShoppingBag } from 'lucide-react'
 import { Product } from '@/types'
@@ -58,7 +59,9 @@ export default async function ShopPage() {
       {/* Products */}
       <section className="py-12 bg-black min-h-[50vh]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ProductGrid products={products} categories={categories} />
+          <Suspense fallback={<div className="text-center text-zinc-500 py-12">Loading products...</div>}>
+            <ProductGrid products={products} categories={categories} />
+          </Suspense>
         </div>
       </section>
     </div>
