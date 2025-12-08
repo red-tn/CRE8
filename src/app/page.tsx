@@ -50,15 +50,31 @@ async function getHomePageData() {
     }
   }) || []
 
+  // Get featured products for shop strip
+  const { data: products } = await supabaseAdmin
+    .from('products')
+    .select('id, name, price, member_price, image_url, images, is_members_only')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(10)
+
   return {
     memberCount: memberCount || 0,
     brandCounts,
     fleetData,
+    products: products || [],
   }
 }
 
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount)
+}
+
 export default async function HomePage() {
-  const { memberCount, brandCounts, fleetData } = await getHomePageData()
+  const { memberCount, brandCounts, fleetData, products } = await getHomePageData()
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -246,6 +262,99 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* Shop Strip Section */}
+      {products.length > 0 && (
+        <section className="py-16 bg-black border-t border-zinc-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+            <div className="flex justify-between items-end">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black mb-1">
+                  SHOP <span className="text-amber-500">MERCH</span>
+                </h2>
+                <p className="text-zinc-500 text-sm">Rep the crown. Members get exclusive pricing.</p>
+              </div>
+              <Link href="/shop" className="text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider hidden sm:flex items-center gap-2">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Scrolling product strip */}
+          <div className="relative">
+            {/* Gradient fades */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-8 md:w-16 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none" />
+
+            {/* Scrollable container */}
+            <div className="overflow-x-auto no-scrollbar">
+              <div className="flex gap-4 px-4 sm:px-6 lg:px-8 pb-4" style={{ width: 'max-content' }}>
+                {products.map((product) => (
+                  <Link
+                    key={product.id}
+                    href="/shop"
+                    className="flex-shrink-0 w-48 sm:w-56 group"
+                  >
+                    {/* Product Image */}
+                    <div className="aspect-square bg-zinc-900 border border-zinc-800 group-hover:border-amber-500/50 transition-colors relative overflow-hidden mb-3">
+                      {product.images?.[0] || product.image_url ? (
+                        <img
+                          src={product.images?.[0] || product.image_url}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Crown className="w-12 h-12 text-amber-500/30" />
+                        </div>
+                      )}
+                      {product.is_members_only && (
+                        <div className="absolute top-2 left-2 bg-amber-500 text-black text-xs font-bold px-2 py-1">
+                          MEMBERS ONLY
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Info */}
+                    <h3 className="font-bold text-sm text-white group-hover:text-amber-500 transition-colors truncate">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-amber-500 font-bold text-sm">
+                        {formatCurrency(product.price)}
+                      </span>
+                      {product.member_price && (
+                        <span className="text-zinc-500 text-xs">
+                          Member: {formatCurrency(product.member_price)}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+
+                {/* View All Card */}
+                <Link
+                  href="/shop"
+                  className="flex-shrink-0 w-48 sm:w-56 aspect-square bg-zinc-900 border border-zinc-800 hover:border-amber-500 transition-colors flex flex-col items-center justify-center group"
+                >
+                  <ShoppingBag className="w-10 h-10 text-zinc-600 group-hover:text-amber-500 transition-colors mb-3" />
+                  <span className="text-zinc-400 group-hover:text-amber-500 font-bold text-sm uppercase tracking-wider transition-colors">
+                    View All
+                  </span>
+                  <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-amber-500 transition-colors mt-1" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile View All Link */}
+          <div className="mt-6 px-4 sm:hidden">
+            <Link href="/shop" className="text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+              View All Products <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-24 bg-black relative overflow-hidden">
