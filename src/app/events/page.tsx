@@ -1,10 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { Calendar, MapPin, Clock, Users, Lock } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { formatDate, formatTime } from '@/lib/utils'
 import { Event } from '@/types'
+import { EventsList } from './EventsList'
 
 export const metadata = {
   title: 'Events | CRE8 Truck Club',
@@ -69,70 +68,7 @@ export default async function EventsPage() {
           </h2>
 
           {upcomingEvents.length > 0 ? (
-            <div className="grid gap-6">
-              {upcomingEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-colors"
-                >
-                  <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6">
-                    {/* Date Box */}
-                    <div className="flex-shrink-0 w-24 h-24 bg-amber-500 text-black flex flex-col items-center justify-center">
-                      <span className="text-sm font-bold uppercase">
-                        {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
-                      </span>
-                      <span className="text-3xl font-black">
-                        {new Date(event.event_date).getDate()}
-                      </span>
-                    </div>
-
-                    {/* Event Details */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <h3 className="text-xl font-bold">{event.title}</h3>
-                        {event.is_members_only && (
-                          <Badge variant="amber" className="flex items-center gap-1">
-                            <Lock className="w-3 h-3" /> Members Only
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-zinc-400 mb-4">{event.description}</p>
-
-                      <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
-                        {event.location && (
-                          <div className="flex items-center gap-2">
-                            <MapPin className="w-4 h-4 text-amber-500" />
-                            <span>{event.location}</span>
-                          </div>
-                        )}
-                        {event.start_time && (
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-amber-500" />
-                            <span>
-                              {formatTime(event.start_time)}
-                              {event.end_time && ` - ${formatTime(event.end_time)}`}
-                            </span>
-                          </div>
-                        )}
-                        {event.max_attendees && (
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-amber-500" />
-                            <span>Max {event.max_attendees} attendees</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Event Type */}
-                    <div className="flex-shrink-0 flex items-center">
-                      {!event.is_members_only && (
-                        <span className="text-sm text-zinc-500 border border-zinc-700 px-3 py-1">Open to All</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <EventsList events={upcomingEvents} />
           ) : (
             <div className="bg-zinc-900 border border-zinc-800 p-12 text-center">
               <Calendar className="w-12 h-12 text-zinc-700 mx-auto mb-4" />

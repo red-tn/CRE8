@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
-import { Calendar, Plus, Pencil, Trash2, X, MapPin, Users } from 'lucide-react'
+import { Calendar, Plus, Pencil, Trash2, X, MapPin, Users, Upload, Image as ImageIcon } from 'lucide-react'
 import { formatDate, formatTime } from '@/lib/utils'
 import { Event } from '@/types'
 
@@ -15,6 +15,7 @@ export default function AdminEventsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -135,6 +136,37 @@ export default function AdminEventsPage() {
 
   const isPastEvent = (date: string) => new Date(date) < new Date()
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploading(true)
+
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+      uploadFormData.append('folder', 'events')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setFormData({ ...formData, imageUrl: data.url })
+      } else {
+        alert(data.error || 'Failed to upload image')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload image')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -209,11 +241,48 @@ export default function AdminEventsPage() {
                     onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                   />
                 </div>
-                <Input
-                  label="Image URL"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                />
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Event Image
+                  </label>
+                  <div className="space-y-3">
+                    {formData.imageUrl ? (
+                      <div className="relative aspect-video bg-zinc-800 border border-zinc-700 overflow-hidden">
+                        <img
+                          src={formData.imageUrl}
+                          alt="Event"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, imageUrl: '' })}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white hover:bg-red-400"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-700 hover:border-amber-500/50 cursor-pointer transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={isUploading}
+                        />
+                        {isUploading ? (
+                          <div className="text-zinc-500">Uploading...</div>
+                        ) : (
+                          <>
+                            <Upload className="w-8 h-8 text-zinc-600 mb-2" />
+                            <span className="text-sm text-zinc-500">Click to upload image</span>
+                          </>
+                        )}
+                      </label>
+                    )}
+                  </div>
+                </div>
                 <Input
                   label="Max Attendees (optional)"
                   type="number"

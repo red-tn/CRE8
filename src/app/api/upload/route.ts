@@ -48,6 +48,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 401 })
       }
       path = `products/${filename}`
+    } else if (folder === 'events') {
+      // Admin uploading event images - need admin access
+      if (!session.member.is_admin) {
+        return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 401 })
+      }
+      path = `events/${filename}`
     } else {
       // Member uploading their own media
       path = `${session.member.id}/${filename}`
