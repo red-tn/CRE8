@@ -130,15 +130,30 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
+    const permanent = searchParams.get('permanent') === 'true'
 
     if (!id) {
       return NextResponse.json({ error: 'ID required' }, { status: 400 })
     }
 
-    await supabaseAdmin
-      .from('products')
-      .update({ is_active: false })
-      .eq('id', id)
+    if (permanent) {
+      // Permanently delete - first delete variants, then product
+      await supabaseAdmin
+        .from('product_variants')
+        .delete()
+        .eq('product_id', id)
+
+      await supabaseAdmin
+        .from('products')
+        .delete()
+        .eq('id', id)
+    } else {
+      // Soft delete - just deactivate
+      await supabaseAdmin
+        .from('products')
+        .update({ is_active: false })
+        .eq('id', id)
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

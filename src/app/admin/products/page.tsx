@@ -177,7 +177,7 @@ export default function AdminProductsPage() {
   }
 
   const deleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return
+    if (!confirm('Are you sure you want to deactivate this product?')) return
 
     try {
       const res = await fetch(`/api/admin/products?id=${id}`, {
@@ -189,6 +189,23 @@ export default function AdminProductsPage() {
       }
     } catch (error) {
       console.error('Error deleting product:', error)
+    }
+  }
+
+  const permanentDeleteProduct = async (id: string) => {
+    if (!confirm('PERMANENTLY DELETE this product? This cannot be undone!')) return
+    if (!confirm('Are you absolutely sure? All variants and data will be lost forever.')) return
+
+    try {
+      const res = await fetch(`/api/admin/products?id=${id}&permanent=true`, {
+        method: 'DELETE',
+      })
+
+      if (res.ok) {
+        fetchProducts()
+      }
+    } catch (error) {
+      console.error('Error permanently deleting product:', error)
     }
   }
 
@@ -840,13 +857,25 @@ export default function AdminProductsPage() {
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteProduct(product.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
+                        {product.is_active ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteProduct(product.id)}
+                            title="Deactivate"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => permanentDeleteProduct(product.id)}
+                            title="Permanently Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>
