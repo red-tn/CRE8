@@ -6,9 +6,25 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { ShoppingBag, Plus, Pencil, Trash2, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { Crown, Plus, Pencil, Trash2, X, Upload } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { Product, ProductVariant } from '@/types'
+
+// Constants for sizes and colors
+const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL', '2XL']
+const PRIMARY_COLORS = ['Black', 'White', 'Gray', 'Navy', 'Red', 'Gold', 'Green', 'Blue', 'Orange', 'Purple', 'Pink', 'Brown']
+
+// Generate SKU from product name
+const generateSKU = (name: string, suffix: string = '01'): string => {
+  const words = name.trim().split(/\s+/)
+  let abbrev = ''
+  if (words.length === 1) {
+    abbrev = words[0].substring(0, 4).toUpperCase()
+  } else {
+    abbrev = words.map(w => w[0]).join('').toUpperCase().substring(0, 4)
+  }
+  return `${abbrev}-CRE8-${suffix}`
+}
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -30,6 +46,7 @@ export default function AdminProductsPage() {
     sku: '',
   })
   const [isSavingVariant, setIsSavingVariant] = useState(false)
+  const [customColor, setCustomColor] = useState('')
 
   const [formData, setFormData] = useState({
     name: '',
@@ -39,11 +56,13 @@ export default function AdminProductsPage() {
     imageUrl: '',
     images: [] as string[],
     category: 'apparel',
-    sizes: '',
-    colors: '',
+    sizes: [] as string[],
+    colors: [] as string[],
     stockQuantity: '0',
     isMembersOnly: false,
+    sku: '',
   })
+  const [customProductColor, setCustomProductColor] = useState('')
 
   useEffect(() => {
     fetchProducts()
@@ -72,11 +91,13 @@ export default function AdminProductsPage() {
       imageUrl: '',
       images: [],
       category: 'apparel',
-      sizes: '',
-      colors: '',
+      sizes: [],
+      colors: [],
       stockQuantity: '0',
       isMembersOnly: false,
+      sku: '',
     })
+    setCustomProductColor('')
     setEditingProduct(null)
     setShowForm(false)
     setVariants([])
@@ -94,11 +115,13 @@ export default function AdminProductsPage() {
       imageUrl: product.image_url || '',
       images: product.images || [],
       category: product.category,
-      sizes: product.sizes.join(', '),
-      colors: product.colors.join(', '),
+      sizes: product.sizes || [],
+      colors: product.colors || [],
       stockQuantity: product.stock_quantity.toString(),
       isMembersOnly: product.is_members_only,
+      sku: '',
     })
+    setCustomProductColor('')
     setShowForm(true)
 
     // Fetch variants for this product
@@ -130,8 +153,8 @@ export default function AdminProductsPage() {
         imageUrl: formData.imageUrl || formData.images[0] || null,
         images: formData.images,
         category: formData.category,
-        sizes: formData.sizes.split(',').map(s => s.trim()).filter(Boolean),
-        colors: formData.colors.split(',').map(s => s.trim()).filter(Boolean),
+        sizes: formData.sizes,
+        colors: formData.colors,
         stockQuantity: parseInt(formData.stockQuantity) || 0,
         isMembersOnly: formData.isMembersOnly,
       }
@@ -331,7 +354,11 @@ export default function AdminProductsPage() {
                 <Input
                   label="Name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value
+                    const newSku = newName ? generateSKU(newName) : ''
+                    setFormData({ ...formData, name: newName, sku: newSku })
+                  }}
                   required
                 />
                 <Input
@@ -339,6 +366,13 @@ export default function AdminProductsPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
+                {/* SKU Display */}
+                {formData.sku && (
+                  <div className="bg-zinc-800 px-3 py-2 border border-zinc-700">
+                    <span className="text-xs text-zinc-500">Auto-generated SKU: </span>
+                    <span className="text-amber-500 font-mono">{formData.sku}</span>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                     label="Price"
@@ -442,18 +476,93 @@ export default function AdminProductsPage() {
                     { value: 'other', label: 'Other' },
                   ]}
                 />
-                <Input
-                  label="Sizes (comma separated)"
-                  value={formData.sizes}
-                  onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
-                  placeholder="S, M, L, XL, 2XL"
-                />
-                <Input
-                  label="Colors (comma separated)"
-                  value={formData.colors}
-                  onChange={(e) => setFormData({ ...formData, colors: e.target.value })}
-                  placeholder="Black, White, Gold"
-                />
+                {/* Size Checkboxes */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Sizes
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    {AVAILABLE_SIZES.map((size) => (
+                      <label key={size} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.sizes.includes(size)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({ ...formData, sizes: [...formData.sizes, size] })
+                            } else {
+                              setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
+                            }
+                          }}
+                          className="w-4 h-4 accent-amber-500"
+                        />
+                        <span className="text-sm">{size}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Color Multi-Select */}
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Colors
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {formData.colors.map((color) => (
+                      <span
+                        key={color}
+                        className="bg-zinc-700 text-white px-2 py-1 text-sm flex items-center gap-1"
+                      >
+                        {color}
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, colors: formData.colors.filter(c => c !== color) })}
+                          className="text-zinc-400 hover:text-red-500"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <select
+                      className="flex-1 bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                      value=""
+                      onChange={(e) => {
+                        if (e.target.value && !formData.colors.includes(e.target.value)) {
+                          setFormData({ ...formData, colors: [...formData.colors, e.target.value] })
+                        }
+                      }}
+                    >
+                      <option value="">Add color...</option>
+                      {PRIMARY_COLORS.filter(c => !formData.colors.includes(c)).map((color) => (
+                        <option key={color} value={color}>{color}</option>
+                      ))}
+                    </select>
+                    <div className="flex gap-1">
+                      <input
+                        type="text"
+                        value={customProductColor}
+                        onChange={(e) => setCustomProductColor(e.target.value)}
+                        placeholder="Custom"
+                        className="w-24 bg-zinc-800 border border-zinc-700 px-2 py-2 text-sm focus:outline-none focus:border-amber-500"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          if (customProductColor.trim() && !formData.colors.includes(customProductColor.trim())) {
+                            setFormData({ ...formData, colors: [...formData.colors, customProductColor.trim()] })
+                            setCustomProductColor('')
+                          }
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
                 <Input
                   label="Base Stock Quantity"
                   type="number"
@@ -476,7 +585,17 @@ export default function AdminProductsPage() {
                       {!showVariantForm && (
                         <Button
                           type="button"
-                          onClick={() => setShowVariantForm(true)}
+                          onClick={() => {
+                            // Auto-generate variant SKU based on product name
+                            const baseSku = formData.sku || generateSKU(formData.name)
+                            const variantNum = String(variants.length + 1).padStart(2, '0')
+                            setVariantFormData({
+                              ...variantFormData,
+                              sku: `${baseSku.replace(/-\d+$/, '')}-${variantNum}`,
+                              stockQuantity: '10',
+                            })
+                            setShowVariantForm(true)
+                          }}
                           size="sm"
                         >
                           <Plus className="w-4 h-4 mr-1" />
@@ -487,20 +606,51 @@ export default function AdminProductsPage() {
 
                     {/* Add Variant Form */}
                     {showVariantForm && (
-                      <div className="bg-zinc-800 p-3 space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <Input
-                            label="Size"
-                            value={variantFormData.size}
-                            onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
-                            placeholder="e.g., M, L, XL"
-                          />
-                          <Input
-                            label="Color"
-                            value={variantFormData.color}
-                            onChange={(e) => setVariantFormData({ ...variantFormData, color: e.target.value })}
-                            placeholder="e.g., Black"
-                          />
+                      <div className="bg-zinc-800 p-3 space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* Size Dropdown */}
+                          <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-1">Size</label>
+                            <select
+                              className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                              value={variantFormData.size}
+                              onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
+                            >
+                              <option value="">Select size...</option>
+                              {AVAILABLE_SIZES.map((size) => (
+                                <option key={size} value={size}>{size}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {/* Color Dropdown */}
+                          <div>
+                            <label className="block text-sm font-medium text-zinc-400 mb-1">Color</label>
+                            <div className="flex gap-1">
+                              <select
+                                className="flex-1 bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                                value={variantFormData.color}
+                                onChange={(e) => setVariantFormData({ ...variantFormData, color: e.target.value })}
+                              >
+                                <option value="">Select color...</option>
+                                {PRIMARY_COLORS.map((color) => (
+                                  <option key={color} value={color}>{color}</option>
+                                ))}
+                                {customColor && !PRIMARY_COLORS.includes(customColor) && (
+                                  <option value={customColor}>{customColor}</option>
+                                )}
+                              </select>
+                              <input
+                                type="text"
+                                value={customColor}
+                                onChange={(e) => {
+                                  setCustomColor(e.target.value)
+                                  setVariantFormData({ ...variantFormData, color: e.target.value })
+                                }}
+                                placeholder="Custom"
+                                className="w-20 bg-zinc-700 border border-zinc-600 px-2 py-2 text-sm focus:outline-none focus:border-amber-500"
+                              />
+                            </div>
+                          </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           <Input
@@ -528,7 +678,7 @@ export default function AdminProductsPage() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => { setShowVariantForm(false); resetVariantForm(); }}
+                            onClick={() => { setShowVariantForm(false); resetVariantForm(); setCustomColor(''); }}
                           >
                             Cancel
                           </Button>
@@ -616,7 +766,7 @@ export default function AdminProductsPage() {
             <div className="p-8 text-center text-zinc-500">Loading...</div>
           ) : products.length === 0 ? (
             <div className="p-8 text-center text-zinc-500">
-              <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-zinc-700" />
+              <Crown className="w-12 h-12 mx-auto mb-4 text-amber-500/50" />
               <p>No products yet</p>
             </div>
           ) : (
@@ -637,10 +787,10 @@ export default function AdminProductsPage() {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-zinc-800 flex items-center justify-center relative">
-                          {product.image_url ? (
-                            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                          {product.image_url || (product.images && product.images.length > 0) ? (
+                            <img src={product.images?.[0] || product.image_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
-                            <ShoppingBag className="w-6 h-6 text-zinc-600" />
+                            <Crown className="w-6 h-6 text-amber-500" />
                           )}
                           {product.images && product.images.length > 1 && (
                             <div className="absolute -bottom-1 -right-1 bg-zinc-700 text-xs px-1 rounded">
