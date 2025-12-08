@@ -29,18 +29,24 @@ export function ProductCard({ product }: ProductCardProps) {
   const displayPrice = member && product.member_price ? product.member_price : product.price
   const hasDiscount = member && product.member_price && product.member_price < product.price
 
-  // Check variant stock
+  // Check variant stock - use variant if exists, otherwise fall back to base stock
   const hasVariants = product.variants && product.variants.length > 0
 
   const getVariantStock = (size?: string, color?: string): number => {
     if (!hasVariants) {
       return product.stock_quantity
     }
+    // Try to find matching variant
     const variant = product.variants?.find(v =>
       (v.size || null) === (size || null) &&
       (v.color || null) === (color || null)
     )
-    return variant?.stock_quantity ?? 0
+    // If variant exists for this combo, use its stock; otherwise use base stock
+    if (variant) {
+      return variant.stock_quantity
+    }
+    // No variant for this combo - use base product stock
+    return product.stock_quantity
   }
 
   const currentStock = useMemo(() => {
@@ -51,7 +57,6 @@ export function ProductCard({ product }: ProductCardProps) {
 
   // Check if a specific size is sold out (for all colors or if no colors)
   const isSizeSoldOut = (size: string): boolean => {
-    if (!hasVariants) return product.stock_quantity <= 0
     if (product.colors.length === 0) {
       return getVariantStock(size, undefined) <= 0
     }
@@ -61,7 +66,6 @@ export function ProductCard({ product }: ProductCardProps) {
 
   // Check if a specific color is sold out (for current size)
   const isColorSoldOut = (color: string): boolean => {
-    if (!hasVariants) return product.stock_quantity <= 0
     return getVariantStock(selectedSize, color) <= 0
   }
 
@@ -111,16 +115,21 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-zinc-500 text-sm line-clamp-2 min-h-[2.5rem]">{product.description}</p>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl font-black text-amber-500">
-            {formatCurrency(displayPrice)}
-          </span>
-          {hasDiscount && (
-            <span className="text-sm text-zinc-500 line-through">
-              {formatCurrency(product.price)}
+        {/* Price and Stock */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-black text-amber-500">
+              {formatCurrency(displayPrice)}
             </span>
-          )}
+            {hasDiscount && (
+              <span className="text-sm text-zinc-500 line-through">
+                {formatCurrency(product.price)}
+              </span>
+            )}
+          </div>
+          <span className={`text-xs font-bold ${currentStock > 5 ? 'text-green-500' : currentStock > 0 ? 'text-amber-500' : 'text-red-500'}`}>
+            {currentStock > 0 ? `${currentStock} in stock` : 'Out of stock'}
+          </span>
         </div>
 
         {/* Size selector - fixed height area */}
