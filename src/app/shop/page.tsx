@@ -9,6 +9,9 @@ export const metadata = {
   description: 'Shop CRE8 Truck Club merchandise - apparel, accessories, and exclusive member-only gear.',
 }
 
+// Revalidate every 60 seconds to pick up product changes
+export const revalidate = 60
+
 async function getProducts() {
   const { data: products } = await supabaseAdmin
     .from('products')

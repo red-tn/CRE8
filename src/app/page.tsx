@@ -3,6 +3,9 @@ import { Crown, Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide
 import { Button } from '@/components/ui/Button'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
+// Revalidate every 60 seconds to pick up changes
+export const revalidate = 60
+
 async function getHomePageData() {
   // Get member count
   const { count: memberCount } = await supabaseAdmin
