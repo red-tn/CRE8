@@ -132,11 +132,13 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        {/* Size selector - fixed height area */}
+        {/* Size selector - fixed height area (only for apparel/hats) */}
         <div className="mb-4 min-h-[3.5rem]">
           {product.sizes.length > 0 && (
             <>
-              <p className="text-xs text-zinc-500 mb-2">Size</p>
+              <p className="text-xs text-zinc-500 mb-2">
+                {product.category === 'hats' ? 'Style/Size' : 'Size'}
+              </p>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map(size => {
                   const soldOut = isSizeSoldOut(size)

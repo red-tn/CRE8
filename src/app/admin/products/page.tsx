@@ -10,9 +10,30 @@ import { Crown, Plus, Pencil, Trash2, X, Upload } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import { Product, ProductVariant } from '@/types'
 
-// Constants for sizes and colors
-const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL', '2XL']
+// Constants for sizes and colors by category
+const APPAREL_SIZES = ['S', 'M', 'L', 'XL', '2XL']
+const HAT_STYLES = ['Snapback', 'Fitted']
+const FITTED_SIZES = ['7', '7 1/8', '7 1/4', '7 3/8', '7 1/2', '7 5/8', '7 3/4', '7 7/8', '8']
 const PRIMARY_COLORS = ['Black', 'White', 'Gray', 'Navy', 'Red', 'Gold', 'Green', 'Blue', 'Orange', 'Purple', 'Pink', 'Brown']
+
+// Get available sizes based on category
+const getSizesForCategory = (category: string): string[] => {
+  switch (category) {
+    case 'apparel':
+      return APPAREL_SIZES
+    case 'hats':
+      return [...HAT_STYLES, ...FITTED_SIZES]
+    case 'accessories':
+    case 'stickers':
+    default:
+      return []
+  }
+}
+
+// Check if category needs sizes
+const categoryNeedsSizes = (category: string): boolean => {
+  return category === 'apparel' || category === 'hats'
+}
 
 // Generate SKU from product name
 const generateSKU = (name: string, suffix: string = '01'): string => {
@@ -485,39 +506,49 @@ export default function AdminProductsPage() {
                 <Select
                   label="Category"
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={(e) => {
+                    const newCategory = e.target.value
+                    // Clear sizes when category changes since size options differ
+                    setFormData({ ...formData, category: newCategory, sizes: [] })
+                  }}
                   options={[
                     { value: 'apparel', label: 'Apparel' },
+                    { value: 'hats', label: 'Hats' },
                     { value: 'accessories', label: 'Accessories' },
                     { value: 'stickers', label: 'Stickers' },
                     { value: 'other', label: 'Other' },
                   ]}
                 />
-                {/* Size Checkboxes */}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">
-                    Sizes
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    {AVAILABLE_SIZES.map((size) => (
-                      <label key={size} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.sizes.includes(size)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormData({ ...formData, sizes: [...formData.sizes, size] })
-                            } else {
-                              setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
-                            }
-                          }}
-                          className="w-4 h-4 accent-amber-500"
-                        />
-                        <span className="text-sm">{size}</span>
-                      </label>
-                    ))}
+                {/* Size Checkboxes - only for apparel and hats */}
+                {categoryNeedsSizes(formData.category) && (
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">
+                      {formData.category === 'hats' ? 'Hat Styles/Sizes' : 'Sizes'}
+                    </label>
+                    {formData.category === 'hats' && (
+                      <p className="text-xs text-zinc-500 mb-2">Select Snapback for adjustable, or Fitted sizes</p>
+                    )}
+                    <div className="flex flex-wrap gap-3">
+                      {getSizesForCategory(formData.category).map((size) => (
+                        <label key={size} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={formData.sizes.includes(size)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData({ ...formData, sizes: [...formData.sizes, size] })
+                              } else {
+                                setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
+                              }
+                            }}
+                            className="w-4 h-4 accent-amber-500"
+                          />
+                          <span className="text-sm">{size}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Color Multi-Select */}
                 <div>
@@ -625,20 +656,24 @@ export default function AdminProductsPage() {
                     {showVariantForm && (
                       <div className="bg-zinc-800 p-3 space-y-3">
                         <div className="grid grid-cols-2 gap-3">
-                          {/* Size Dropdown */}
-                          <div>
-                            <label className="block text-sm font-medium text-zinc-400 mb-1">Size</label>
-                            <select
-                              className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
-                              value={variantFormData.size}
-                              onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
-                            >
-                              <option value="">Select size...</option>
-                              {AVAILABLE_SIZES.map((size) => (
-                                <option key={size} value={size}>{size}</option>
-                              ))}
-                            </select>
-                          </div>
+                          {/* Size Dropdown - only show for categories that need sizes */}
+                          {categoryNeedsSizes(formData.category) && (
+                            <div>
+                              <label className="block text-sm font-medium text-zinc-400 mb-1">
+                                {formData.category === 'hats' ? 'Style/Size' : 'Size'}
+                              </label>
+                              <select
+                                className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                                value={variantFormData.size}
+                                onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
+                              >
+                                <option value="">Select...</option>
+                                {getSizesForCategory(formData.category).map((size) => (
+                                  <option key={size} value={size}>{size}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
                           {/* Color Dropdown */}
                           <div>
                             <label className="block text-sm font-medium text-zinc-400 mb-1">Color</label>
