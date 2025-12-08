@@ -9,7 +9,7 @@ import { Select } from '@/components/ui/Select'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { ArrowLeft, Save, Truck, User, Camera, Instagram, Upload, X, Play, Image as ImageIcon } from 'lucide-react'
 import Link from 'next/link'
-import { MemberMedia } from '@/types'
+import { MemberMedia, TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -371,21 +371,38 @@ export default function ProfilePage() {
                       label="Make"
                       name="truck_make"
                       value={formData.truck_make}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        setFormData({
+                          ...formData,
+                          truck_make: e.target.value,
+                          truck_model: '' // Reset model when make changes
+                        })
+                      }}
                     >
                       <option value="">Select Make</option>
-                      <option value="Chevy">Chevy</option>
-                      <option value="Ford">Ford</option>
-                      <option value="Dodge">Dodge</option>
+                      {TRUCK_MAKES.map((make) => (
+                        <option key={make} value={make}>
+                          {make}
+                        </option>
+                      ))}
                     </Select>
                   </div>
-                  <Input
+                  <Select
                     label="Model"
                     name="truck_model"
                     value={formData.truck_model}
                     onChange={handleChange}
-                    placeholder="e.g., Silverado 1500, F-150, Ram 1500"
-                  />
+                    disabled={!formData.truck_make}
+                  >
+                    <option value="">
+                      {formData.truck_make ? 'Select Model' : 'Select Make first'}
+                    </option>
+                    {formData.truck_make && TRUCK_MODELS[formData.truck_make as TruckMake].map((model) => (
+                      <option key={model} value={model}>
+                        {model}
+                      </option>
+                    ))}
+                  </Select>
                 </CardContent>
               </Card>
 

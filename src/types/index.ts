@@ -1,3 +1,15 @@
+export type TruckMake = 'Chevy' | 'Ford' | 'Dodge' | 'Toyota' | 'Nissan'
+
+export const TRUCK_MAKES: TruckMake[] = ['Chevy', 'Ford', 'Dodge', 'Toyota', 'Nissan']
+
+export const TRUCK_MODELS: Record<TruckMake, string[]> = {
+  Chevy: ['Silverado 1500', 'Silverado 2500HD', 'Silverado 3500HD', 'Colorado', 'S-10', 'C/K 1500', 'C/K 2500', 'Avalanche', 'Other'],
+  Ford: ['F-150', 'F-250', 'F-350', 'Ranger', 'Maverick', 'Lightning', 'Other'],
+  Dodge: ['Ram 1500', 'Ram 2500', 'Ram 3500', 'Dakota', 'Other'],
+  Toyota: ['Tacoma', 'Tundra', 'T100', 'Hilux', 'Other'],
+  Nissan: ['Titan', 'Titan XD', 'Frontier', 'Hardbody', 'Other'],
+}
+
 export interface Member {
   id: string
   email: string
@@ -5,7 +17,7 @@ export interface Member {
   last_name: string
   phone?: string
   truck_year?: number
-  truck_make?: 'Chevy' | 'Ford' | 'Dodge'
+  truck_make?: TruckMake
   truck_model?: string
   truck_photo_url?: string
   profile_photo_url?: string

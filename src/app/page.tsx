@@ -24,6 +24,8 @@ async function getHomePageData() {
     Chevy: members?.filter(m => m.truck_make === 'Chevy').length || 0,
     Ford: members?.filter(m => m.truck_make === 'Ford').length || 0,
     Dodge: members?.filter(m => m.truck_make === 'Dodge').length || 0,
+    Toyota: members?.filter(m => m.truck_make === 'Toyota').length || 0,
+    Nissan: members?.filter(m => m.truck_make === 'Nissan').length || 0,
   }
 
   // Get members with profile photos or truck photos for the fleet section
@@ -398,24 +400,36 @@ export default async function HomePage() {
           <p className="text-center text-zinc-600 uppercase tracking-wider text-sm mb-8">
             We Roll With
           </p>
-          <div className="flex justify-center items-center gap-8 md:gap-16 flex-wrap">
+          <div className="flex justify-center items-center gap-6 md:gap-12 flex-wrap">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+              <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 CHEVY
               </div>
               <div className="text-amber-500 font-bold mt-1">{brandCounts.Chevy}</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+              <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 FORD
               </div>
               <div className="text-amber-500 font-bold mt-1">{brandCounts.Ford}</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+              <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 DODGE
               </div>
               <div className="text-amber-500 font-bold mt-1">{brandCounts.Dodge}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+                TOYOTA
+              </div>
+              <div className="text-amber-500 font-bold mt-1">{brandCounts.Toyota}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+                NISSAN
+              </div>
+              <div className="text-amber-500 font-bold mt-1">{brandCounts.Nissan}</div>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { useAuthStore } from '@/store/auth'
+import { TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -295,20 +296,31 @@ export default function SignupPage() {
                 label="Make (optional)"
                 name="truckMake"
                 value={formData.truckMake}
-                onChange={handleChange}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    truckMake: e.target.value,
+                    truckModel: '' // Reset model when make changes
+                  })
+                  setError('')
+                }}
                 options={[
                   { value: '', label: 'Select make...' },
-                  { value: 'Chevy', label: 'Chevy' },
-                  { value: 'Ford', label: 'Ford' },
-                  { value: 'Dodge', label: 'Dodge' },
+                  ...TRUCK_MAKES.map(make => ({ value: make, label: make }))
                 ]}
               />
-              <Input
+              <Select
                 label="Model (optional)"
                 name="truckModel"
-                placeholder="Silverado 1500"
                 value={formData.truckModel}
                 onChange={handleChange}
+                disabled={!formData.truckMake}
+                options={[
+                  { value: '', label: formData.truckMake ? 'Select model...' : 'Select make first' },
+                  ...(formData.truckMake
+                    ? TRUCK_MODELS[formData.truckMake as TruckMake].map(model => ({ value: model, label: model }))
+                    : [])
+                ]}
               />
               <div className="flex gap-4">
                 <Button
