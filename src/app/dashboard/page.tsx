@@ -16,8 +16,13 @@ import {
   AlertCircle,
   User,
   Camera,
+  X,
+  Check,
+  HelpCircle,
+  XCircle,
+  MapPin,
 } from 'lucide-react'
-import { formatDate, formatCurrency, getDuesStatus } from '@/lib/utils'
+import { formatDate, formatCurrency, getDuesStatus, formatTime } from '@/lib/utils'
 import Link from 'next/link'
 import { MembershipDues, Event, EventRSVP, MemberMedia } from '@/types'
 
@@ -31,6 +36,9 @@ function DashboardContent() {
   const [isPayingDues, setIsPayingDues] = useState(false)
   const [showDuesSuccess, setShowDuesSuccess] = useState(false)
   const [truckPhoto, setTruckPhoto] = useState<string | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<(Event & { rsvp?: EventRSVP }) | null>(null)
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false)
+  const [guestCount, setGuestCount] = useState(0)
 
   useEffect(() => {
     checkAuth()
@@ -108,6 +116,41 @@ function DashboardContent() {
   const handleLogout = async () => {
     await logout()
     router.push('/')
+  }
+
+  const handleOpenRsvpModal = (event: Event & { rsvp?: EventRSVP }) => {
+    setSelectedEvent(event)
+    setGuestCount(event.rsvp?.guests || 0)
+  }
+
+  const handleRsvp = async (status: 'attending' | 'maybe' | 'not_attending') => {
+    if (!selectedEvent) return
+
+    setIsSubmittingRsvp(true)
+    try {
+      const res = await fetch('/api/member/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId: selectedEvent.id,
+          status,
+          guests: guestCount,
+        }),
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        // Update the events list with the new RSVP
+        setUpcomingEvents(upcomingEvents.map(e =>
+          e.id === selectedEvent.id ? { ...e, rsvp: data.rsvp } : e
+        ))
+        setSelectedEvent(null)
+      }
+    } catch (error) {
+      console.error('Error saving RSVP:', error)
+    } finally {
+      setIsSubmittingRsvp(false)
+    }
   }
 
   if (isLoading) {
@@ -332,7 +375,8 @@ function DashboardContent() {
                   {upcomingEvents.slice(0, 3).map((event) => (
                     <div
                       key={event.id}
-                      className="flex items-center gap-4 p-3 bg-zinc-800/50 border border-zinc-800"
+                      className="flex items-center gap-4 p-3 bg-zinc-800/50 border border-zinc-800 hover:border-amber-500/50 transition-colors cursor-pointer"
+                      onClick={() => handleOpenRsvpModal(event)}
                     >
                       <div className="w-12 h-12 bg-amber-500 text-black flex flex-col items-center justify-center text-xs font-bold">
                         <span>
@@ -345,9 +389,11 @@ function DashboardContent() {
                         <p className="text-sm text-zinc-500">{event.location}</p>
                       </div>
                       {event.rsvp ? (
-                        <Badge variant="success">RSVP&apos;d</Badge>
+                        <Badge variant={event.rsvp.status === 'attending' ? 'success' : event.rsvp.status === 'maybe' ? 'default' : 'danger'}>
+                          {event.rsvp.status === 'attending' ? 'Going' : event.rsvp.status === 'maybe' ? 'Maybe' : 'Not Going'}
+                        </Badge>
                       ) : (
-                        <Button variant="outline" size="sm">RSVP</Button>
+                        <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleOpenRsvpModal(event); }}>RSVP</Button>
                       )}
                     </div>
                   ))}
@@ -362,6 +408,114 @@ function DashboardContent() {
           </Card>
         </div>
       </div>
+
+      {/* RSVP Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-xl font-bold">{selectedEvent.title}</h2>
+                  <p className="text-sm text-zinc-500 mt-1">
+                    {new Date(selectedEvent.event_date).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                    {selectedEvent.start_time && ` at ${formatTime(selectedEvent.start_time)}`}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedEvent(null)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {selectedEvent.location && (
+                  <div className="flex items-center gap-2 text-zinc-400">
+                    <MapPin className="w-4 h-4 text-amber-500" />
+                    <span>{selectedEvent.location}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">
+                    Bringing guests?
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setGuestCount(Math.max(0, guestCount - 1))}
+                      className="w-10 h-10 bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center"
+                    >
+                      -
+                    </button>
+                    <span className="text-xl font-bold w-8 text-center">{guestCount}</span>
+                    <button
+                      type="button"
+                      onClick={() => setGuestCount(guestCount + 1)}
+                      className="w-10 h-10 bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center"
+                    >
+                      +
+                    </button>
+                    <span className="text-zinc-500 text-sm">additional guest{guestCount !== 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-3">
+                    Your response
+                  </label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <button
+                      onClick={() => handleRsvp('attending')}
+                      disabled={isSubmittingRsvp}
+                      className={`flex flex-col items-center gap-2 p-4 border transition-colors ${
+                        selectedEvent.rsvp?.status === 'attending'
+                          ? 'border-green-500 bg-green-500/10'
+                          : 'border-zinc-700 hover:border-green-500/50'
+                      }`}
+                    >
+                      <Check className="w-6 h-6 text-green-500" />
+                      <span className="text-sm font-medium">Going</span>
+                    </button>
+                    <button
+                      onClick={() => handleRsvp('maybe')}
+                      disabled={isSubmittingRsvp}
+                      className={`flex flex-col items-center gap-2 p-4 border transition-colors ${
+                        selectedEvent.rsvp?.status === 'maybe'
+                          ? 'border-amber-500 bg-amber-500/10'
+                          : 'border-zinc-700 hover:border-amber-500/50'
+                      }`}
+                    >
+                      <HelpCircle className="w-6 h-6 text-amber-500" />
+                      <span className="text-sm font-medium">Maybe</span>
+                    </button>
+                    <button
+                      onClick={() => handleRsvp('not_attending')}
+                      disabled={isSubmittingRsvp}
+                      className={`flex flex-col items-center gap-2 p-4 border transition-colors ${
+                        selectedEvent.rsvp?.status === 'not_attending'
+                          ? 'border-red-500 bg-red-500/10'
+                          : 'border-zinc-700 hover:border-red-500/50'
+                      }`}
+                    >
+                      <XCircle className="w-6 h-6 text-red-500" />
+                      <span className="text-sm font-medium">Can&apos;t Go</span>
+                    </button>
+                  </div>
+                </div>
+
+                {isSubmittingRsvp && (
+                  <div className="text-center text-zinc-500">Saving...</div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
