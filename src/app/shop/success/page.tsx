@@ -25,7 +25,7 @@ function SuccessContent() {
         </div>
 
         <h1 className="text-3xl font-black mb-4">
-          ORDER <span className="text-amber-500">CONFIRMED</span>
+          ORDER <span className="text-white">CONFIRMED</span>
         </h1>
 
         <p className="text-zinc-400 mb-8">
@@ -34,7 +34,7 @@ function SuccessContent() {
         </p>
 
         <div className="bg-zinc-900 border border-zinc-800 p-6 mb-8">
-          <Package className="w-8 h-8 text-amber-500 mx-auto mb-4" />
+          <Package className="w-8 h-8 text-white mx-auto mb-4" />
           <p className="text-sm text-zinc-500">
             Order confirmation has been sent to your email.
             You&apos;ll receive tracking information once your order ships.

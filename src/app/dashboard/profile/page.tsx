@@ -239,7 +239,7 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-amber-500" />
+                    <Camera className="w-5 h-5 text-white" />
                     Profile Photo
                   </h2>
                 </CardHeader>
@@ -268,7 +268,7 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-bold flex items-center gap-2">
-                    <User className="w-5 h-5 text-amber-500" />
+                    <User className="w-5 h-5 text-white" />
                     Personal Info
                   </h2>
                 </CardHeader>
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                       value={formData.bio}
                       onChange={handleChange}
                       rows={3}
-                      className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none transition-colors"
+                      className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:border-white focus:outline-none transition-colors"
                       placeholder="Tell us about yourself..."
                     />
                   </div>
@@ -315,7 +315,7 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Instagram className="w-5 h-5 text-amber-500" />
+                    <Instagram className="w-5 h-5 text-white" />
                     Social Media
                   </h2>
                 </CardHeader>
@@ -348,7 +348,7 @@ export default function ProfilePage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Truck className="w-5 h-5 text-amber-500" />
+                    <Truck className="w-5 h-5 text-white" />
                     Truck Info
                   </h2>
                 </CardHeader>
@@ -418,7 +418,7 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-bold flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-amber-500" />
+                  <ImageIcon className="w-5 h-5 text-white" />
                   Media Library
                 </h2>
               </CardHeader>
@@ -473,7 +473,7 @@ export default function ProfilePage() {
                             <button
                               type="button"
                               onClick={() => handleSetProfilePhoto(item.url)}
-                              className="p-2 bg-amber-500 text-black hover:bg-amber-400 transition-colors"
+                              className="p-2 bg-white text-black hover:bg-zinc-200 transition-colors"
                               title="Set as profile photo"
                             >
                               <User className="w-4 h-4" />
@@ -491,7 +491,7 @@ export default function ProfilePage() {
 
                         {/* Profile indicator */}
                         {formData.profile_photo_url === item.url && (
-                          <div className="absolute top-1 right-1 bg-amber-500 text-black px-1 py-0.5 text-xs font-bold">
+                          <div className="absolute top-1 right-1 bg-white text-black px-1 py-0.5 text-xs font-bold">
                             PROFILE
                           </div>
                         )}

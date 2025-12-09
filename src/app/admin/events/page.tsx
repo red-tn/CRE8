@@ -171,7 +171,7 @@ export default function AdminEventsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-black">
-          <span className="text-amber-500">EVENTS</span>
+          <span className="text-white">EVENTS</span>
         </h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="w-4 h-4 mr-2" />
@@ -263,7 +263,7 @@ export default function AdminEventsPage() {
                         </button>
                       </div>
                     ) : (
-                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-700 hover:border-amber-500/50 cursor-pointer transition-colors">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-zinc-700 hover:border-white/50 cursor-pointer transition-colors">
                         <input
                           type="file"
                           accept="image/*"
@@ -294,7 +294,7 @@ export default function AdminEventsPage() {
                     type="checkbox"
                     checked={formData.isMembersOnly}
                     onChange={(e) => setFormData({ ...formData, isMembersOnly: e.target.checked })}
-                    className="w-4 h-4 accent-amber-500"
+                    className="w-4 h-4 accent-white"
                   />
                   <span className="text-sm">Members Only Event</span>
                 </label>
@@ -330,7 +330,7 @@ export default function AdminEventsPage() {
               <CardContent className="p-6">
                 <div className="flex gap-6">
                   {/* Date Box */}
-                  <div className="flex-shrink-0 w-20 h-20 bg-amber-500 text-black flex flex-col items-center justify-center">
+                  <div className="flex-shrink-0 w-20 h-20 bg-white text-black flex flex-col items-center justify-center">
                     <span className="text-sm font-bold uppercase">
                       {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                     </span>

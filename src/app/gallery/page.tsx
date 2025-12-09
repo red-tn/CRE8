@@ -132,12 +132,12 @@ export default async function GalleryPage() {
       {/* Hero */}
       <section className="relative py-24 md:py-32 bg-zinc-900">
         <div className="absolute inset-0 bg-gradient-to-b from-black to-zinc-900" />
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Truck className="w-12 h-12 text-amber-500 mx-auto mb-6" />
+          <Truck className="w-12 h-12 text-white mx-auto mb-6" />
           <h1 className="text-4xl md:text-6xl font-black mb-6">
-            THE <span className="text-amber-500">FLEET</span>
+            THE <span className="text-white">FLEET</span>
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
             Check out what our members are rolling in. Chevy, Ford, Dodge - all welcome.
@@ -150,15 +150,15 @@ export default async function GalleryPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center gap-8 md:gap-16">
             <div className="text-center">
-              <div className="text-2xl font-black text-amber-500">{chevyCount}</div>
+              <div className="text-2xl font-black text-white">{chevyCount}</div>
               <div className="text-sm text-zinc-500 uppercase tracking-wider">Chevy</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-black text-amber-500">{fordCount}</div>
+              <div className="text-2xl font-black text-white">{fordCount}</div>
               <div className="text-sm text-zinc-500 uppercase tracking-wider">Ford</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-black text-amber-500">{dodgeCount}</div>
+              <div className="text-2xl font-black text-white">{dodgeCount}</div>
               <div className="text-sm text-zinc-500 uppercase tracking-wider">Dodge</div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default async function GalleryPage() {
                 <Link
                   key={image.id}
                   href={`/member/${image.member_id}`}
-                  className="group relative aspect-square bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-all duration-300 overflow-hidden block"
+                  className="group relative aspect-square bg-zinc-900 border border-zinc-800 hover:border-white/50 transition-all duration-300 overflow-hidden block"
                 >
                   {/* Placeholder - replace with actual image */}
                   {image.image_url ? (
@@ -210,7 +210,7 @@ export default async function GalleryPage() {
                         {image.member?.first_name} {image.member?.last_name?.[0]}.
                       </p>
                       {image.member?.instagram_handle && (
-                        <p className="text-amber-500 text-xs">@{image.member.instagram_handle}</p>
+                        <p className="text-white text-xs">@{image.member.instagram_handle}</p>
                       )}
                       {image.caption && (
                         <p className="text-zinc-500 text-xs mt-1 line-clamp-2">{image.caption}</p>
@@ -239,7 +239,7 @@ export default async function GalleryPage() {
       <section className="py-20 bg-zinc-900 border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-black mb-6">
-            WANT YOUR TRUCK <span className="text-amber-500">FEATURED</span>?
+            WANT YOUR TRUCK <span className="text-white">FEATURED</span>?
           </h2>
           <p className="text-zinc-400 mb-8">
             Members can upload photos of their trucks to the fleet gallery.

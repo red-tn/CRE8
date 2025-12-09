@@ -47,12 +47,12 @@ export default async function EventsPage() {
       {/* Hero */}
       <section className="relative py-24 md:py-32 bg-zinc-900">
         <div className="absolute inset-0 bg-gradient-to-b from-black to-zinc-900" />
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Calendar className="w-12 h-12 text-amber-500 mx-auto mb-6" />
+          <Calendar className="w-12 h-12 text-white mx-auto mb-6" />
           <h1 className="text-4xl md:text-6xl font-black mb-6">
-            <span className="text-amber-500">EVENTS</span>
+            <span className="text-white">EVENTS</span>
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
             Meets, cruises, shows, and hangouts. We stay busy.
@@ -64,7 +64,7 @@ export default async function EventsPage() {
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-black mb-8">
-            UPCOMING <span className="text-amber-500">EVENTS</span>
+            UPCOMING <span className="text-white">EVENTS</span>
           </h2>
 
           {upcomingEvents.length > 0 ? (
@@ -84,7 +84,7 @@ export default async function EventsPage() {
         <section className="py-20 bg-zinc-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl md:text-3xl font-black mb-8">
-              PAST <span className="text-amber-500">EVENTS</span>
+              PAST <span className="text-white">EVENTS</span>
             </h2>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -118,7 +118,7 @@ export default async function EventsPage() {
       <section className="py-20 bg-black border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-black mb-6">
-            WANT ACCESS TO <span className="text-amber-500">EXCLUSIVE</span> EVENTS?
+            WANT ACCESS TO <span className="text-white">EXCLUSIVE</span> EVENTS?
           </h2>
           <p className="text-zinc-400 mb-8">
             Members get access to exclusive events, priority registration, and more.

@@ -76,9 +76,9 @@ export default function CartPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-black">
-            YOUR <span className="text-amber-500">CART</span>
+            YOUR <span className="text-white">CART</span>
           </h1>
-          <Link href="/shop" className="text-amber-500 hover:text-amber-400 flex items-center gap-2 text-sm font-bold">
+          <Link href="/shop" className="text-white hover:text-zinc-200 flex items-center gap-2 text-sm font-bold">
             <ArrowLeft className="w-4 h-4" />
             Continue Shopping
           </Link>
@@ -120,7 +120,7 @@ export default function CartPage() {
                         {item.size && <span>Size: {item.size}</span>}
                         {item.color && <span>Color: {item.color}</span>}
                       </div>
-                      <div className="mt-2 text-amber-500 font-bold">
+                      <div className="mt-2 text-white font-bold">
                         {formatCurrency(price)}
                         {member && item.product.member_price && (
                           <span className="text-zinc-500 text-xs ml-2">Member Price</span>
@@ -185,7 +185,7 @@ export default function CartPage() {
                   </div>
                   <div className="border-t border-zinc-800 pt-3 flex justify-between text-lg font-bold">
                     <span>Subtotal</span>
-                    <span className="text-amber-500">{formatCurrency(subtotal)}</span>
+                    <span className="text-white">{formatCurrency(subtotal)}</span>
                   </div>
                 </div>
 

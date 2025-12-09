@@ -45,7 +45,7 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
             onClick={() => setActiveCategory(null)}
             className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-colors ${
               activeCategory === null
-                ? 'bg-amber-500 text-black'
+                ? 'bg-white text-black'
                 : 'bg-zinc-800 text-zinc-400 hover:text-white'
             }`}
           >
@@ -57,7 +57,7 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
               onClick={() => setActiveCategory(category)}
               className={`px-4 py-2 text-sm font-bold uppercase tracking-wider transition-colors ${
                 activeCategory === category
-                  ? 'bg-amber-500 text-black'
+                  ? 'bg-white text-black'
                   : 'bg-zinc-800 text-zinc-400 hover:text-white'
               }`}
             >
@@ -71,7 +71,7 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
             type="checkbox"
             checked={showMembersOnly}
             onChange={(e) => setShowMembersOnly(e.target.checked)}
-            className="w-4 h-4 accent-amber-500"
+            className="w-4 h-4 accent-white"
           />
           <span className="text-sm text-zinc-400">Members Only</span>
         </label>
@@ -84,7 +84,7 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
             <div
               key={product.id}
               ref={(el) => { productRefs.current[product.id] = el }}
-              className={`h-full ${highlightedProductId === product.id ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-black rounded-sm' : ''}`}
+              className={`h-full ${highlightedProductId === product.id ? 'ring-2 ring-white ring-offset-2 ring-offset-black rounded-sm' : ''}`}
             >
               <ProductCard product={product} />
             </div>

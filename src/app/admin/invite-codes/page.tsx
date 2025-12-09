@@ -85,7 +85,7 @@ export default function AdminInviteCodesPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-black">
-          <span className="text-amber-500">INVITE CODES</span>
+          <span className="text-white">INVITE CODES</span>
         </h1>
       </div>
 
@@ -151,7 +151,7 @@ export default function AdminInviteCodesPage() {
                   return (
                     <tr key={code.id} className="border-t border-zinc-800 hover:bg-zinc-800/50">
                       <td className="p-4">
-                        <code className="bg-zinc-800 px-3 py-1 text-amber-500 font-mono">
+                        <code className="bg-zinc-800 px-3 py-1 text-white font-mono">
                           {code.code}
                         </code>
                       </td>

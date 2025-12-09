@@ -66,7 +66,7 @@ export function Header() {
                 className={cn(
                   'text-sm font-bold uppercase tracking-wider transition-colors',
                   pathname === link.href
-                    ? 'text-amber-500'
+                    ? 'text-white'
                     : 'text-zinc-400 hover:text-white'
                 )}
               >
@@ -81,7 +81,7 @@ export function Header() {
             <Link href="/cart" className="relative p-2 text-zinc-400 hover:text-white transition-colors">
               <ShoppingCart className="w-6 h-6" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-black text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-black text-xs font-bold rounded-full flex items-center justify-center">
                   {itemCount}
                 </span>
               )}
@@ -99,7 +99,7 @@ export function Header() {
             ) : (
               <Link
                 href="/login"
-                className="hidden md:block px-4 py-2 text-sm font-bold uppercase tracking-wider text-amber-500 border border-amber-500 hover:bg-amber-500 hover:text-black transition-colors"
+                className="hidden md:block px-4 py-2 text-sm font-bold uppercase tracking-wider text-white border border-white hover:bg-white hover:text-black transition-colors"
               >
                 Login
               </Link>
@@ -128,7 +128,7 @@ export function Header() {
                 className={cn(
                   'px-6 py-3 text-sm font-bold uppercase tracking-wider',
                   pathname === link.href
-                    ? 'text-amber-500 bg-zinc-900'
+                    ? 'text-white bg-zinc-900'
                     : 'text-zinc-400'
                 )}
               >
@@ -140,7 +140,7 @@ export function Header() {
                 <Link
                   href="/dashboard"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 px-6 py-3 text-amber-500"
+                  className="flex items-center gap-2 px-6 py-3 text-white"
                 >
                   <User className="w-4 h-4" />
                   <span className="text-sm font-bold uppercase">Dashboard</span>
@@ -157,7 +157,7 @@ export function Header() {
                   <Link
                     href="/signup"
                     onClick={() => setIsOpen(false)}
-                    className="block px-6 py-3 text-sm font-bold uppercase tracking-wider text-amber-500"
+                    className="block px-6 py-3 text-sm font-bold uppercase tracking-wider text-white"
                   >
                     Join the Club
                   </Link>

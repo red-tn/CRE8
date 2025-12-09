@@ -180,7 +180,7 @@ function DashboardContent() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-amber-500 overflow-hidden flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-white overflow-hidden flex items-center justify-center">
               {member.profile_photo_url ? (
                 <img
                   src={member.profile_photo_url}
@@ -217,7 +217,7 @@ function DashboardContent() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-amber-500" />
+                  <CreditCard className="w-5 h-5 text-white" />
                   Membership Dues
                 </h2>
                 {duesStatus && (
@@ -266,7 +266,7 @@ function DashboardContent() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+                  <AlertCircle className="w-12 h-12 text-white mx-auto mb-4" />
                   <h3 className="text-lg font-bold mb-2">No Active Membership</h3>
                   <p className="text-zinc-500 mb-6">
                     Pay your dues to unlock all member benefits.
@@ -287,19 +287,19 @@ function DashboardContent() {
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-amber-500" />
+                  <CheckCircle className="w-4 h-4 text-white" />
                   <span className="text-zinc-400">Exclusive events access</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-amber-500" />
+                  <CheckCircle className="w-4 h-4 text-white" />
                   <span className="text-zinc-400">Member merch pricing</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-amber-500" />
+                  <CheckCircle className="w-4 h-4 text-white" />
                   <span className="text-zinc-400">Fleet gallery feature</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-amber-500" />
+                  <CheckCircle className="w-4 h-4 text-white" />
                   <span className="text-zinc-400">Priority registration</span>
                 </li>
               </ul>
@@ -310,7 +310,7 @@ function DashboardContent() {
           <Card className="overflow-hidden">
             <CardHeader>
               <h2 className="text-lg font-bold flex items-center gap-2">
-                <Truck className="w-5 h-5 text-amber-500" />
+                <Truck className="w-5 h-5 text-white" />
                 Your Truck
               </h2>
             </CardHeader>
@@ -360,7 +360,7 @@ function DashboardContent() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-amber-500" />
+                  <Calendar className="w-5 h-5 text-white" />
                   Upcoming Events
                 </h2>
                 <Link href="/events">
@@ -374,10 +374,10 @@ function DashboardContent() {
                   {upcomingEvents.slice(0, 3).map((event) => (
                     <div
                       key={event.id}
-                      className="flex items-center gap-4 p-3 bg-zinc-800/50 border border-zinc-800 hover:border-amber-500/50 transition-colors cursor-pointer"
+                      className="flex items-center gap-4 p-3 bg-zinc-800/50 border border-zinc-800 hover:border-white/50 transition-colors cursor-pointer"
                       onClick={() => handleOpenRsvpModal(event)}
                     >
-                      <div className="w-12 h-12 bg-amber-500 text-black flex flex-col items-center justify-center text-xs font-bold">
+                      <div className="w-12 h-12 bg-white text-black flex flex-col items-center justify-center text-xs font-bold">
                         <span>
                           {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                         </span>
@@ -434,7 +434,7 @@ function DashboardContent() {
               <div className="space-y-6">
                 {selectedEvent.location && (
                   <div className="flex items-center gap-2 text-zinc-400">
-                    <MapPin className="w-4 h-4 text-amber-500" />
+                    <MapPin className="w-4 h-4 text-white" />
                     <span>{selectedEvent.location}</span>
                   </div>
                 )}
@@ -485,11 +485,11 @@ function DashboardContent() {
                       disabled={isSubmittingRsvp}
                       className={`flex flex-col items-center gap-2 p-4 border transition-colors ${
                         selectedEvent.rsvp?.status === 'maybe'
-                          ? 'border-amber-500 bg-amber-500/10'
-                          : 'border-zinc-700 hover:border-amber-500/50'
+                          ? 'border-white bg-white/10'
+                          : 'border-zinc-700 hover:border-white/50'
                       }`}
                     >
-                      <HelpCircle className="w-6 h-6 text-amber-500" />
+                      <HelpCircle className="w-6 h-6 text-white" />
                       <span className="text-sm font-medium">Maybe</span>
                     </button>
                     <button

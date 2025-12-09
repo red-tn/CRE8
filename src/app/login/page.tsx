@@ -64,7 +64,7 @@ export default function LoginPage() {
             className="h-16 w-auto mx-auto mb-4"
           />
           <h1 className="text-3xl font-black">
-            MEMBER <span className="text-amber-500">LOGIN</span>
+            MEMBER <span className="text-white">LOGIN</span>
           </h1>
           <p className="text-zinc-500 mt-2">Welcome back to the crew</p>
         </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
         <div className="mt-8 space-y-4 text-center">
           <p className="text-zinc-500 text-sm">
             Not a member yet?{' '}
-            <Link href="/signup" className="text-amber-500 hover:text-amber-400">
+            <Link href="/signup" className="text-white hover:text-zinc-200">
               Join the club
             </Link>
           </p>

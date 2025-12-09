@@ -119,13 +119,13 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
       {/* Hero Section */}
       <section className="relative py-24 md:py-32 bg-zinc-900">
         <div className="absolute inset-0 bg-gradient-to-b from-black to-zinc-900" />
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back link */}
           <Link
             href="/gallery"
-            className="inline-flex items-center gap-2 text-zinc-500 hover:text-amber-500 mb-8 transition-colors"
+            className="inline-flex items-center gap-2 text-zinc-500 hover:text-white mb-8 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Fleet
@@ -133,7 +133,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
 
           <div className="flex flex-col md:flex-row gap-8 items-start">
             {/* Profile Photo */}
-            <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 bg-zinc-800 border-2 border-amber-500/50 overflow-hidden">
+            <div className="w-32 h-32 md:w-40 md:h-40 flex-shrink-0 bg-zinc-800 border-2 border-white/50 overflow-hidden">
               {heroImage ? (
                 <img
                   src={heroImage}
@@ -156,12 +156,12 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
             {/* Member Info */}
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-black mb-2">
-                {member.first_name} <span className="text-amber-500">{member.last_name?.[0]}.</span>
+                {member.first_name} <span className="text-white">{member.last_name?.[0]}.</span>
               </h1>
 
               {member.truck_year && member.truck_make && member.truck_model && (
                 <div className="flex items-center gap-2 text-zinc-400 mb-4">
-                  <Truck className="w-5 h-5 text-amber-500" />
+                  <Truck className="w-5 h-5 text-white" />
                   <span className="text-lg">
                     {member.truck_year} {member.truck_make} {member.truck_model}
                   </span>
@@ -219,7 +219,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
                     {member.phone && (
                       <a
                         href={`tel:${member.phone}`}
-                        className="flex items-center gap-2 text-zinc-400 hover:text-amber-500 transition-colors"
+                        className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
                       >
                         <Phone className="w-4 h-4" />
                         {member.phone}
@@ -228,7 +228,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
                     {member.email && (
                       <a
                         href={`mailto:${member.email}`}
-                        className="flex items-center gap-2 text-zinc-400 hover:text-amber-500 transition-colors"
+                        className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
                       >
                         <Mail className="w-4 h-4" />
                         {member.email}
@@ -240,7 +240,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
 
               {!isLoggedIn && (
                 <p className="text-zinc-600 text-sm mt-4">
-                  <Link href="/login" className="text-amber-500 hover:text-amber-400">
+                  <Link href="/login" className="text-white hover:text-zinc-200">
                     Log in
                   </Link>
                   {' '}to see contact info
@@ -255,7 +255,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
       <section className="py-12 bg-black flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-black mb-8">
-            <span className="text-amber-500">{member.first_name}&apos;s</span> TRUCK
+            <span className="text-white">{member.first_name}&apos;s</span> TRUCK
           </h2>
 
           {allImages.length > 0 ? (
@@ -263,7 +263,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
               {allImages.map((image) => (
                 <div
                   key={image.id}
-                  className="aspect-square bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-colors overflow-hidden group"
+                  className="aspect-square bg-zinc-900 border border-zinc-800 hover:border-white/50 transition-colors overflow-hidden group"
                 >
                   <img
                     src={image.url}
@@ -289,7 +289,7 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
       <section className="py-16 bg-zinc-900 border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-black mb-4">
-            WANT TO JOIN THE <span className="text-amber-500">FLEET</span>?
+            WANT TO JOIN THE <span className="text-white">FLEET</span>?
           </h2>
           <p className="text-zinc-500 mb-6">
             Become a member and get your truck featured in our gallery.

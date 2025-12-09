@@ -90,7 +90,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 texture-overlay" />
 
         {/* Amber glow effect */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/20 rounded-full blur-[150px]" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/20 rounded-full blur-[150px]" />
 
         {/* Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
@@ -105,7 +105,7 @@ export default async function HomePage() {
             />
           </div>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6">
-            CRE<span className="text-amber-500">8</span>
+            CRE<span className="text-white">8</span>
           </h1>
           <p className="text-xl md:text-2xl text-zinc-400 mb-4 font-light">
             TRUCK CLUB
@@ -132,7 +132,7 @@ export default async function HomePage() {
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-zinc-600 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-amber-500 rounded-full" />
+            <div className="w-1 h-2 bg-white rounded-full" />
           </div>
         </div>
       </section>
@@ -142,19 +142,19 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">{memberCount}+</div>
+              <div className="text-4xl md:text-5xl font-black text-white mb-2">{memberCount}+</div>
               <div className="text-zinc-500 uppercase tracking-wider text-sm">Members</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">50+</div>
+              <div className="text-4xl md:text-5xl font-black text-white mb-2">50+</div>
               <div className="text-zinc-500 uppercase tracking-wider text-sm">Events/Year</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">3</div>
+              <div className="text-4xl md:text-5xl font-black text-white mb-2">3</div>
               <div className="text-zinc-500 uppercase tracking-wider text-sm">Brands</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-black text-amber-500 mb-2">1</div>
+              <div className="text-4xl md:text-5xl font-black text-white mb-2">1</div>
               <div className="text-zinc-500 uppercase tracking-wider text-sm">Family</div>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black mb-4">
-              WHY <span className="text-amber-500">CRE8</span>?
+              WHY <span className="text-white">CRE8</span>?
             </h2>
             <p className="text-zinc-500 max-w-2xl mx-auto">
               More than a club - we&apos;re a community of truck enthusiasts who live and breathe the lifestyle.
@@ -174,32 +174,32 @@ export default async function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
-              <Users className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-white/50 transition-colors group">
+              <Users className="w-10 h-10 text-white mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="text-xl font-bold mb-2">The Crew</h3>
               <p className="text-zinc-500 text-sm">
                 Connect with {memberCount}+ members who share your passion. Real friendships, real builds.
               </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
-              <Calendar className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-white/50 transition-colors group">
+              <Calendar className="w-10 h-10 text-white mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="text-xl font-bold mb-2">Events</h3>
               <p className="text-zinc-500 text-sm">
                 Weekly meets, monthly cruises, and exclusive member-only events. We stay active.
               </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
-              <ShoppingBag className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-white/50 transition-colors group">
+              <ShoppingBag className="w-10 h-10 text-white mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="text-xl font-bold mb-2">Exclusive Merch</h3>
               <p className="text-zinc-500 text-sm">
                 Member pricing on all gear. Rep the crown with exclusive drops.
               </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-amber-500/50 transition-colors group">
-              <Truck className="w-10 h-10 text-amber-500 mb-4 group-hover:scale-110 transition-transform" />
+            <div className="bg-zinc-900 border border-zinc-800 p-8 hover:border-white/50 transition-colors group">
+              <Truck className="w-10 h-10 text-white mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="text-xl font-bold mb-2">Build Support</h3>
               <p className="text-zinc-500 text-sm">
                 Get advice, resources, and help with your build from experienced members.
@@ -215,11 +215,11 @@ export default async function HomePage() {
           <div className="flex justify-between items-end mb-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-black mb-2">
-                THE <span className="text-amber-500">FLEET</span>
+                THE <span className="text-white">FLEET</span>
               </h2>
               <p className="text-zinc-500">Check out what our members are rolling in.</p>
             </div>
-            <Link href="/gallery" className="text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider hidden md:flex items-center gap-2">
+            <Link href="/gallery" className="text-white hover:text-zinc-200 font-bold text-sm uppercase tracking-wider hidden md:flex items-center gap-2">
               View All <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -230,7 +230,7 @@ export default async function HomePage() {
                 <Link
                   key={member.id}
                   href={`/member/${member.id}`}
-                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden block"
+                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-white/50 transition-colors relative group overflow-hidden block"
                 >
                   {member.display_image ? (
                     <img
@@ -260,7 +260,7 @@ export default async function HomePage() {
               Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-amber-500/50 transition-colors relative group overflow-hidden"
+                  className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-white/50 transition-colors relative group overflow-hidden"
                 >
                   <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
                     <Truck className="w-12 h-12" />
@@ -270,7 +270,7 @@ export default async function HomePage() {
             )}
           </div>
 
-          <Link href="/gallery" className="mt-8 text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider flex md:hidden items-center justify-center gap-2">
+          <Link href="/gallery" className="mt-8 text-white hover:text-zinc-200 font-bold text-sm uppercase tracking-wider flex md:hidden items-center justify-center gap-2">
             View All <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -283,11 +283,11 @@ export default async function HomePage() {
             <div className="flex justify-between items-end">
               <div>
                 <h2 className="text-2xl md:text-3xl font-black mb-1">
-                  SHOP <span className="text-amber-500">MERCH</span>
+                  SHOP <span className="text-white">MERCH</span>
                 </h2>
                 <p className="text-zinc-500 text-sm">Rep the crown. Members get exclusive pricing.</p>
               </div>
-              <Link href="/shop" className="text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider hidden sm:flex items-center gap-2">
+              <Link href="/shop" className="text-white hover:text-zinc-200 font-bold text-sm uppercase tracking-wider hidden sm:flex items-center gap-2">
                 View All <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -309,7 +309,7 @@ export default async function HomePage() {
                     className="flex-shrink-0 w-48 sm:w-56 group"
                   >
                     {/* Product Image */}
-                    <div className="aspect-square bg-zinc-900 border border-zinc-800 group-hover:border-amber-500/50 transition-colors relative overflow-hidden mb-3">
+                    <div className="aspect-square bg-zinc-900 border border-zinc-800 group-hover:border-white/50 transition-colors relative overflow-hidden mb-3">
                       {product.images?.[0] || product.image_url ? (
                         <img
                           src={product.images?.[0] || product.image_url}
@@ -328,18 +328,18 @@ export default async function HomePage() {
                         </div>
                       )}
                       {product.is_members_only && (
-                        <div className="absolute top-2 left-2 bg-amber-500 text-black text-xs font-bold px-2 py-1">
+                        <div className="absolute top-2 left-2 bg-white text-black text-xs font-bold px-2 py-1">
                           MEMBERS ONLY
                         </div>
                       )}
                     </div>
 
                     {/* Product Info */}
-                    <h3 className="font-bold text-sm text-white group-hover:text-amber-500 transition-colors truncate">
+                    <h3 className="font-bold text-sm text-white group-hover:text-white transition-colors truncate">
                       {product.name}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-amber-500 font-bold text-sm">
+                      <span className="text-white font-bold text-sm">
                         {formatCurrency(product.price)}
                       </span>
                       {product.member_price && (
@@ -354,13 +354,13 @@ export default async function HomePage() {
                 {/* View All Card */}
                 <Link
                   href="/shop"
-                  className="flex-shrink-0 w-48 sm:w-56 aspect-square bg-zinc-900 border border-zinc-800 hover:border-amber-500 transition-colors flex flex-col items-center justify-center group"
+                  className="flex-shrink-0 w-48 sm:w-56 aspect-square bg-zinc-900 border border-zinc-800 hover:border-white transition-colors flex flex-col items-center justify-center group"
                 >
-                  <ShoppingBag className="w-10 h-10 text-zinc-600 group-hover:text-amber-500 transition-colors mb-3" />
-                  <span className="text-zinc-400 group-hover:text-amber-500 font-bold text-sm uppercase tracking-wider transition-colors">
+                  <ShoppingBag className="w-10 h-10 text-zinc-600 group-hover:text-white transition-colors mb-3" />
+                  <span className="text-zinc-400 group-hover:text-white font-bold text-sm uppercase tracking-wider transition-colors">
                     View All
                   </span>
-                  <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-amber-500 transition-colors mt-1" />
+                  <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-white transition-colors mt-1" />
                 </Link>
               </div>
             </div>
@@ -368,7 +368,7 @@ export default async function HomePage() {
 
           {/* Mobile View All Link */}
           <div className="mt-6 px-4 sm:hidden">
-            <Link href="/shop" className="text-amber-500 hover:text-amber-400 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+            <Link href="/shop" className="text-white hover:text-zinc-200 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
               View All Products <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -377,9 +377,9 @@ export default async function HomePage() {
 
       {/* CTA Section */}
       <section className="py-24 bg-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-transparent to-amber-500/10" />
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Image
@@ -390,7 +390,7 @@ export default async function HomePage() {
             className="h-16 w-auto mx-auto mb-6"
           />
           <h2 className="text-3xl md:text-5xl font-black mb-6">
-            READY TO <span className="text-amber-500">JOIN</span>?
+            READY TO <span className="text-white">JOIN</span>?
           </h2>
           <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
             $50/year gets you access to everything. Exclusive events, member pricing on merch,
@@ -425,31 +425,31 @@ export default async function HomePage() {
               <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 CHEVY
               </div>
-              <div className="text-amber-500 font-bold mt-1">{brandCounts.Chevy}</div>
+              <div className="text-white font-bold mt-1">{brandCounts.Chevy}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 FORD
               </div>
-              <div className="text-amber-500 font-bold mt-1">{brandCounts.Ford}</div>
+              <div className="text-white font-bold mt-1">{brandCounts.Ford}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 DODGE
               </div>
-              <div className="text-amber-500 font-bold mt-1">{brandCounts.Dodge}</div>
+              <div className="text-white font-bold mt-1">{brandCounts.Dodge}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 TOYOTA
               </div>
-              <div className="text-amber-500 font-bold mt-1">{brandCounts.Toyota}</div>
+              <div className="text-white font-bold mt-1">{brandCounts.Toyota}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
                 NISSAN
               </div>
-              <div className="text-amber-500 font-bold mt-1">{brandCounts.Nissan}</div>
+              <div className="text-white font-bold mt-1">{brandCounts.Nissan}</div>
             </div>
           </div>
         </div>

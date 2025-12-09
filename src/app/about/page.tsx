@@ -14,7 +14,7 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="relative py-24 md:py-32 bg-zinc-900">
         <div className="absolute inset-0 bg-gradient-to-b from-black to-zinc-900" />
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Image
@@ -25,7 +25,7 @@ export default function AboutPage() {
             className="h-20 w-auto mx-auto mb-6"
           />
           <h1 className="text-4xl md:text-6xl font-black mb-6">
-            ABOUT <span className="text-amber-500">US</span>
+            ABOUT <span className="text-white">US</span>
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
             We&apos;re not your typical truck club. We&apos;re a community of enthusiasts
@@ -40,7 +40,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-black mb-6">
-                OUR <span className="text-amber-500">STORY</span>
+                OUR <span className="text-white">STORY</span>
               </h2>
               <p className="text-zinc-400 mb-4">
                 CRE8 was born in 2025 from a simple frustration - there wasn&apos;t a truck club
@@ -76,13 +76,13 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black mb-4">
-              WHAT WE <span className="text-amber-500">STAND FOR</span>
+              WHAT WE <span className="text-white">STAND FOR</span>
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-black border border-zinc-800 p-8 text-center">
-              <Target className="w-10 h-10 text-amber-500 mx-auto mb-4" />
+              <Target className="w-10 h-10 text-white mx-auto mb-4" />
               <h3 className="text-xl font-bold mb-2">Authenticity</h3>
               <p className="text-zinc-500 text-sm">
                 No posers. No fakes. Just real enthusiasts who live for their trucks.
@@ -90,7 +90,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-black border border-zinc-800 p-8 text-center">
-              <Heart className="w-10 h-10 text-amber-500 mx-auto mb-4" />
+              <Heart className="w-10 h-10 text-white mx-auto mb-4" />
               <h3 className="text-xl font-bold mb-2">Community</h3>
               <p className="text-zinc-500 text-sm">
                 We look out for each other. Need help with a build? We got you.
@@ -98,7 +98,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-black border border-zinc-800 p-8 text-center">
-              <Zap className="w-10 h-10 text-amber-500 mx-auto mb-4" />
+              <Zap className="w-10 h-10 text-white mx-auto mb-4" />
               <h3 className="text-xl font-bold mb-2">Energy</h3>
               <p className="text-zinc-500 text-sm">
                 We stay active. Weekly meets, monthly events, constant engagement.
@@ -106,7 +106,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-black border border-zinc-800 p-8 text-center">
-              <Users className="w-10 h-10 text-amber-500 mx-auto mb-4" />
+              <Users className="w-10 h-10 text-white mx-auto mb-4" />
               <h3 className="text-xl font-bold mb-2">Inclusivity</h3>
               <p className="text-zinc-500 text-sm">
                 Chevy, Ford, Dodge, Toyota, Nissan - we don&apos;t discriminate. All trucks welcome.
@@ -121,30 +121,30 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1 bg-zinc-900 border border-zinc-800 p-8">
-              <h3 className="text-2xl font-bold mb-6 text-amber-500">Member Benefits</h3>
+              <h3 className="text-2xl font-bold mb-6 text-white">Member Benefits</h3>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2" />
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Access to exclusive member-only events</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2" />
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Discounted pricing on all merchandise</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2" />
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Your truck featured in the fleet gallery</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2" />
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Priority registration for popular events</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2" />
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Access to member-only Discord channels</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mt-2" />
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Voting rights on club decisions</span>
                 </li>
               </ul>
@@ -152,7 +152,7 @@ export default function AboutPage() {
 
             <div className="order-1 md:order-2">
               <h2 className="text-3xl md:text-4xl font-black mb-6">
-                <span className="text-amber-500">$50</span>/YEAR
+                <span className="text-white">$50</span>/YEAR
               </h2>
               <p className="text-zinc-400 mb-6">
                 That&apos;s it. No hidden fees. No BS. Just $50 a year gets you full access
@@ -176,7 +176,7 @@ export default function AboutPage() {
       <section className="py-20 bg-zinc-900">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-black mb-12 text-center">
-            <span className="text-amber-500">FAQ</span>
+            <span className="text-white">FAQ</span>
           </h2>
 
           <div className="space-y-6">
@@ -219,7 +219,7 @@ export default function AboutPage() {
       <section className="py-20 bg-black border-t border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-black mb-6">
-            READY TO <span className="text-amber-500">JOIN</span>?
+            READY TO <span className="text-white">JOIN</span>?
           </h2>
           <p className="text-zinc-400 mb-8">
             Stop scrolling. Start creating. Become part of the crew.

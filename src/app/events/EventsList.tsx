@@ -113,11 +113,11 @@ export function EventsList({ events }: EventsListProps) {
           <div
             key={event.id}
             onClick={() => handleEventClick(event)}
-            className="bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-colors cursor-pointer"
+            className="bg-zinc-900 border border-zinc-800 hover:border-white/50 transition-colors cursor-pointer"
           >
             <div className="p-6 md:p-8 flex flex-col md:flex-row gap-6">
               {/* Date Box */}
-              <div className="flex-shrink-0 w-24 h-24 bg-amber-500 text-black flex flex-col items-center justify-center">
+              <div className="flex-shrink-0 w-24 h-24 bg-white text-black flex flex-col items-center justify-center">
                 <span className="text-sm font-bold uppercase">
                   {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                 </span>
@@ -144,13 +144,13 @@ export function EventsList({ events }: EventsListProps) {
                 <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
                   {event.location && (
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-amber-500" />
+                      <MapPin className="w-4 h-4 text-white" />
                       <span>{event.location}</span>
                     </div>
                   )}
                   {event.start_time && (
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-500" />
+                      <Clock className="w-4 h-4 text-white" />
                       <span>
                         {formatTime(event.start_time)}
                         {event.end_time && ` - ${formatTime(event.end_time)}`}
@@ -159,7 +159,7 @@ export function EventsList({ events }: EventsListProps) {
                   )}
                   {event.max_attendees && (
                     <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-amber-500" />
+                      <Users className="w-4 h-4 text-white" />
                       <span>Max {event.max_attendees} attendees</span>
                     </div>
                   )}
@@ -203,7 +203,7 @@ export function EventsList({ events }: EventsListProps) {
               <div className="space-y-6">
                 {selectedEvent.location && (
                   <div className="flex items-center gap-2 text-zinc-400">
-                    <MapPin className="w-4 h-4 text-amber-500" />
+                    <MapPin className="w-4 h-4 text-white" />
                     <span>{selectedEvent.location}</span>
                   </div>
                 )}
@@ -254,11 +254,11 @@ export function EventsList({ events }: EventsListProps) {
                       disabled={isSubmitting}
                       className={`flex flex-col items-center gap-2 p-4 border transition-colors ${
                         rsvps[selectedEvent.id]?.status === 'maybe'
-                          ? 'border-amber-500 bg-amber-500/10'
-                          : 'border-zinc-700 hover:border-amber-500/50'
+                          ? 'border-white bg-white/10'
+                          : 'border-zinc-700 hover:border-white/50'
                       }`}
                     >
-                      <HelpCircle className="w-6 h-6 text-amber-500" />
+                      <HelpCircle className="w-6 h-6 text-white" />
                       <span className="text-sm font-medium">Maybe</span>
                     </button>
                     <button

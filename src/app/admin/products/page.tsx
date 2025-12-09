@@ -366,7 +366,7 @@ export default function AdminProductsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-black">
-          <span className="text-amber-500">PRODUCTS</span>
+          <span className="text-white">PRODUCTS</span>
         </h1>
         <Button onClick={() => setShowForm(true)}>
           <Plus className="w-4 h-4 mr-2" />
@@ -409,7 +409,7 @@ export default function AdminProductsPage() {
                 {formData.sku && (
                   <div className="bg-zinc-800 px-3 py-2 border border-zinc-700">
                     <span className="text-xs text-zinc-500">Auto-generated SKU: </span>
-                    <span className="text-amber-500 font-mono">{formData.sku}</span>
+                    <span className="text-white font-mono">{formData.sku}</span>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-4">
@@ -451,7 +451,7 @@ export default function AdminProductsPage() {
                                 newImages[index] = temp
                                 setFormData({ ...formData, images: newImages, imageUrl: newImages[0] })
                               }}
-                              className="p-1 bg-amber-500 text-black text-xs"
+                              className="p-1 bg-white text-black text-xs"
                               title="Set as primary"
                             >
                               ★
@@ -473,7 +473,7 @@ export default function AdminProductsPage() {
                           </button>
                         </div>
                         {index === 0 && (
-                          <div className="absolute top-1 left-1 bg-amber-500 text-black text-xs px-1">
+                          <div className="absolute top-1 left-1 bg-white text-black text-xs px-1">
                             Primary
                           </div>
                         )}
@@ -481,7 +481,7 @@ export default function AdminProductsPage() {
                     ))}
 
                     {/* Upload Button */}
-                    <label className={`aspect-square bg-zinc-800 border border-dashed border-zinc-600 hover:border-amber-500 flex flex-col items-center justify-center cursor-pointer transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <label className={`aspect-square bg-zinc-800 border border-dashed border-zinc-600 hover:border-white flex flex-col items-center justify-center cursor-pointer transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
                       <input
                         type="file"
                         accept="image/*"
@@ -542,7 +542,7 @@ export default function AdminProductsPage() {
                                 setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
                               }
                             }}
-                            className="w-4 h-4 accent-amber-500"
+                            className="w-4 h-4 accent-white"
                           />
                           <span className="text-sm">{size}</span>
                         </label>
@@ -575,7 +575,7 @@ export default function AdminProductsPage() {
                   </div>
                   <div className="flex gap-2">
                     <select
-                      className="flex-1 bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                      className="flex-1 bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm focus:outline-none focus:border-white"
                       value=""
                       onChange={(e) => {
                         if (e.target.value && !formData.colors.includes(e.target.value)) {
@@ -594,7 +594,7 @@ export default function AdminProductsPage() {
                         value={customProductColor}
                         onChange={(e) => setCustomProductColor(e.target.value)}
                         placeholder="Custom"
-                        className="w-24 bg-zinc-800 border border-zinc-700 px-2 py-2 text-sm focus:outline-none focus:border-amber-500"
+                        className="w-24 bg-zinc-800 border border-zinc-700 px-2 py-2 text-sm focus:outline-none focus:border-white"
                       />
                       <Button
                         type="button"
@@ -628,7 +628,7 @@ export default function AdminProductsPage() {
                   <div className="border border-zinc-700 p-4 space-y-3">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-bold text-amber-500">Size/Color Inventory</h3>
+                        <h3 className="font-bold text-white">Size/Color Inventory</h3>
                         <p className="text-xs text-zinc-500">Track stock per size and color combination</p>
                       </div>
                       {!showVariantForm && (
@@ -664,7 +664,7 @@ export default function AdminProductsPage() {
                                 {formData.category === 'hats' ? 'Style/Size' : 'Size'}
                               </label>
                               <select
-                                className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                                className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
                                 value={variantFormData.size}
                                 onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
                               >
@@ -680,7 +680,7 @@ export default function AdminProductsPage() {
                             <label className="block text-sm font-medium text-zinc-400 mb-1">Color</label>
                             <div className="flex gap-1">
                               <select
-                                className="flex-1 bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-amber-500"
+                                className="flex-1 bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
                                 value={variantFormData.color}
                                 onChange={(e) => setVariantFormData({ ...variantFormData, color: e.target.value })}
                               >
@@ -700,7 +700,7 @@ export default function AdminProductsPage() {
                                   setVariantFormData({ ...variantFormData, color: e.target.value })
                                 }}
                                 placeholder="Custom"
-                                className="w-20 bg-zinc-700 border border-zinc-600 px-2 py-2 text-sm focus:outline-none focus:border-amber-500"
+                                className="w-20 bg-zinc-700 border border-zinc-600 px-2 py-2 text-sm focus:outline-none focus:border-white"
                               />
                             </div>
                           </div>
@@ -793,7 +793,7 @@ export default function AdminProductsPage() {
                     type="checkbox"
                     checked={formData.isMembersOnly}
                     onChange={(e) => setFormData({ ...formData, isMembersOnly: e.target.checked })}
-                    className="w-4 h-4 accent-amber-500"
+                    className="w-4 h-4 accent-white"
                   />
                   <span className="text-sm">Members Only</span>
                 </label>
@@ -819,7 +819,7 @@ export default function AdminProductsPage() {
             <div className="p-8 text-center text-zinc-500">Loading...</div>
           ) : products.length === 0 ? (
             <div className="p-8 text-center text-zinc-500">
-              <Package className="w-12 h-12 mx-auto mb-4 text-amber-500/50" />
+              <Package className="w-12 h-12 mx-auto mb-4 text-white/50" />
               <p>No products yet</p>
             </div>
           ) : (
@@ -869,7 +869,7 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="p-4">
                       <div>
-                        <p className="text-amber-500 font-bold">{formatCurrency(product.price)}</p>
+                        <p className="text-white font-bold">{formatCurrency(product.price)}</p>
                         {product.member_price && (
                           <p className="text-sm text-zinc-500">
                             Member: {formatCurrency(product.member_price)}

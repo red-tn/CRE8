@@ -23,13 +23,13 @@ export function Footer() {
               Just bring your build and your passion.
             </p>
             <div className="flex gap-4">
-              <a href="https://instagram.com/cre8truckclub" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-amber-500 transition-colors">
+              <a href="https://instagram.com/cre8truckclub" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="https://youtube.com/@cre8truckclub" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-amber-500 transition-colors">
+              <a href="https://youtube.com/@cre8truckclub" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors">
                 <Youtube className="w-5 h-5" />
               </a>
-              <a href="mailto:info@cre8truckclub.com" className="text-zinc-500 hover:text-amber-500 transition-colors">
+              <a href="mailto:info@cre8truckclub.com" className="text-zinc-500 hover:text-white transition-colors">
                 <Mail className="w-5 h-5" />
               </a>
             </div>
@@ -40,22 +40,22 @@ export function Footer() {
             <h3 className="text-white font-bold uppercase tracking-wider mb-4">Club</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/about" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/events" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   Events
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/gallery" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   Fleet Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/signup" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/signup" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   Join the Club
                 </Link>
               </li>
@@ -67,22 +67,22 @@ export function Footer() {
             <h3 className="text-white font-bold uppercase tracking-wider mb-4">Shop</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/shop" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/shop" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   All Products
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=apparel" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/shop?category=apparel" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   Apparel
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=accessories" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/shop?category=accessories" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   Accessories
                 </Link>
               </li>
               <li>
-                <Link href="/cart" className="text-zinc-500 hover:text-amber-500 text-sm transition-colors">
+                <Link href="/cart" className="text-zinc-500 hover:text-white text-sm transition-colors">
                   Cart
                 </Link>
               </li>

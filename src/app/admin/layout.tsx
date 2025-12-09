@@ -91,7 +91,7 @@ export default function AdminLayout({
                 className={cn(
                   'flex items-center gap-3 px-6 py-3 text-sm transition-colors',
                   isActive
-                    ? 'bg-amber-500/10 text-amber-500 border-r-2 border-amber-500'
+                    ? 'bg-white/10 text-white border-r-2 border-white'
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                 )}
               >
@@ -104,7 +104,7 @@ export default function AdminLayout({
 
         <div className="p-4 border-t border-zinc-800">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-amber-500 flex items-center justify-center text-black font-bold">
+            <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold">
               {member.first_name[0]}
             </div>
             <div className="flex-1 min-w-0">

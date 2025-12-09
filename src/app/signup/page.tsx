@@ -128,7 +128,7 @@ export default function SignupPage() {
             className="h-16 w-auto mx-auto mb-4"
           />
           <h1 className="text-3xl font-black">
-            JOIN <span className="text-amber-500">THE CLUB</span>
+            JOIN <span className="text-white">THE CLUB</span>
           </h1>
           <p className="text-zinc-500 mt-2">Become part of the crew</p>
         </div>
@@ -139,7 +139,7 @@ export default function SignupPage() {
             <div
               key={s}
               className={`flex-1 h-1 ${
-                s <= step ? 'bg-amber-500' : 'bg-zinc-800'
+                s <= step ? 'bg-white' : 'bg-zinc-800'
               }`}
             />
           ))}
@@ -353,7 +353,7 @@ export default function SignupPage() {
         {/* Login link */}
         <p className="text-center text-zinc-500 text-sm mt-8">
           Already a member?{' '}
-          <Link href="/login" className="text-amber-500 hover:text-amber-400">
+          <Link href="/login" className="text-white hover:text-zinc-200">
             Login
           </Link>
         </p>

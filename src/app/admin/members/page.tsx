@@ -74,7 +74,7 @@ export default function AdminMembersPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-black">
-          <span className="text-amber-500">MEMBERS</span>
+          <span className="text-white">MEMBERS</span>
         </h1>
         <div className="flex items-center gap-4">
           <Badge variant="default">{members.length} total</Badge>
@@ -156,14 +156,14 @@ export default function AdminMembersPage() {
                   <tr key={member.id} className="border-t border-zinc-800 hover:bg-zinc-800/50">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-amber-500 flex items-center justify-center text-black font-bold">
+                        <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold">
                           {member.first_name[0]}
                         </div>
                         <div>
                           <p className="font-bold">
                             {member.first_name} {member.last_name}
                             {member.is_admin && (
-                              <Shield className="w-4 h-4 text-amber-500 inline ml-2" />
+                              <Shield className="w-4 h-4 text-white inline ml-2" />
                             )}
                           </p>
                           <p className="text-sm text-zinc-500">{member.email}</p>
@@ -195,7 +195,7 @@ export default function AdminMembersPage() {
                           onClick={() => toggleAdmin(member)}
                           title={member.is_admin ? 'Remove admin' : 'Make admin'}
                         >
-                          <Shield className={`w-4 h-4 ${member.is_admin ? 'text-amber-500' : ''}`} />
+                          <Shield className={`w-4 h-4 ${member.is_admin ? 'text-white' : ''}`} />
                         </Button>
                         <Button
                           variant="ghost"

@@ -79,7 +79,7 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition-all duration-300 group h-full flex flex-col">
+    <div className="bg-zinc-900 border border-zinc-800 hover:border-white/50 transition-all duration-300 group h-full flex flex-col">
       {/* Image */}
       <div className="relative aspect-square bg-zinc-800 overflow-hidden flex-shrink-0">
         {product.images?.[0] || product.image_url ? (
@@ -118,7 +118,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Price and Stock */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-black text-amber-500">
+            <span className="text-xl font-black text-white">
               {formatCurrency(displayPrice)}
             </span>
             {hasDiscount && (
@@ -127,7 +127,7 @@ export function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
-          <span className={`text-xs font-bold ${currentStock > 5 ? 'text-green-500' : currentStock > 0 ? 'text-amber-500' : 'text-red-500'}`}>
+          <span className={`text-xs font-bold ${currentStock > 5 ? 'text-green-500' : currentStock > 0 ? 'text-white' : 'text-red-500'}`}>
             {currentStock > 0 ? `${currentStock} in stock` : 'Out of stock'}
           </span>
         </div>
@@ -149,7 +149,7 @@ export function ProductCard({ product }: ProductCardProps) {
                       disabled={soldOut}
                       className={`px-3 py-1 text-xs font-bold transition-colors relative ${
                         selectedSize === size
-                          ? 'bg-amber-500 text-black'
+                          ? 'bg-white text-black'
                           : soldOut
                           ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
                           : 'bg-zinc-800 text-zinc-400 hover:text-white'
@@ -179,7 +179,7 @@ export function ProductCard({ product }: ProductCardProps) {
                       disabled={soldOut}
                       className={`px-3 py-1 text-xs font-bold transition-colors ${
                         selectedColor === color
-                          ? 'bg-amber-500 text-black'
+                          ? 'bg-white text-black'
                           : soldOut
                           ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed line-through'
                           : 'bg-zinc-800 text-zinc-400 hover:text-white'

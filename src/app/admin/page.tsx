@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   return (
     <div>
       <h1 className="text-3xl font-black mb-8">
-        ADMIN <span className="text-amber-500">DASHBOARD</span>
+        ADMIN <span className="text-white">DASHBOARD</span>
       </h1>
 
       {/* Stats Grid */}
@@ -57,8 +57,8 @@ export default function AdminDashboard() {
                 <p className="text-zinc-500 text-sm">Total Members</p>
                 <p className="text-3xl font-black">{stats?.totalMembers || 0}</p>
               </div>
-              <div className="w-12 h-12 bg-amber-500/20 flex items-center justify-center">
-                <Users className="w-6 h-6 text-amber-500" />
+              <div className="w-12 h-12 bg-white/20 flex items-center justify-center">
+                <Users className="w-6 h-6 text-white" />
               </div>
             </div>
             <p className="text-green-500 text-sm mt-2">
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <Link href="/admin/orders">
-              <p className="text-amber-500 text-sm mt-2 hover:text-amber-400">
+              <p className="text-white text-sm mt-2 hover:text-zinc-200">
                 View orders →
               </p>
             </Link>
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <Link href="/admin/events">
-              <p className="text-amber-500 text-sm mt-2 hover:text-amber-400">
+              <p className="text-white text-sm mt-2 hover:text-zinc-200">
                 Manage events →
               </p>
             </Link>
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-zinc-500 text-sm flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  <AlertCircle className="w-4 h-4 text-white" />
                   Memberships Expiring Soon
                 </p>
                 <p className="text-3xl font-black">{stats?.expiringSoon || 0}</p>

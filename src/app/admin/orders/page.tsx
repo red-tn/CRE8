@@ -79,7 +79,7 @@ export default function AdminOrdersPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-black">
-          <span className="text-amber-500">ORDERS</span>
+          <span className="text-white">ORDERS</span>
         </h1>
       </div>
 
@@ -131,7 +131,7 @@ export default function AdminOrdersPage() {
                   </div>
                   <div>
                     <p className="text-sm text-zinc-500">Total</p>
-                    <p className="text-xl font-bold text-amber-500">
+                    <p className="text-xl font-bold text-white">
                       {formatCurrency(selectedOrder.total)}
                     </p>
                   </div>
@@ -244,7 +244,7 @@ export default function AdminOrdersPage() {
                     <td className="p-4 text-zinc-400">
                       {formatDate(order.created_at)}
                     </td>
-                    <td className="p-4 font-bold text-amber-500">
+                    <td className="p-4 font-bold text-white">
                       {formatCurrency(order.total)}
                     </td>
                     <td className="p-4">{getStatusBadge(order.status)}</td>
