@@ -339,9 +339,17 @@ export default function AdminMembersPage() {
                       <tr key={member.id} className="border-t border-zinc-800 hover:bg-zinc-800/50">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold">
-                              {member.first_name[0]}
-                            </div>
+                            {member.truck_photo_url || member.profile_photo_url ? (
+                              <img
+                                src={member.truck_photo_url || member.profile_photo_url}
+                                alt={`${member.first_name}'s vehicle`}
+                                className="w-10 h-10 object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold">
+                                {member.first_name[0]}
+                              </div>
+                            )}
                             <div>
                               <p className="font-bold">
                                 {member.first_name} {member.last_name}
@@ -414,9 +422,17 @@ export default function AdminMembersPage() {
                   <div key={member.id} className="p-4">
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold flex-shrink-0">
-                          {member.first_name[0]}
-                        </div>
+                        {member.truck_photo_url || member.profile_photo_url ? (
+                          <img
+                            src={member.truck_photo_url || member.profile_photo_url}
+                            alt={`${member.first_name}'s vehicle`}
+                            className="w-10 h-10 object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold flex-shrink-0">
+                            {member.first_name[0]}
+                          </div>
+                        )}
                         <div className="min-w-0">
                           <p className="font-bold truncate">
                             {member.first_name} {member.last_name}
