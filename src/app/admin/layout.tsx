@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -13,6 +13,8 @@ import {
   Package,
   LayoutDashboard,
   LogOut,
+  Menu,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -33,6 +35,7 @@ export default function AdminLayout({
   const router = useRouter()
   const pathname = usePathname()
   const { member, isLoading, checkAuth, logout } = useAuthStore()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -43,6 +46,11 @@ export default function AdminLayout({
       router.push('/login')
     }
   }, [isLoading, member, router])
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [pathname])
 
   const handleLogout = async () => {
     await logout()
@@ -63,9 +71,43 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen flex">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
+        <Link href="/admin" className="flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="CRE8"
+            width={60}
+            height={30}
+            className="h-8 w-auto"
+          />
+          <span className="text-xs text-zinc-500">Admin</span>
+        </Link>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 text-zinc-400 hover:text-white"
+        >
+          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-screen">
-        <div className="p-6 border-b border-zinc-800">
+      <aside
+        className={cn(
+          'w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-screen z-50 transition-transform duration-300',
+          'lg:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="p-6 border-b border-zinc-800 hidden lg:block">
           <Link href="/admin" className="flex items-center gap-3">
             <Image
               src="/logo.png"
@@ -77,6 +119,9 @@ export default function AdminLayout({
             <span className="text-xs text-zinc-500">Admin</span>
           </Link>
         </div>
+
+        {/* Mobile spacer for header */}
+        <div className="h-14 lg:hidden" />
 
         <nav className="flex-1 py-6">
           {adminLinks.map((link) => {
@@ -123,7 +168,7 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 lg:ml-64 p-4 lg:p-8 pt-20 lg:pt-8">
         {children}
       </main>
     </div>
