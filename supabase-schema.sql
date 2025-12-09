@@ -18,6 +18,7 @@ CREATE TABLE members (
   truck_photo_url TEXT,
   bio TEXT,
   instagram_handle VARCHAR(100),
+  invite_code_id UUID REFERENCES invite_codes(id),
   is_admin BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

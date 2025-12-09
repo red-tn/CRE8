@@ -155,7 +155,14 @@ export default function AdminMembersPage() {
           <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Edit Member</h2>
+                <div>
+                  <h2 className="text-xl font-bold">Edit Member</h2>
+                  {editingMember.invite_code && (
+                    <p className="text-sm text-zinc-500 mt-1">
+                      Signed up with code: <code className="bg-zinc-800 px-2 py-0.5 text-white font-mono">{editingMember.invite_code.code}</code>
+                    </p>
+                  )}
+                </div>
                 <Button variant="ghost" size="sm" onClick={() => setEditingMember(null)}>
                   <X className="w-4 h-4" />
                 </Button>

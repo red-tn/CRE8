@@ -26,6 +26,8 @@ export interface Member {
   instagram_handle?: string
   snapchat_handle?: string
   tiktok_handle?: string
+  invite_code_id?: string
+  invite_code?: InviteCode
   is_admin: boolean
   is_active: boolean
   created_at: string

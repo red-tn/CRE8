@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
         truck_make: truckMake || null,
         truck_model: truckModel || null,
         instagram_handle: instagram || null,
+        invite_code_id: invite.id,
         is_admin: false,
         is_active: true,
       })

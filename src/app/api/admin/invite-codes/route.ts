@@ -3,10 +3,25 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
 import { generateInviteCode } from '@/lib/utils'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await requireAdmin()
 
+    const { searchParams } = new URL(request.url)
+    const codeId = searchParams.get('codeId')
+
+    // If codeId is provided, get members who used this code
+    if (codeId) {
+      const { data: members } = await supabaseAdmin
+        .from('members')
+        .select('id, email, first_name, last_name, truck_year, truck_make, truck_model, created_at, truck_photo_url, profile_photo_url')
+        .eq('invite_code_id', codeId)
+        .order('created_at', { ascending: false })
+
+      return NextResponse.json({ members: members || [] })
+    }
+
+    // Otherwise get all codes
     const { data: codes } = await supabaseAdmin
       .from('invite_codes')
       .select('*, created_by_member:members!invite_codes_created_by_fkey(first_name, last_name)')
