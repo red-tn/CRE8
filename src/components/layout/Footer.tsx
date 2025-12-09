@@ -19,7 +19,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-zinc-500 text-sm max-w-md mb-6">
-              The edgiest truck club for enthusiasts. Chevy, Ford, Dodge, Toyota, Nissan - we don&apos;t discriminate.
+              The edgiest truck club for enthusiasts. Chevy, Ford, Dodge, Toyota, Nissan, GMC - we don&apos;t discriminate.
               Just bring your build and your passion.
             </p>
             <div className="flex gap-4">

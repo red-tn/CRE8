@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CRE8 Truck Club | The Edgiest Truck Club",
-  description: "CRE8 Truck Club - The edgiest truck club for enthusiasts driving Chevy, Ford, Dodge, Toyota, and Nissan pickups. Join the crew.",
+  description: "CRE8 Truck Club - The edgiest truck club for enthusiasts driving Chevy, Ford, Dodge, Toyota, Nissan, and GMC pickups. Join the crew.",
   keywords: ["truck club", "chevy trucks", "ford trucks", "dodge trucks", "toyota trucks", "nissan trucks", "truck enthusiasts", "car club"],
   openGraph: {
     title: "CRE8 Truck Club",
@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white min-h-screen flex flex-col`}
       >
         {/* Background watermark */}
-        <div className="fixed bottom-0 left-0 -translate-x-[10%] translate-y-1/4 pointer-events-none z-[1] opacity-[0.08]">
+        <div className="fixed bottom-0 left-0 -translate-x-[10%] translate-y-1/4 pointer-events-none z-[1] opacity-[0.06]">
           <Image
             src="/logo.png"
             alt=""

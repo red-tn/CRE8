@@ -1,6 +1,6 @@
-export type TruckMake = 'Chevy' | 'Ford' | 'Dodge' | 'Toyota' | 'Nissan'
+export type TruckMake = 'Chevy' | 'Ford' | 'Dodge' | 'Toyota' | 'Nissan' | 'GMC'
 
-export const TRUCK_MAKES: TruckMake[] = ['Chevy', 'Ford', 'Dodge', 'Toyota', 'Nissan']
+export const TRUCK_MAKES: TruckMake[] = ['Chevy', 'Ford', 'Dodge', 'Toyota', 'Nissan', 'GMC']
 
 export const TRUCK_MODELS: Record<TruckMake, string[]> = {
   Chevy: ['Silverado 1500', 'Silverado 2500HD', 'Silverado 3500HD', 'Colorado', 'S-10', 'C/K 1500', 'C/K 2500', 'Avalanche', 'Other'],
@@ -8,6 +8,7 @@ export const TRUCK_MODELS: Record<TruckMake, string[]> = {
   Dodge: ['Ram 1500', 'Ram 2500', 'Ram 3500', 'Dakota', 'Other'],
   Toyota: ['Tacoma', 'Tundra', 'T100', 'Hilux', 'Other'],
   Nissan: ['Titan', 'Titan XD', 'Frontier', 'Hardbody', 'Other'],
+  GMC: ['Sierra 1500', 'Sierra 2500HD', 'Sierra 3500HD', 'Canyon', 'Syclone', 'Sonoma', 'Other'],
 }
 
 export interface Member {

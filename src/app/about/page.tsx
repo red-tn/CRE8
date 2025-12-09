@@ -109,7 +109,7 @@ export default function AboutPage() {
               <Users className="w-10 h-10 text-white mx-auto mb-4" />
               <h3 className="text-xl font-bold mb-2">Inclusivity</h3>
               <p className="text-zinc-500 text-sm">
-                Chevy, Ford, Dodge, Toyota, Nissan - we don&apos;t discriminate. All trucks welcome.
+                Chevy, Ford, Dodge, Toyota, Nissan, GMC - we don&apos;t discriminate. All trucks welcome.
               </p>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function AboutPage() {
             <div className="bg-black border border-zinc-800 p-6">
               <h3 className="text-lg font-bold mb-2">What trucks are allowed?</h3>
               <p className="text-zinc-500">
-                Chevy, Ford, Dodge, Toyota, and Nissan pickups. Any year, any model. Lifted, lowered, stock,
+                Chevy, Ford, Dodge, Toyota, Nissan, and GMC pickups. Any year, any model. Lifted, lowered, stock,
                 modded - we love them all.
               </p>
             </div>

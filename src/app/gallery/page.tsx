@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge'
 
 export const metadata = {
   title: 'Fleet Gallery | CRE8 Truck Club',
-  description: 'Check out the CRE8 Truck Club fleet - Chevy, Ford, and Dodge trucks from our members.',
+  description: 'Check out the CRE8 Truck Club fleet - Chevy, Ford, Dodge, Toyota, Nissan, and GMC trucks from our members.',
 }
 
 interface GalleryItem {
@@ -126,6 +126,9 @@ export default async function GalleryPage() {
   const chevyCount = images.filter(img => img.member?.truck_make === 'Chevy').length
   const fordCount = images.filter(img => img.member?.truck_make === 'Ford').length
   const dodgeCount = images.filter(img => img.member?.truck_make === 'Dodge').length
+  const toyotaCount = images.filter(img => img.member?.truck_make === 'Toyota').length
+  const nissanCount = images.filter(img => img.member?.truck_make === 'Nissan').length
+  const gmcCount = images.filter(img => img.member?.truck_make === 'GMC').length
 
   return (
     <div className="flex flex-col">
@@ -140,7 +143,7 @@ export default async function GalleryPage() {
             THE <span className="text-white">FLEET</span>
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
-            Check out what our members are rolling in. Chevy, Ford, Dodge - all welcome.
+            Check out what our members are rolling in. Chevy, Ford, Dodge, Toyota, Nissan, GMC - all welcome.
           </p>
         </div>
       </section>
@@ -148,7 +151,7 @@ export default async function GalleryPage() {
       {/* Stats */}
       <section className="py-8 bg-black border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center gap-8 md:gap-16">
+          <div className="flex justify-center gap-6 md:gap-12 flex-wrap">
             <div className="text-center">
               <div className="text-2xl font-black text-white">{chevyCount}</div>
               <div className="text-sm text-zinc-500 uppercase tracking-wider">Chevy</div>
@@ -160,6 +163,18 @@ export default async function GalleryPage() {
             <div className="text-center">
               <div className="text-2xl font-black text-white">{dodgeCount}</div>
               <div className="text-sm text-zinc-500 uppercase tracking-wider">Dodge</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black text-white">{toyotaCount}</div>
+              <div className="text-sm text-zinc-500 uppercase tracking-wider">Toyota</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black text-white">{nissanCount}</div>
+              <div className="text-sm text-zinc-500 uppercase tracking-wider">Nissan</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-black text-white">{gmcCount}</div>
+              <div className="text-sm text-zinc-500 uppercase tracking-wider">GMC</div>
             </div>
           </div>
         </div>

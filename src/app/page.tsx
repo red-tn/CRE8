@@ -27,6 +27,7 @@ async function getHomePageData() {
     Dodge: members?.filter(m => m.truck_make === 'Dodge').length || 0,
     Toyota: members?.filter(m => m.truck_make === 'Toyota').length || 0,
     Nissan: members?.filter(m => m.truck_make === 'Nissan').length || 0,
+    GMC: members?.filter(m => m.truck_make === 'GMC').length || 0,
   }
 
   // Get members with profile photos or truck photos for the fleet section
@@ -444,6 +445,12 @@ export default async function HomePage() {
                 NISSAN
               </div>
               <div className="text-white font-bold mt-1">{brandCounts.Nissan}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-black text-zinc-700 hover:text-zinc-500 transition-colors cursor-default">
+                GMC
+              </div>
+              <div className="text-white font-bold mt-1">{brandCounts.GMC}</div>
             </div>
           </div>
         </div>
