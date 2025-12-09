@@ -100,7 +100,7 @@ export default async function HomePage() {
               alt="CRE8 Truck Club"
               width={200}
               height={100}
-              className="h-24 md:h-32 w-auto animate-pulse-glow"
+              className="h-24 md:h-32 w-auto"
               priority
             />
           </div>
