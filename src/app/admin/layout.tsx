@@ -65,8 +65,26 @@ export default function AdminLayout({
     )
   }
 
-  if (!member || !member.is_admin) {
-    return null
+  if (!member) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-zinc-500 mb-4">Please log in to access the admin panel</p>
+          <Link href="/login" className="text-white underline">Go to Login</Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (!member.is_admin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-zinc-500 mb-4">You don&apos;t have admin access</p>
+          <Link href="/" className="text-white underline">Go to Home</Link>
+        </div>
+      </div>
+    )
   }
 
   return (
