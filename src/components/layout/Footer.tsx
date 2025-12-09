@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Crown, Instagram, Youtube, Mail } from 'lucide-react'
+import Image from 'next/image'
+import { Instagram, Youtube, Mail } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -8,14 +9,17 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <Crown className="w-8 h-8 text-amber-500" />
-              <span className="text-2xl font-black tracking-tighter text-white">
-                CRE<span className="text-amber-500">8</span>
-              </span>
+            <Link href="/" className="inline-block mb-4">
+              <Image
+                src="/logo.png"
+                alt="CRE8 Truck Club"
+                width={100}
+                height={50}
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="text-zinc-500 text-sm max-w-md mb-6">
-              The edgiest truck club for young enthusiasts. Chevy, Ford, Dodge - we don&apos;t discriminate.
+              The edgiest truck club for enthusiasts. Chevy, Ford, Dodge, Toyota, Nissan - we don&apos;t discriminate.
               Just bring your build and your passion.
             </p>
             <div className="flex gap-4">

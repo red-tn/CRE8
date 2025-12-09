@@ -1,4 +1,5 @@
-import { Crown, Target, Heart, Zap, Users } from 'lucide-react'
+import { Target, Heart, Zap, Users } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 
@@ -16,9 +17,15 @@ export default function AboutPage() {
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Crown className="w-12 h-12 text-amber-500 mx-auto mb-6" />
+          <Image
+            src="/logo.png"
+            alt="CRE8 Truck Club"
+            width={150}
+            height={75}
+            className="h-20 w-auto mx-auto mb-6"
+          />
           <h1 className="text-4xl md:text-6xl font-black mb-6">
-            ABOUT <span className="text-amber-500">CRE8</span>
+            ABOUT <span className="text-amber-500">US</span>
           </h1>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
             We&apos;re not your typical truck club. We&apos;re a community of enthusiasts
@@ -52,7 +59,13 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="bg-zinc-900 border border-zinc-800 aspect-video flex items-center justify-center">
-              <Crown className="w-24 h-24 text-zinc-700" />
+              <Image
+                src="/logo.png"
+                alt="CRE8 Truck Club"
+                width={200}
+                height={100}
+                className="h-24 w-auto opacity-30"
+              />
             </div>
           </div>
         </div>

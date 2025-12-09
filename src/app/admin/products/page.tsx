@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { Crown, Plus, Pencil, Trash2, X, Upload } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Upload, Package } from 'lucide-react'
+import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
 import { Product, ProductVariant } from '@/types'
 
@@ -818,7 +819,7 @@ export default function AdminProductsPage() {
             <div className="p-8 text-center text-zinc-500">Loading...</div>
           ) : products.length === 0 ? (
             <div className="p-8 text-center text-zinc-500">
-              <Crown className="w-12 h-12 mx-auto mb-4 text-amber-500/50" />
+              <Package className="w-12 h-12 mx-auto mb-4 text-amber-500/50" />
               <p>No products yet</p>
             </div>
           ) : (
@@ -842,7 +843,7 @@ export default function AdminProductsPage() {
                           {product.image_url || (product.images && product.images.length > 0) ? (
                             <img src={product.images?.[0] || product.image_url} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
-                            <Crown className="w-6 h-6 text-amber-500" />
+                            <Image src="/logo.png" alt="CRE8" width={40} height={20} className="h-6 w-auto opacity-50" />
                           )}
                           {product.images && product.images.length > 1 && (
                             <div className="absolute -bottom-1 -right-1 bg-zinc-700 text-xs px-1 rounded">

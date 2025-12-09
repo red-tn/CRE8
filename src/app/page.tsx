@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Crown, Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
+import { Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
@@ -94,7 +95,14 @@ export default async function HomePage() {
         {/* Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
-            <Crown className="w-20 h-20 text-amber-500 animate-pulse-glow" />
+            <Image
+              src="/logo.png"
+              alt="CRE8 Truck Club"
+              width={200}
+              height={100}
+              className="h-24 md:h-32 w-auto animate-pulse-glow"
+              priority
+            />
           </div>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6">
             CRE<span className="text-amber-500">8</span>
@@ -310,7 +318,13 @@ export default async function HomePage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Crown className="w-12 h-12 text-amber-500/30" />
+                          <Image
+                            src="/logo.png"
+                            alt="CRE8"
+                            width={80}
+                            height={40}
+                            className="h-12 w-auto opacity-30"
+                          />
                         </div>
                       )}
                       {product.is_members_only && (
@@ -368,9 +382,15 @@ export default async function HomePage() {
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Crown className="w-16 h-16 text-amber-500 mx-auto mb-6" />
+          <Image
+            src="/logo.png"
+            alt="CRE8 Truck Club"
+            width={120}
+            height={60}
+            className="h-16 w-auto mx-auto mb-6"
+          />
           <h2 className="text-3xl md:text-5xl font-black mb-6">
-            READY TO <span className="text-amber-500">CRE8</span>?
+            READY TO <span className="text-amber-500">JOIN</span>?
           </h2>
           <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
             $50/year gets you access to everything. Exclusive events, member pricing on merch,

@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getSession } from '@/lib/auth'
-import { Crown, Truck, Instagram, Phone, Mail, ArrowLeft, Ghost, Music2 } from 'lucide-react'
+import { Truck, Instagram, Phone, Mail, ArrowLeft, Ghost, Music2 } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { notFound } from 'next/navigation'
@@ -141,7 +142,13 @@ export default async function MemberProfilePage({ params }: MemberProfileProps) 
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Crown className="w-12 h-12 text-zinc-700" />
+                  <Image
+                    src="/logo.png"
+                    alt="CRE8"
+                    width={80}
+                    height={40}
+                    className="h-12 w-auto opacity-30"
+                  />
                 </div>
               )}
             </div>

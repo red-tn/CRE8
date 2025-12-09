@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Menu, X, ShoppingCart, User, Crown } from 'lucide-react'
+import { Menu, X, ShoppingCart, User } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 import { useAuthStore } from '@/store/auth'
 import { cn } from '@/lib/utils'
@@ -45,13 +46,15 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative">
-              <Crown className="w-8 h-8 text-amber-500 group-hover:scale-110 transition-transform" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter text-white">
-              CRE<span className="text-amber-500">8</span>
-            </span>
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/logo.png"
+              alt="CRE8 Truck Club"
+              width={120}
+              height={60}
+              className="h-12 w-auto group-hover:scale-105 transition-transform"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}

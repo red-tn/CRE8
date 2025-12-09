@@ -3,9 +3,9 @@
 import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuthStore } from '@/store/auth'
 import {
-  Crown,
   Users,
   ShoppingBag,
   Calendar,
@@ -66,12 +66,15 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col fixed h-screen">
         <div className="p-6 border-b border-zinc-800">
-          <Link href="/admin" className="flex items-center gap-2">
-            <Crown className="w-8 h-8 text-amber-500" />
-            <div>
-              <span className="text-xl font-black">CRE8</span>
-              <span className="text-xs text-zinc-500 block">Admin Panel</span>
-            </div>
+          <Link href="/admin" className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="CRE8"
+              width={80}
+              height={40}
+              className="h-10 w-auto"
+            />
+            <span className="text-xs text-zinc-500">Admin</span>
           </Link>
         </div>
 

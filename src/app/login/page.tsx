@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Crown } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/store/auth'
@@ -56,7 +56,13 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Crown className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <Image
+            src="/logo.png"
+            alt="CRE8 Truck Club"
+            width={120}
+            height={60}
+            className="h-16 w-auto mx-auto mb-4"
+          />
           <h1 className="text-3xl font-black">
             MEMBER <span className="text-amber-500">LOGIN</span>
           </h1>
