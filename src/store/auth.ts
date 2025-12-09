@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   logout: async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
       set({ member: null })
     } catch (error) {
       console.error('Logout error:', error)
@@ -29,7 +29,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   checkAuth: async () => {
     try {
       set({ isLoading: true })
-      const res = await fetch('/api/auth/me')
+      const res = await fetch('/api/auth/me', { credentials: 'include' })
       if (res.ok) {
         const data = await res.json()
         set({ member: data.member })
