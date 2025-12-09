@@ -37,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white min-h-screen flex flex-col`}
       >
         {/* Background watermark */}
-        <div className="fixed bottom-0 left-0 -translate-x-1/4 translate-y-1/4 pointer-events-none z-[1] opacity-[0.08]">
+        <div className="fixed bottom-0 left-0 -translate-x-1/4 translate-y-1/4 pointer-events-none z-[1] opacity-[0.12]">
           <Image
             src="/logo.png"
             alt=""

@@ -132,7 +132,7 @@ export default async function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-zinc-900 border-y border-zinc-800">
+      <section className="py-20 bg-zinc-900/80 border-y border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
@@ -156,7 +156,7 @@ export default async function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-24 bg-black">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-black mb-4">
@@ -204,7 +204,7 @@ export default async function HomePage() {
       </section>
 
       {/* Fleet Gallery Preview */}
-      <section className="py-24 bg-zinc-900">
+      <section className="py-24 bg-zinc-900/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-12">
             <div>
@@ -272,7 +272,7 @@ export default async function HomePage() {
 
       {/* Shop Strip Section */}
       {products.length > 0 && (
-        <section className="py-16 bg-black border-t border-zinc-800">
+        <section className="py-16 border-t border-zinc-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
             <div className="flex justify-between items-end">
               <div>
@@ -370,7 +370,7 @@ export default async function HomePage() {
       )}
 
       {/* CTA Section */}
-      <section className="py-24 bg-black relative overflow-hidden">
+      <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 via-transparent to-white/10" />
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
@@ -409,7 +409,7 @@ export default async function HomePage() {
       </section>
 
       {/* Brands Section */}
-      <section className="py-16 bg-zinc-900 border-t border-zinc-800">
+      <section className="py-16 bg-zinc-900/80 border-t border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-zinc-600 uppercase tracking-wider text-sm mb-8">
             We Roll With
