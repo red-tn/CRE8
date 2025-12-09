@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabaseAdmin
       .from('members')
-      .select('*, membership_dues(*), invite_code:invite_codes(*)', { count: 'exact' })
+      .select('*, membership_dues(*), invite_code:invite_codes!members_invite_code_id_fkey(*)', { count: 'exact' })
 
     if (search) {
       query = query.or(`email.ilike.%${search}%,first_name.ilike.%${search}%,last_name.ilike.%${search}%`)
