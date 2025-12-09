@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
-import { Ticket, Plus, Copy, Trash2, Check, ChevronDown, ChevronUp, Users } from 'lucide-react'
+import { Ticket, Plus, Copy, Trash2, Check, ChevronDown, ChevronUp, Users, Pencil, X } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { InviteCode, Member } from '@/types'
 
@@ -25,6 +25,11 @@ export default function AdminInviteCodesPage() {
     maxUses: '1',
     expiresAt: '',
   })
+
+  // Edit modal state
+  const [editingCode, setEditingCode] = useState<InviteCode | null>(null)
+  const [editForm, setEditForm] = useState({ maxUses: '', expiresAt: '' })
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     fetchCodes()
@@ -120,6 +125,40 @@ export default function AdminInviteCodesPage() {
     await navigator.clipboard.writeText(code)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  const openEditModal = (code: InviteCode) => {
+    setEditingCode(code)
+    setEditForm({
+      maxUses: code.max_uses.toString(),
+      expiresAt: code.expires_at ? code.expires_at.split('T')[0] : '',
+    })
+  }
+
+  const saveEdit = async () => {
+    if (!editingCode) return
+
+    setIsSaving(true)
+    try {
+      const res = await fetch('/api/admin/invite-codes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingCode.id,
+          maxUses: parseInt(editForm.maxUses) || 1,
+          expiresAt: editForm.expiresAt || null,
+        }),
+      })
+
+      if (res.ok) {
+        setEditingCode(null)
+        fetchCodes()
+      }
+    } catch (error) {
+      console.error('Error updating invite code:', error)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -239,7 +278,16 @@ export default function AdminInviteCodesPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
+                                  onClick={() => openEditModal(code)}
+                                  title="Edit"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
                                   onClick={() => copyCode(code.code, code.id)}
+                                  title="Copy code"
                                 >
                                   {copiedId === code.id ? (
                                     <Check className="w-4 h-4 text-green-500" />
@@ -251,6 +299,7 @@ export default function AdminInviteCodesPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => deleteCode(code.id)}
+                                  title="Delete"
                                 >
                                   <Trash2 className="w-4 h-4 text-red-500" />
                                 </Button>
@@ -328,6 +377,13 @@ export default function AdminInviteCodesPage() {
                           {code.code}
                         </code>
                         <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditModal(code)}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -430,6 +486,62 @@ export default function AdminInviteCodesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Modal */}
+      {editingCode && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-900 border border-zinc-800 w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+              <div>
+                <h2 className="text-lg font-bold">Edit Invite Code</h2>
+                <code className="text-sm text-zinc-400">{editingCode.code}</code>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setEditingCode(null)}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <Input
+                label="Max Uses"
+                type="number"
+                min="1"
+                value={editForm.maxUses}
+                onChange={(e) => setEditForm({ ...editForm, maxUses: e.target.value })}
+              />
+              <div className="text-xs text-zinc-500">
+                Current usage: {editingCode.current_uses} / {editingCode.max_uses}
+              </div>
+
+              <Input
+                label="Expires At (optional)"
+                type="date"
+                value={editForm.expiresAt}
+                onChange={(e) => setEditForm({ ...editForm, expiresAt: e.target.value })}
+              />
+              {editForm.expiresAt && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditForm({ ...editForm, expiresAt: '' })}
+                  className="text-xs"
+                >
+                  Clear expiration
+                </Button>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3 p-4 border-t border-zinc-800">
+              <Button variant="ghost" onClick={() => setEditingCode(null)}>
+                Cancel
+              </Button>
+              <Button onClick={saveEdit} isLoading={isSaving}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

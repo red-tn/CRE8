@@ -72,6 +72,42 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PUT(request: NextRequest) {
+  try {
+    await requireAdmin()
+
+    const body = await request.json()
+    const { id, maxUses, expiresAt } = body
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID required' }, { status: 400 })
+    }
+
+    const updates: { max_uses?: number; expires_at?: string | null } = {}
+    if (maxUses !== undefined) updates.max_uses = maxUses
+    if (expiresAt !== undefined) updates.expires_at = expiresAt || null
+
+    const { data: inviteCode, error } = await supabaseAdmin
+      .from('invite_codes')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error updating invite code:', error)
+      return NextResponse.json({ error: 'Failed to update invite code' }, { status: 500 })
+    }
+
+    return NextResponse.json({ code: inviteCode })
+  } catch (error) {
+    if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    return NextResponse.json({ error: 'Failed to update invite code' }, { status: 500 })
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     await requireAdmin()
