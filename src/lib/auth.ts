@@ -5,15 +5,22 @@ import crypto from 'crypto'
 const SESSION_COOKIE_NAME = 'cre8_session'
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000 // 30 days
 
+// OWASP recommends minimum 100,000 iterations for PBKDF2 (2024)
+const PBKDF2_ITERATIONS = 100000
+
 export async function hashPassword(password: string): Promise<string> {
   const salt = crypto.randomBytes(16).toString('hex')
-  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
+  const hash = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATIONS, 64, 'sha512').toString('hex')
   return `${salt}:${hash}`
 }
 
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
   const [salt, hash] = storedHash.split(':')
-  const verifyHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
+  // Support legacy 1000 iteration hashes during migration
+  const legacyHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex')
+  if (legacyHash === hash) return true
+  // Check with new iteration count
+  const verifyHash = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATIONS, 64, 'sha512').toString('hex')
   return hash === verifyHash
 }
 

@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  Home,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -175,13 +176,22 @@ export default function AdminLayout({
               <p className="text-xs text-zinc-500 truncate">{member.email}</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors w-full"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </button>
+          <div className="space-y-2">
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors w-full"
+            >
+              <Home className="w-4 h-4" />
+              Main Site
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-sm text-zinc-500 hover:text-white transition-colors w-full"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
         </div>
       </aside>
 

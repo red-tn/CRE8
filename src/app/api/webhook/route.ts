@@ -53,11 +53,15 @@ export async function POST(request: NextRequest) {
           // Handle product order
           const memberId = session.metadata?.member_id || null
           const items = session.metadata?.items ? JSON.parse(session.metadata.items) : []
-          // Retrieve full session with shipping details - cast to any for shipping details access
+
+          // SECURITY: Retrieve line items directly from Stripe to verify what was actually charged
+          const lineItems = await stripe.checkout.sessions.listLineItems(session.id)
+
+          // Retrieve full session with shipping details
           const fullSession = await stripe.checkout.sessions.retrieve(session.id) as Stripe.Checkout.Session & { shipping_details?: { name?: string; address?: Stripe.Address } }
           const shippingDetails = fullSession.shipping_details
 
-          // Create order
+          // Create order using Stripe's verified amounts (not metadata)
           const { data: order } = await supabaseAdmin
             .from('orders')
             .insert({
@@ -85,7 +89,7 @@ export async function POST(request: NextRequest) {
             .single()
 
           if (order && items.length > 0) {
-            // Get product details
+            // Get product details from database
             const productIds = items.map((item: { productId: string }) => item.productId)
             const { data: products } = await supabaseAdmin
               .from('products')
@@ -94,21 +98,38 @@ export async function POST(request: NextRequest) {
 
             if (products) {
               const isMember = !!memberId
+
+              // SECURITY: Build order items using database prices, not metadata
+              // Verify quantities match what Stripe charged by cross-referencing line items
               const orderItems = items.map((item: { productId: string; quantity: number; size?: string; color?: string }) => {
                 const product = products.find(p => p.id === item.productId)
-                const price = isMember && product?.member_price ? product.member_price : product?.price || 0
+                if (!product) return null
+
+                // Use database price, not anything from metadata
+                const price = isMember && product.member_price ? product.member_price : product.price
+
+                // Verify this product was in the Stripe line items
+                const stripeItem = lineItems.data.find(li =>
+                  li.description?.includes(product.name) ||
+                  li.price?.product === product.stripe_product_id
+                )
+
+                // Cap quantity to what was actually charged (prevent inflation)
+                const verifiedQuantity = stripeItem
+                  ? Math.min(item.quantity, stripeItem.quantity || item.quantity)
+                  : item.quantity
 
                 return {
                   order_id: order.id,
                   product_id: item.productId,
-                  product_name: product?.name || 'Unknown Product',
-                  quantity: item.quantity,
+                  product_name: product.name,
+                  quantity: verifiedQuantity,
                   size: item.size,
                   color: item.color,
                   unit_price: price,
-                  total_price: price * item.quantity,
+                  total_price: price * verifiedQuantity,
                 }
-              })
+              }).filter(Boolean)
 
               await supabaseAdmin.from('order_items').insert(orderItems)
 
