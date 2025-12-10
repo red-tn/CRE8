@@ -199,12 +199,17 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 sm:gap-4 flex-wrap">
             {member.is_admin && (
               <Link href="/admin">
                 <Button variant="secondary">Admin Panel</Button>
               </Link>
             )}
+            <Link href="/dashboard/profile">
+              <Button variant="outline">
+                <User className="w-4 h-4 mr-2" /> Edit Profile
+              </Button>
+            </Link>
             <Button variant="ghost" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" /> Logout
             </Button>
