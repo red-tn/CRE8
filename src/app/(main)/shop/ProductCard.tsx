@@ -49,9 +49,23 @@ export function ProductCard({ product }: ProductCardProps) {
     return product.stock_quantity
   }
 
+  // Calculate current stock based on selected variant
   const currentStock = useMemo(() => {
-    return getVariantStock(selectedSize, selectedColor)
-  }, [selectedSize, selectedColor, product.variants])
+    if (!hasVariants) {
+      return product.stock_quantity
+    }
+    // Try to find matching variant
+    const variant = product.variants?.find(v =>
+      (v.size || null) === (selectedSize || null) &&
+      (v.color || null) === (selectedColor || null)
+    )
+    // If variant exists for this combo, use its stock; otherwise use base stock
+    if (variant) {
+      return variant.stock_quantity
+    }
+    // No variant for this combo - use base product stock
+    return product.stock_quantity
+  }, [selectedSize, selectedColor, product.variants, product.stock_quantity, hasVariants])
 
   const isSoldOut = currentStock <= 0
 
