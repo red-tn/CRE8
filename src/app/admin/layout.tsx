@@ -168,9 +168,17 @@ export default function AdminLayout({
 
         <div className="p-4 border-t border-zinc-800">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold">
-              {member.first_name[0]}
-            </div>
+            {member.profile_photo_url ? (
+              <img
+                src={member.profile_photo_url}
+                alt={member.first_name}
+                className="w-10 h-10 object-cover rounded-full"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-white flex items-center justify-center text-black font-bold rounded-full">
+                {member.first_name[0]}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <p className="font-medium text-sm truncate">{member.first_name}</p>
               <p className="text-xs text-zinc-500 truncate">{member.email}</p>

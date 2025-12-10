@@ -393,8 +393,8 @@ export default function AdminMembersPage() {
                       <th className="text-left p-4 text-sm font-bold text-zinc-400">Member</th>
                       <th className="text-left p-4 text-sm font-bold text-zinc-400">Truck</th>
                       <th className="text-left p-4 text-sm font-bold text-zinc-400">Joined</th>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Status</th>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Dues</th>
+                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Account</th>
+                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Dues Status</th>
                       <th className="text-right p-4 text-sm font-bold text-zinc-400">Actions</th>
                     </tr>
                   </thead>
@@ -439,7 +439,7 @@ export default function AdminMembersPage() {
                         </td>
                         <td className="p-4">
                           <Badge variant={member.is_active ? 'success' : 'danger'}>
-                            {member.is_active ? 'Active' : 'Inactive'}
+                            {member.is_active ? 'Enabled' : 'Disabled'}
                           </Badge>
                         </td>
                         <td className="p-4">
@@ -527,7 +527,7 @@ export default function AdminMembersPage() {
                       </div>
                       <div className="flex flex-col gap-1 flex-shrink-0">
                         <Badge variant={member.is_active ? 'success' : 'danger'}>
-                          {member.is_active ? 'Active' : 'Inactive'}
+                          {member.is_active ? 'Enabled' : 'Disabled'}
                         </Badge>
                         {(() => {
                           const duesStatus = getDuesStatus(member)

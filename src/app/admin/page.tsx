@@ -96,7 +96,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="text-green-500 text-sm mt-2">
-              {stats?.activeMembers || 0} active
+              {stats?.activeMembers || 0} paid members
             </p>
           </CardContent>
         </Card>
