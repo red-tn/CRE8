@@ -278,230 +278,85 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Form */}
-          <div className="lg:col-span-2 space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Profile Photo */}
-              <Card>
-                <CardHeader>
-                  <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-white" />
-                    Profile Photo
-                  </h2>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-6">
-                    <div className="w-24 h-24 bg-zinc-800 border border-zinc-700 rounded-full overflow-hidden flex items-center justify-center">
-                      {formData.profile_photo_url ? (
-                        <img
-                          src={formData.profile_photo_url}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <User className="w-10 h-10 text-zinc-600" />
-                      )}
-                    </div>
-                    <div className="text-sm text-zinc-500">
-                      <p>Upload a photo or select from your media library below.</p>
-                      <p className="mt-1">Recommended: Square image, at least 200x200px</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Personal Info */}
-              <Card>
-                <CardHeader>
-                  <h2 className="text-lg font-bold flex items-center gap-2">
-                    <User className="w-5 h-5 text-white" />
-                    Personal Info
-                  </h2>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="First Name"
-                      name="first_name"
-                      value={formData.first_name}
-                      onChange={handleChange}
-                      required
-                    />
-                    <Input
-                      label="Last Name"
-                      name="last_name"
-                      value={formData.last_name}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <Input
-                    label="Phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="(555) 123-4567"
-                  />
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-2">Bio</label>
-                    <textarea
-                      name="bio"
-                      value={formData.bio}
-                      onChange={handleChange}
-                      rows={3}
-                      className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:border-white focus:outline-none transition-colors"
-                      placeholder="Tell us about yourself..."
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Social Media */}
-              <Card>
-                <CardHeader>
-                  <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Instagram className="w-5 h-5 text-white" />
-                    Social Media
-                  </h2>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Input
-                    label="Instagram"
-                    name="instagram_handle"
-                    value={formData.instagram_handle}
-                    onChange={handleChange}
-                    placeholder="@yourusername"
-                  />
-                  <Input
-                    label="Snapchat"
-                    name="snapchat_handle"
-                    value={formData.snapchat_handle}
-                    onChange={handleChange}
-                    placeholder="yourusername"
-                  />
-                  <Input
-                    label="TikTok"
-                    name="tiktok_handle"
-                    value={formData.tiktok_handle}
-                    onChange={handleChange}
-                    placeholder="@yourusername"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Truck Info */}
-              <Card>
-                <CardHeader>
-                  <h2 className="text-lg font-bold flex items-center gap-2">
-                    <Truck className="w-5 h-5 text-white" />
-                    Truck Info
-                  </h2>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Select
-                      label="Year"
-                      name="truck_year"
-                      value={formData.truck_year}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Year</option>
-                      {years.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </Select>
-                    <Select
-                      label="Make"
-                      name="truck_make"
-                      value={formData.truck_make}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          truck_make: e.target.value,
-                          truck_model: '' // Reset model when make changes
-                        })
-                      }}
-                    >
-                      <option value="">Select Make</option>
-                      {TRUCK_MAKES.map((make) => (
-                        <option key={make} value={make}>
-                          {make}
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
-                  <Select
-                    label="Model"
-                    name="truck_model"
-                    value={formData.truck_model}
-                    onChange={handleChange}
-                    disabled={!formData.truck_make}
-                  >
-                    <option value="">
-                      {formData.truck_make ? 'Select Model' : 'Select Make first'}
-                    </option>
-                    {formData.truck_make && TRUCK_MODELS[formData.truck_make as TruckMake].map((model) => (
-                      <option key={model} value={model}>
-                        {model}
-                      </option>
-                    ))}
-                  </Select>
-                </CardContent>
-              </Card>
-
-              <Button type="submit" isLoading={isSaving} className="w-full">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-            </form>
-
-            {/* Change Password */}
+        <div className="max-w-2xl mx-auto space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Profile Photo */}
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-bold flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-white" />
-                  Change Password
+                  <Camera className="w-5 h-5 text-white" />
+                  Profile Photo
                 </h2>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleChangePassword} className="space-y-4">
-                  <Input
-                    label="Current Password"
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    required
-                  />
-                  <Input
-                    label="New Password"
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder="At least 8 characters"
-                    required
-                  />
-                  <Input
-                    label="Confirm New Password"
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    required
-                  />
-                  <Button type="submit" variant="secondary" isLoading={isChangingPassword} className="w-full">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Change Password
-                  </Button>
-                </form>
+                <div className="flex items-center gap-6">
+                  <div className="w-24 h-24 bg-zinc-800 border border-zinc-700 rounded-full overflow-hidden flex items-center justify-center">
+                    {formData.profile_photo_url ? (
+                      <img
+                        src={formData.profile_photo_url}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-10 h-10 text-zinc-600" />
+                    )}
+                  </div>
+                  <div className="text-sm text-zinc-500">
+                    <p>Upload a photo or select from your media library below.</p>
+                    <p className="mt-1">Recommended: Square image, at least 200x200px</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Media Library Sidebar */}
-          <div className="space-y-6">
+            {/* Personal Info */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <User className="w-5 h-5 text-white" />
+                  Personal Info
+                </h2>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="First Name"
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Input
+                    label="Last Name"
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <Input
+                  label="Phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="(555) 123-4567"
+                />
+                <div>
+                  <label className="block text-sm font-medium text-zinc-400 mb-2">Bio</label>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 focus:border-white focus:outline-none transition-colors"
+                    placeholder="Tell us about yourself..."
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Media Library - Inline */}
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-bold flex items-center gap-2">
@@ -536,7 +391,7 @@ export default function ProfilePage() {
                     <p className="text-sm">No media uploaded yet</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {media.map((item) => (
                       <div
                         key={item.id}
@@ -586,6 +441,147 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Social Media */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <Instagram className="w-5 h-5 text-white" />
+                  Social Media
+                </h2>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Input
+                  label="Instagram"
+                  name="instagram_handle"
+                  value={formData.instagram_handle}
+                  onChange={handleChange}
+                  placeholder="@yourusername"
+                />
+                <Input
+                  label="Snapchat"
+                  name="snapchat_handle"
+                  value={formData.snapchat_handle}
+                  onChange={handleChange}
+                  placeholder="yourusername"
+                />
+                <Input
+                  label="TikTok"
+                  name="tiktok_handle"
+                  value={formData.tiktok_handle}
+                  onChange={handleChange}
+                  placeholder="@yourusername"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Truck Info */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-white" />
+                  Truck Info
+                </h2>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <Select
+                    label="Year"
+                    name="truck_year"
+                    value={formData.truck_year}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Year</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    label="Make"
+                    name="truck_make"
+                    value={formData.truck_make}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        truck_make: e.target.value,
+                        truck_model: '' // Reset model when make changes
+                      })
+                    }}
+                  >
+                    <option value="">Select Make</option>
+                    {TRUCK_MAKES.map((make) => (
+                      <option key={make} value={make}>
+                        {make}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <Select
+                  label="Model"
+                  name="truck_model"
+                  value={formData.truck_model}
+                  onChange={handleChange}
+                  disabled={!formData.truck_make}
+                >
+                  <option value="">
+                    {formData.truck_make ? 'Select Model' : 'Select Make first'}
+                  </option>
+                  {formData.truck_make && TRUCK_MODELS[formData.truck_make as TruckMake].map((model) => (
+                    <option key={model} value={model}>
+                      {model}
+                    </option>
+                  ))}
+                </Select>
+              </CardContent>
+            </Card>
+
+            <Button type="submit" isLoading={isSaving} className="w-full">
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
+          </form>
+
+            {/* Change Password */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-white" />
+                  Change Password
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <Input
+                    label="Current Password"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    required
+                  />
+                  <Input
+                    label="New Password"
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    placeholder="At least 8 characters"
+                    required
+                  />
+                  <Input
+                    label="Confirm New Password"
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    required
+                  />
+                  <Button type="submit" variant="secondary" isLoading={isChangingPassword} className="w-full">
+                    <Lock className="w-4 h-4 mr-2" />
+                    Change Password
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </div>

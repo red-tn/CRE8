@@ -2,10 +2,17 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
-import { Users, DollarSign, ShoppingBag, Calendar, TrendingUp, AlertCircle } from 'lucide-react'
+import { Users, DollarSign, ShoppingBag, Calendar, TrendingUp, AlertCircle, ChevronDown, ChevronUp, Mail } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+
+interface ExpiringMember {
+  id: string
+  name: string
+  email: string
+  expiresAt: string
+}
 
 interface DashboardStats {
   totalMembers: number
@@ -14,11 +21,14 @@ interface DashboardStats {
   pendingOrders: number
   upcomingEvents: number
   expiringSoon: number
+  expiringMembers: ExpiringMember[]
 }
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [showExpiringMembers, setShowExpiringMembers] = useState(false)
+  const [isSendingReminders, setIsSendingReminders] = useState(false)
 
   useEffect(() => {
     fetchStats()
@@ -35,6 +45,30 @@ export default function AdminDashboard() {
       console.error('Error fetching stats:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const sendDuesReminders = async () => {
+    if (!confirm('Send dues reminder emails to members with expiring memberships?')) return
+
+    setIsSendingReminders(true)
+    try {
+      const res = await fetch('/api/admin/send-reminders', {
+        method: 'POST',
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        alert(data.message || `Sent ${data.sent} reminder emails`)
+      } else {
+        alert(data.error || 'Failed to send reminders')
+      }
+    } catch (error) {
+      console.error('Error sending reminders:', error)
+      alert('Failed to send reminders')
+    } finally {
+      setIsSendingReminders(false)
     }
   }
 
@@ -128,14 +162,53 @@ export default function AdminDashboard() {
               <div>
                 <p className="text-zinc-500 text-sm flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-white" />
-                  Memberships Expiring Soon
+                  Memberships Expiring Soon (30 days)
                 </p>
                 <p className="text-3xl font-black">{stats?.expiringSoon || 0}</p>
               </div>
-              <Link href="/admin/members?filter=expiring">
-                <Button variant="outline">Send Reminders</Button>
-              </Link>
+              <div className="flex gap-2">
+                {(stats?.expiringSoon || 0) > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowExpiringMembers(!showExpiringMembers)}
+                  >
+                    {showExpiringMembers ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={sendDuesReminders}
+                  isLoading={isSendingReminders}
+                  disabled={(stats?.expiringSoon || 0) === 0}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Reminders
+                </Button>
+              </div>
             </div>
+            {showExpiringMembers && stats?.expiringMembers && stats.expiringMembers.length > 0 && (
+              <div className="mt-4 border-t border-zinc-800 pt-4">
+                <p className="text-sm text-zinc-400 mb-2">Members who will receive reminders:</p>
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {stats.expiringMembers.map((member) => (
+                    <div key={member.id} className="flex justify-between items-center text-sm bg-zinc-800/50 px-3 py-2">
+                      <div>
+                        <span className="text-white font-medium">{member.name}</span>
+                        <span className="text-zinc-500 ml-2">{member.email}</span>
+                      </div>
+                      <span className="text-yellow-500 text-xs">
+                        Expires {new Date(member.expiresAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

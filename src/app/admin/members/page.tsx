@@ -8,10 +8,43 @@ import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
 import { Search, Users, Check, X, Shield, Pencil, KeyRound } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
-import { Member, TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
+import { Member, MembershipDues, TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
+
+interface MemberWithDues extends Member {
+  membership_dues?: MembershipDues[]
+}
+
+// Helper function to get dues status
+function getDuesStatus(member: MemberWithDues): { label: string; variant: 'success' | 'warning' | 'danger' | 'default' } {
+  const dues = member.membership_dues
+  if (!dues || dues.length === 0) {
+    return { label: 'Unpaid', variant: 'danger' }
+  }
+
+  // Find the most recent paid dues
+  const paidDues = dues.filter(d => d.status === 'paid').sort((a, b) =>
+    new Date(b.period_end).getTime() - new Date(a.period_end).getTime()
+  )[0]
+
+  if (!paidDues) {
+    return { label: 'Unpaid', variant: 'danger' }
+  }
+
+  const now = new Date()
+  const expiresDate = new Date(paidDues.period_end)
+  const daysUntilExpiry = Math.ceil((expiresDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (daysUntilExpiry < 0) {
+    return { label: 'Expired', variant: 'danger' }
+  } else if (daysUntilExpiry <= 30) {
+    return { label: `${daysUntilExpiry}d left`, variant: 'warning' }
+  } else {
+    return { label: 'Paid', variant: 'success' }
+  }
+}
 
 export default function AdminMembersPage() {
-  const [members, setMembers] = useState<Member[]>([])
+  const [members, setMembers] = useState<MemberWithDues[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('')
@@ -361,6 +394,7 @@ export default function AdminMembersPage() {
                       <th className="text-left p-4 text-sm font-bold text-zinc-400">Truck</th>
                       <th className="text-left p-4 text-sm font-bold text-zinc-400">Joined</th>
                       <th className="text-left p-4 text-sm font-bold text-zinc-400">Status</th>
+                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Dues</th>
                       <th className="text-right p-4 text-sm font-bold text-zinc-400">Actions</th>
                     </tr>
                   </thead>
@@ -407,6 +441,16 @@ export default function AdminMembersPage() {
                           <Badge variant={member.is_active ? 'success' : 'danger'}>
                             {member.is_active ? 'Active' : 'Inactive'}
                           </Badge>
+                        </td>
+                        <td className="p-4">
+                          {(() => {
+                            const duesStatus = getDuesStatus(member)
+                            return (
+                              <Badge variant={duesStatus.variant}>
+                                {duesStatus.label}
+                              </Badge>
+                            )
+                          })()}
                         </td>
                         <td className="p-4 text-right">
                           <div className="flex justify-end gap-2">
@@ -481,9 +525,19 @@ export default function AdminMembersPage() {
                           <p className="text-sm text-zinc-500 truncate">{member.email}</p>
                         </div>
                       </div>
-                      <Badge variant={member.is_active ? 'success' : 'danger'} className="flex-shrink-0">
-                        {member.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
+                      <div className="flex flex-col gap-1 flex-shrink-0">
+                        <Badge variant={member.is_active ? 'success' : 'danger'}>
+                          {member.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                        {(() => {
+                          const duesStatus = getDuesStatus(member)
+                          return (
+                            <Badge variant={duesStatus.variant}>
+                              {duesStatus.label}
+                            </Badge>
+                          )
+                        })()}
+                      </div>
                     </div>
                     <div className="text-sm text-zinc-400 mb-3">
                       {member.truck_make ? (

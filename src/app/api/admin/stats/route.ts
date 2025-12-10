@@ -49,13 +49,22 @@ export async function GET() {
       .eq('is_active', true)
       .gte('event_date', new Date().toISOString().split('T')[0])
 
-    // Get memberships expiring in 30 days
-    const { count: expiringSoon } = await supabaseAdmin
+    // Get memberships expiring in 30 days with member details
+    const { data: expiringDues, count: expiringSoon } = await supabaseAdmin
       .from('membership_dues')
-      .select('*', { count: 'exact', head: true })
+      .select('*, member:members(id, first_name, last_name, email)', { count: 'exact' })
       .eq('status', 'paid')
       .lte('period_end', thirtyDaysFromNow.toISOString().split('T')[0])
       .gte('period_end', new Date().toISOString().split('T')[0])
+      .order('period_end', { ascending: true })
+
+    // Format expiring members for frontend
+    const expiringMembers = (expiringDues || []).map(d => ({
+      id: d.member?.id,
+      name: `${d.member?.first_name} ${d.member?.last_name}`,
+      email: d.member?.email,
+      expiresAt: d.period_end,
+    }))
 
     return NextResponse.json({
       totalMembers: totalMembers || 0,
@@ -64,6 +73,7 @@ export async function GET() {
       pendingOrders: pendingOrders || 0,
       upcomingEvents: upcomingEvents || 0,
       expiringSoon: expiringSoon || 0,
+      expiringMembers,
     })
   } catch (error) {
     if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
