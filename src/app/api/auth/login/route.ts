@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
       member: memberData,
     })
   } catch (error) {
-    console.error('Login error:', error)
+    console.error('Login error:', error instanceof Error ? error.message : error)
+    console.error('Login error stack:', error instanceof Error ? error.stack : 'No stack')
     return NextResponse.json(
       { error: 'Something went wrong' },
       { status: 500 }

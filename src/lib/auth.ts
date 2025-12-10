@@ -39,35 +39,13 @@ export async function createSession(memberId: string): Promise<string> {
   })
 
   const cookieStore = await cookies()
-  const cookieOptions: {
-    httpOnly: boolean
-    secure: boolean
-    sameSite: 'lax'
-    expires: Date
-    path: string
-    domain?: string
-  } = {
+  cookieStore.set(SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     expires: expiresAt,
     path: '/',
-  }
-
-  // Set domain for production to ensure cookie works across the domain
-  if (process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_APP_URL) {
-    try {
-      const url = new URL(process.env.NEXT_PUBLIC_APP_URL)
-      // Don't set domain for localhost or vercel.app
-      if (!url.hostname.includes('localhost') && !url.hostname.includes('vercel.app')) {
-        cookieOptions.domain = url.hostname
-      }
-    } catch {
-      // Ignore URL parsing errors
-    }
-  }
-
-  cookieStore.set(SESSION_COOKIE_NAME, token, cookieOptions)
+  })
 
   return token
 }
