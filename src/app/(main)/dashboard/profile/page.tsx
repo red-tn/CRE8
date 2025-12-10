@@ -545,46 +545,45 @@ export default function ProfilePage() {
             </Button>
           </form>
 
-            {/* Change Password */}
-            <Card>
-              <CardHeader>
-                <h2 className="text-lg font-bold flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-white" />
+          {/* Change Password */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Lock className="w-5 h-5 text-white" />
+                Change Password
+              </h2>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <Input
+                  label="Current Password"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                  required
+                />
+                <Input
+                  label="New Password"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  placeholder="At least 8 characters"
+                  required
+                />
+                <Input
+                  label="Confirm New Password"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  required
+                />
+                <Button type="submit" variant="secondary" isLoading={isChangingPassword} className="w-full">
+                  <Lock className="w-4 h-4 mr-2" />
                   Change Password
-                </h2>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleChangePassword} className="space-y-4">
-                  <Input
-                    label="Current Password"
-                    type="password"
-                    value={passwordData.currentPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    required
-                  />
-                  <Input
-                    label="New Password"
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder="At least 8 characters"
-                    required
-                  />
-                  <Input
-                    label="Confirm New Password"
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    required
-                  />
-                  <Button type="submit" variant="secondary" isLoading={isChangingPassword} className="w-full">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Change Password
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
