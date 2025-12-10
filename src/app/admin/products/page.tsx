@@ -31,9 +31,14 @@ const getSizesForCategory = (category: string): string[] => {
   }
 }
 
-// Check if category needs sizes
+// Check if category needs sizes (only apparel uses size/color at product level)
 const categoryNeedsSizes = (category: string): boolean => {
-  return category === 'apparel' || category === 'hats'
+  return category === 'apparel'
+}
+
+// Check if category should only use variants (no size/color at product level)
+const categoryUsesVariantsOnly = (category: string): boolean => {
+  return category === 'hats' || category === 'stickers' || category === 'accessories'
 }
 
 // Generate SKU from product name
@@ -520,15 +525,12 @@ export default function AdminProductsPage() {
                     { value: 'other', label: 'Other' },
                   ]}
                 />
-                {/* Size Checkboxes - only for apparel and hats */}
+                {/* Size Checkboxes - only for apparel */}
                 {categoryNeedsSizes(formData.category) && (
                   <div>
                     <label className="block text-sm font-medium text-zinc-400 mb-2">
-                      {formData.category === 'hats' ? 'Hat Styles/Sizes' : 'Sizes'}
+                      Sizes
                     </label>
-                    {formData.category === 'hats' && (
-                      <p className="text-xs text-zinc-500 mb-2">Select Snapback for adjustable, or Fitted sizes</p>
-                    )}
                     <div className="flex flex-wrap gap-3">
                       {getSizesForCategory(formData.category).map((size) => (
                         <label key={size} className="flex items-center gap-2 cursor-pointer">
@@ -551,67 +553,79 @@ export default function AdminProductsPage() {
                   </div>
                 )}
 
-                {/* Color Multi-Select */}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-2">
-                    Colors
-                  </label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {formData.colors.map((color) => (
-                      <span
-                        key={color}
-                        className="bg-zinc-700 text-white px-2 py-1 text-sm flex items-center gap-1"
-                      >
-                        {color}
-                        <button
-                          type="button"
-                          onClick={() => setFormData({ ...formData, colors: formData.colors.filter(c => c !== color) })}
-                          className="text-zinc-400 hover:text-red-500"
+                {/* Color Multi-Select - only for apparel */}
+                {categoryNeedsSizes(formData.category) && (
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">
+                      Colors
+                    </label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {formData.colors.map((color) => (
+                        <span
+                          key={color}
+                          className="bg-zinc-700 text-white px-2 py-1 text-sm flex items-center gap-1"
                         >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <select
-                      className="flex-1 bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm focus:outline-none focus:border-white"
-                      value=""
-                      onChange={(e) => {
-                        if (e.target.value && !formData.colors.includes(e.target.value)) {
-                          setFormData({ ...formData, colors: [...formData.colors, e.target.value] })
-                        }
-                      }}
-                    >
-                      <option value="">Add color...</option>
-                      {PRIMARY_COLORS.filter(c => !formData.colors.includes(c)).map((color) => (
-                        <option key={color} value={color}>{color}</option>
+                          {color}
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, colors: formData.colors.filter(c => c !== color) })}
+                            className="text-zinc-400 hover:text-red-500"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
                       ))}
-                    </select>
-                    <div className="flex gap-1">
-                      <input
-                        type="text"
-                        value={customProductColor}
-                        onChange={(e) => setCustomProductColor(e.target.value)}
-                        placeholder="Custom"
-                        className="w-24 bg-zinc-800 border border-zinc-700 px-2 py-2 text-sm focus:outline-none focus:border-white"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (customProductColor.trim() && !formData.colors.includes(customProductColor.trim())) {
-                            setFormData({ ...formData, colors: [...formData.colors, customProductColor.trim()] })
-                            setCustomProductColor('')
+                    </div>
+                    <div className="flex gap-2">
+                      <select
+                        className="flex-1 bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm focus:outline-none focus:border-white"
+                        value=""
+                        onChange={(e) => {
+                          if (e.target.value && !formData.colors.includes(e.target.value)) {
+                            setFormData({ ...formData, colors: [...formData.colors, e.target.value] })
                           }
                         }}
                       >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                        <option value="">Add color...</option>
+                        {PRIMARY_COLORS.filter(c => !formData.colors.includes(c)).map((color) => (
+                          <option key={color} value={color}>{color}</option>
+                        ))}
+                      </select>
+                      <div className="flex gap-1">
+                        <input
+                          type="text"
+                          value={customProductColor}
+                          onChange={(e) => setCustomProductColor(e.target.value)}
+                          placeholder="Custom"
+                          className="w-24 bg-zinc-800 border border-zinc-700 px-2 py-2 text-sm focus:outline-none focus:border-white"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (customProductColor.trim() && !formData.colors.includes(customProductColor.trim())) {
+                              setFormData({ ...formData, colors: [...formData.colors, customProductColor.trim()] })
+                              setCustomProductColor('')
+                            }
+                          }}
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* Note for variant-only categories */}
+                {categoryUsesVariantsOnly(formData.category) && (
+                  <div className="bg-zinc-800 p-3 border border-zinc-700">
+                    <p className="text-sm text-zinc-400">
+                      <strong>{formData.category === 'hats' ? 'Hats' : formData.category === 'stickers' ? 'Stickers' : 'Accessories'}</strong> use variants for inventory management.
+                      Save the product first, then add variants with specific options and stock levels.
+                    </p>
+                  </div>
+                )}
                 {/* Only show base stock input if no variants exist */}
                 {variants.length === 0 && (
                   <Input
