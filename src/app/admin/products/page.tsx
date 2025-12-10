@@ -612,15 +612,22 @@ export default function AdminProductsPage() {
                     </div>
                   </div>
                 </div>
-                <Input
-                  label="Base Stock Quantity"
-                  type="number"
-                  value={formData.stockQuantity}
-                  onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
-                  disabled={variants.length > 0}
-                />
+                {/* Only show base stock input if no variants exist */}
+                {variants.length === 0 && (
+                  <Input
+                    label="Stock Quantity"
+                    type="number"
+                    value={formData.stockQuantity}
+                    onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+                  />
+                )}
                 {variants.length > 0 && (
-                  <p className="text-xs text-zinc-500 -mt-2">Stock is managed per variant below</p>
+                  <div className="bg-zinc-800 p-3 border border-zinc-700">
+                    <p className="text-sm text-zinc-400">Total Stock (from variants):</p>
+                    <p className="text-2xl font-bold text-white">
+                      {variants.reduce((sum, v) => sum + v.stock_quantity, 0)} units
+                    </p>
+                  </div>
                 )}
 
                 {/* Variant Inventory Section - Only show when editing */}
@@ -780,9 +787,6 @@ export default function AdminProductsPage() {
                             </button>
                           </div>
                         ))}
-                        <p className="text-xs text-zinc-500 pt-1">
-                          Total: {variants.reduce((sum, v) => sum + v.stock_quantity, 0)} units
-                        </p>
                       </div>
                     )}
                   </div>

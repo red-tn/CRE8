@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
 
+// Helper to recalculate product stock from variants
+async function recalculateProductStock(productId: string) {
+  const { data: variants } = await supabaseAdmin
+    .from('product_variants')
+    .select('stock_quantity')
+    .eq('product_id', productId)
+    .eq('is_active', true)
+
+  const totalStock = variants?.reduce((sum, v) => sum + (v.stock_quantity || 0), 0) || 0
+
+  await supabaseAdmin
+    .from('products')
+    .update({ stock_quantity: totalStock })
+    .eq('id', productId)
+}
+
 // GET - Fetch variants for a product
 export async function GET(request: NextRequest) {
   try {
@@ -64,6 +80,9 @@ export async function POST(request: NextRequest) {
       throw error
     }
 
+    // Recalculate product stock from variants
+    await recalculateProductStock(productId)
+
     return NextResponse.json({ variant })
   } catch (error) {
     if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
@@ -101,6 +120,11 @@ export async function PUT(request: NextRequest) {
 
     if (error) throw error
 
+    // Recalculate product stock from variants
+    if (variant?.product_id) {
+      await recalculateProductStock(variant.product_id)
+    }
+
     return NextResponse.json({ variant })
   } catch (error) {
     if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
@@ -122,12 +146,24 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Variant ID required' }, { status: 400 })
     }
 
+    // Get product_id before deleting
+    const { data: variant } = await supabaseAdmin
+      .from('product_variants')
+      .select('product_id')
+      .eq('id', id)
+      .single()
+
     const { error } = await supabaseAdmin
       .from('product_variants')
       .delete()
       .eq('id', id)
 
     if (error) throw error
+
+    // Recalculate product stock from remaining variants
+    if (variant?.product_id) {
+      await recalculateProductStock(variant.product_id)
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

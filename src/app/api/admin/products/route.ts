@@ -11,7 +11,37 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false })
 
-    return NextResponse.json({ products: products || [] })
+    if (!products) {
+      return NextResponse.json({ products: [] })
+    }
+
+    // Fetch all variants for these products
+    const productIds = products.map(p => p.id)
+    const { data: variants } = await supabaseAdmin
+      .from('product_variants')
+      .select('*')
+      .in('product_id', productIds)
+      .eq('is_active', true)
+
+    // Calculate total stock from variants for each product
+    const productsWithStock = products.map(product => {
+      const productVariants = variants?.filter(v => v.product_id === product.id) || []
+      const hasVariants = productVariants.length > 0
+
+      // If has variants, calculate total from variants; otherwise use base stock
+      const calculatedStock = hasVariants
+        ? productVariants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0)
+        : product.stock_quantity
+
+      return {
+        ...product,
+        stock_quantity: calculatedStock,
+        has_variants: hasVariants,
+        variant_count: productVariants.length,
+      }
+    })
+
+    return NextResponse.json({ products: productsWithStock })
   } catch (error) {
     if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -88,6 +118,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
     }
 
+    // Check if product has variants
+    const { data: variants } = await supabaseAdmin
+      .from('product_variants')
+      .select('stock_quantity')
+      .eq('product_id', id)
+      .eq('is_active', true)
+
+    const hasVariants = variants && variants.length > 0
+
     // Convert field names
     const dbUpdates: Record<string, unknown> = {}
     if (updates.name !== undefined) dbUpdates.name = updates.name
@@ -99,9 +138,19 @@ export async function PUT(request: NextRequest) {
     if (updates.category !== undefined) dbUpdates.category = updates.category
     if (updates.sizes !== undefined) dbUpdates.sizes = updates.sizes
     if (updates.colors !== undefined) dbUpdates.colors = updates.colors
-    if (updates.stockQuantity !== undefined) dbUpdates.stock_quantity = updates.stockQuantity
     if (updates.isMembersOnly !== undefined) dbUpdates.is_members_only = updates.isMembersOnly
     if (updates.isActive !== undefined) dbUpdates.is_active = updates.isActive
+
+    // Only update base stock if there are no variants
+    if (updates.stockQuantity !== undefined && !hasVariants) {
+      dbUpdates.stock_quantity = updates.stockQuantity
+    }
+
+    // If has variants, calculate and store total from variants
+    if (hasVariants) {
+      const totalStock = variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0)
+      dbUpdates.stock_quantity = totalStock
+    }
 
     const { data: product, error } = await supabaseAdmin
       .from('products')
