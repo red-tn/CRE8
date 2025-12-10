@@ -36,36 +36,45 @@ export function ProductCard({ product }: ProductCardProps) {
     if (!hasVariants) {
       return product.stock_quantity
     }
+
+    // Determine if we should match by size only or color only
+    const productHasSizes = product.sizes.length > 0
+    const productHasColors = product.colors.length > 0
+
     // Try to find matching variant
-    const variant = product.variants?.find(v =>
-      (v.size || null) === (size || null) &&
-      (v.color || null) === (color || null)
-    )
-    // If variant exists for this combo, use its stock; otherwise use base stock
+    const variant = product.variants?.find(v => {
+      // Match size if product has sizes defined
+      const sizeMatches = !productHasSizes || (v.size || null) === (size || null)
+      // Match color if product has colors defined
+      const colorMatches = !productHasColors || (v.color || null) === (color || null)
+      return sizeMatches && colorMatches
+    })
+
+    // If variant exists for this combo, use its stock
     if (variant) {
       return variant.stock_quantity
     }
-    // No variant for this combo - use base product stock
-    return product.stock_quantity
+
+    // If no exact match but we have variants, sum up variants that match the criteria
+    // This handles cases where not all size/color combos have variants
+    const matchingVariants = product.variants?.filter(v => {
+      const sizeMatches = !productHasSizes || !size || (v.size || null) === (size || null)
+      const colorMatches = !productHasColors || !color || (v.color || null) === (color || null)
+      return sizeMatches && colorMatches
+    }) || []
+
+    if (matchingVariants.length > 0) {
+      return matchingVariants.reduce((sum, v) => sum + v.stock_quantity, 0)
+    }
+
+    // No matching variants - return 0 (not base stock, since we have variants defined)
+    return 0
   }
 
   // Calculate current stock based on selected variant
   const currentStock = useMemo(() => {
-    if (!hasVariants) {
-      return product.stock_quantity
-    }
-    // Try to find matching variant
-    const variant = product.variants?.find(v =>
-      (v.size || null) === (selectedSize || null) &&
-      (v.color || null) === (selectedColor || null)
-    )
-    // If variant exists for this combo, use its stock; otherwise use base stock
-    if (variant) {
-      return variant.stock_quantity
-    }
-    // No variant for this combo - use base product stock
-    return product.stock_quantity
-  }, [selectedSize, selectedColor, product.variants, product.stock_quantity, hasVariants])
+    return getVariantStock(selectedSize, selectedColor)
+  }, [selectedSize, selectedColor, product.variants, product.stock_quantity, product.sizes.length, product.colors.length, hasVariants])
 
   const isSoldOut = currentStock <= 0
 
@@ -146,13 +155,11 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        {/* Size selector - fixed height area (only for apparel/hats) */}
+        {/* Size selector - only for apparel (not hats, stickers, accessories) */}
         <div className="mb-4 min-h-[3.5rem]">
-          {product.sizes.length > 0 && (
+          {product.sizes.length > 0 && product.category === 'apparel' && (
             <>
-              <p className="text-xs text-zinc-500 mb-2">
-                {product.category === 'hats' ? 'Style/Size' : 'Size'}
-              </p>
+              <p className="text-xs text-zinc-500 mb-2">Size</p>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map(size => {
                   const soldOut = isSizeSoldOut(size)
@@ -178,9 +185,9 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Color selector - fixed height area */}
+        {/* Color selector - only for apparel (not hats, stickers, accessories) */}
         <div className="mb-4 min-h-[3.5rem]">
-          {product.colors.length > 0 && (
+          {product.colors.length > 0 && product.category === 'apparel' && (
             <>
               <p className="text-xs text-zinc-500 mb-2">Color</p>
               <div className="flex flex-wrap gap-2">
