@@ -30,6 +30,7 @@ export interface Member {
   invite_code?: InviteCode
   is_admin: boolean
   is_active: boolean
+  receive_order_notifications?: boolean
   created_at: string
   updated_at: string
 }

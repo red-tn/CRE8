@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
-import { Package, Eye, X } from 'lucide-react'
+import { Package, Eye, X, Truck, Printer, MapPin, Copy } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Order } from '@/types'
 
@@ -14,6 +14,8 @@ export default function AdminOrdersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState('')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [trackingNumber, setTrackingNumber] = useState('')
+  const [isSavingTracking, setIsSavingTracking] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -54,6 +56,50 @@ export default function AdminOrdersPage() {
     } catch (error) {
       console.error('Error updating order:', error)
     }
+  }
+
+  const saveTrackingNumber = async () => {
+    if (!selectedOrder || !trackingNumber.trim()) return
+    setIsSavingTracking(true)
+
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedOrder.id,
+          tracking_number: trackingNumber.trim(),
+          status: 'shipped' // Auto-update status to shipped when tracking is added
+        }),
+      })
+
+      if (res.ok) {
+        fetchOrders()
+        setSelectedOrder({ ...selectedOrder, tracking_number: trackingNumber.trim(), status: 'shipped' })
+        alert('Tracking number saved!')
+      }
+    } catch (error) {
+      console.error('Error saving tracking:', error)
+      alert('Failed to save tracking number')
+    } finally {
+      setIsSavingTracking(false)
+    }
+  }
+
+  const copyAddressToClipboard = () => {
+    if (!selectedOrder?.shipping_address) return
+    const addr = selectedOrder.shipping_address
+    const text = `${addr.name}
+${addr.line1}${addr.line2 ? '\n' + addr.line2 : ''}
+${addr.city}, ${addr.state} ${addr.postal_code}
+${addr.country || 'USA'}`
+    navigator.clipboard.writeText(text)
+    alert('Address copied to clipboard!')
+  }
+
+  const openFedExShipManager = () => {
+    // FedEx Ship Manager URL - users will need to be logged in
+    window.open('https://www.fedex.com/shipping/shipEntryAction.do', '_blank')
   }
 
   const getStatusBadge = (status: string) => {
@@ -150,19 +196,90 @@ export default function AdminOrdersPage() {
 
                 {/* Shipping Address */}
                 {selectedOrder.shipping_address && (
-                  <div>
-                    <h3 className="font-bold mb-2">Shipping Address</h3>
-                    <p>{selectedOrder.shipping_address.name}</p>
-                    <p>{selectedOrder.shipping_address.line1}</p>
-                    {selectedOrder.shipping_address.line2 && (
-                      <p>{selectedOrder.shipping_address.line2}</p>
-                    )}
-                    <p>
-                      {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state}{' '}
-                      {selectedOrder.shipping_address.postal_code}
-                    </p>
+                  <div className="bg-zinc-800 p-4 border border-zinc-700">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-bold flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        Shipping Address
+                      </h3>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" onClick={copyAddressToClipboard} title="Copy address">
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                        <Button variant="secondary" size="sm" onClick={openFedExShipManager} title="Open FedEx Ship Manager">
+                          <Printer className="w-4 h-4 mr-1" />
+                          FedEx
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="text-sm space-y-1">
+                      <p className="font-medium text-white">{selectedOrder.shipping_address.name}</p>
+                      <p>{selectedOrder.shipping_address.line1}</p>
+                      {selectedOrder.shipping_address.line2 && (
+                        <p>{selectedOrder.shipping_address.line2}</p>
+                      )}
+                      <p>
+                        {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state}{' '}
+                        {selectedOrder.shipping_address.postal_code}
+                      </p>
+                      <p>{selectedOrder.shipping_address.country || 'United States'}</p>
+                    </div>
                   </div>
                 )}
+
+                {/* Tracking Number */}
+                <div className="bg-zinc-800 p-4 border border-zinc-700">
+                  <h3 className="font-bold flex items-center gap-2 mb-3">
+                    <Truck className="w-4 h-4" />
+                    Shipping & Tracking
+                  </h3>
+                  {selectedOrder.tracking_number ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-zinc-400">Tracking Number:</p>
+                      <div className="flex items-center gap-2">
+                        <code className="bg-zinc-900 px-3 py-2 font-mono text-sm flex-1">
+                          {selectedOrder.tracking_number}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedOrder.tracking_number || '')
+                            alert('Tracking number copied!')
+                          }}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => window.open(`https://www.fedex.com/fedextrack/?trknbr=${selectedOrder.tracking_number}`, '_blank')}
+                        >
+                          Track
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-zinc-400">Add tracking number to mark as shipped:</p>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Enter tracking number"
+                          value={trackingNumber}
+                          onChange={(e) => setTrackingNumber(e.target.value)}
+                          className="flex-1"
+                        />
+                        <Button
+                          onClick={saveTrackingNumber}
+                          isLoading={isSavingTracking}
+                          disabled={!trackingNumber.trim()}
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Order Items */}
                 <div>
@@ -187,7 +304,7 @@ export default function AdminOrdersPage() {
                 {/* Update Status */}
                 <div>
                   <h3 className="font-bold mb-2">Update Status</h3>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {['paid', 'shipped', 'delivered', 'cancelled'].map((status) => (
                       <Button
                         key={status}
@@ -198,7 +315,23 @@ export default function AdminOrdersPage() {
                         {status}
                       </Button>
                     ))}
+                    {selectedOrder.status !== 'refunded' && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => {
+                          if (confirm('Are you sure you want to refund this order? This will process a refund through Stripe.')) {
+                            updateOrderStatus(selectedOrder.id, 'refunded')
+                          }
+                        }}
+                      >
+                        Refund
+                      </Button>
+                    )}
                   </div>
+                  {selectedOrder.status === 'refunded' && (
+                    <p className="text-sm text-red-400 mt-2">This order has been refunded.</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -252,7 +385,10 @@ export default function AdminOrdersPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setSelectedOrder(order)}
+                        onClick={() => {
+                          setSelectedOrder(order)
+                          setTrackingNumber(order.tracking_number || '')
+                        }}
                       >
                         <Eye className="w-4 h-4" />
                       </Button>

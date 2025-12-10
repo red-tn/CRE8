@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { sendEmail, getNewOrderNotificationEmail } from '@/lib/sendgrid'
 import Stripe from 'stripe'
 
 export async function POST(request: NextRequest) {
@@ -175,6 +176,45 @@ export async function POST(request: NextRequest) {
                       .eq('id', item.productId)
                   }
                 }
+              }
+
+              // Send order notification to admins who have notifications enabled
+              try {
+                const { data: adminsToNotify } = await supabaseAdmin
+                  .from('members')
+                  .select('email, first_name')
+                  .eq('is_admin', true)
+                  .eq('receive_order_notifications', true)
+                  .eq('is_active', true)
+
+                if (adminsToNotify && adminsToNotify.length > 0) {
+                  const customerName = shippingDetails?.name || session.customer_email || 'Guest'
+                  const customerEmail = session.customer_email || 'N/A'
+                  const adminLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://cre8trucks.club'}/admin/orders`
+
+                  const emailContent = getNewOrderNotificationEmail(
+                    order.id,
+                    customerName,
+                    customerEmail,
+                    order.total,
+                    orderItems as { product_name: string; quantity: number; size?: string; color?: string; unit_price: number; total_price: number }[],
+                    order.shipping_address as { name?: string; line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } | null,
+                    adminLink
+                  )
+
+                  // Send to all admins with notifications enabled
+                  for (const admin of adminsToNotify) {
+                    await sendEmail({
+                      to: admin.email,
+                      subject: emailContent.subject,
+                      html: emailContent.html,
+                    })
+                    console.log(`Order notification sent to ${admin.email}`)
+                  }
+                }
+              } catch (emailError) {
+                // Don't fail the webhook if email fails
+                console.error('Failed to send order notifications:', emailError)
               }
             }
           }

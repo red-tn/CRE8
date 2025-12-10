@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
+import { stripe } from '@/lib/stripe'
 
 export async function GET(request: NextRequest) {
   try {
@@ -44,16 +45,41 @@ export async function PUT(request: NextRequest) {
     await requireAdmin()
 
     const body = await request.json()
-    const { id, status, trackingNumber, notes } = body
+    const { id, status, tracking_number, notes } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
     }
 
+    // Get current order to check payment intent
+    const { data: currentOrder } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (!currentOrder) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
     const updates: Record<string, unknown> = {}
     if (status) updates.status = status
-    if (trackingNumber !== undefined) updates.tracking_number = trackingNumber
+    if (tracking_number !== undefined) updates.tracking_number = tracking_number
     if (notes !== undefined) updates.notes = notes
+
+    // Handle refund if status is changing to refunded
+    if (status === 'refunded' && currentOrder.status !== 'refunded') {
+      if (currentOrder.stripe_payment_intent_id) {
+        try {
+          await stripe.refunds.create({
+            payment_intent: currentOrder.stripe_payment_intent_id,
+          })
+        } catch (stripeError) {
+          console.error('Stripe refund error:', stripeError)
+          return NextResponse.json({ error: 'Failed to process refund in Stripe' }, { status: 500 })
+        }
+      }
+    }
 
     const { data: order, error } = await supabaseAdmin
       .from('orders')
@@ -72,6 +98,7 @@ export async function PUT(request: NextRequest) {
     if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    console.error('Error updating order:', error)
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
   }
 }

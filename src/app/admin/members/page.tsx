@@ -60,6 +60,7 @@ export default function AdminMembersPage() {
     truck_model: '',
     instagram_handle: '',
     bio: '',
+    receive_order_notifications: false,
   })
 
   useEffect(() => {
@@ -152,6 +153,7 @@ export default function AdminMembersPage() {
       truck_model: member.truck_model || '',
       instagram_handle: member.instagram_handle || '',
       bio: member.bio || '',
+      receive_order_notifications: member.receive_order_notifications || false,
     })
   }
 
@@ -174,6 +176,7 @@ export default function AdminMembersPage() {
           truck_model: formData.truck_model || null,
           instagram_handle: formData.instagram_handle || null,
           bio: formData.bio || null,
+          receive_order_notifications: formData.receive_order_notifications,
         }),
       })
 
@@ -300,6 +303,23 @@ export default function AdminMembersPage() {
                     placeholder="Member bio..."
                   />
                 </div>
+
+                {/* Order Notifications - Only show for admins */}
+                {editingMember?.is_admin && (
+                  <div className="flex items-center gap-3 p-4 bg-zinc-800 border border-zinc-700">
+                    <input
+                      type="checkbox"
+                      id="receive_order_notifications"
+                      checked={formData.receive_order_notifications}
+                      onChange={(e) => setFormData({ ...formData, receive_order_notifications: e.target.checked })}
+                      className="w-5 h-5 rounded border-zinc-600 bg-zinc-900 text-white focus:ring-white focus:ring-offset-zinc-900"
+                    />
+                    <label htmlFor="receive_order_notifications" className="text-sm">
+                      <span className="font-medium text-white">Receive Order Notifications</span>
+                      <p className="text-zinc-400 text-xs mt-0.5">Get email alerts when new orders are placed</p>
+                    </label>
+                  </div>
+                )}
 
                 <div className="flex gap-4 pt-4">
                   <Button
