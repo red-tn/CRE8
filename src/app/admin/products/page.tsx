@@ -571,14 +571,17 @@ export default function AdminProductsPage() {
                   ]}
                 />
 
-                {/* Info about variants */}
-                <div className="bg-zinc-800 p-3 border border-zinc-700">
-                  <p className="text-sm text-zinc-400">
-                    <strong>Inventory is managed via variants.</strong> Save the product first, then add variants with size/type, color, stock quantity, and images.
-                  </p>
-                </div>
-                {/* Only show base stock input if no variants exist */}
-                {variants.length === 0 && (
+                {/* Info about variants - for categories that use variants */}
+                {['apparel', 'hats', 'stickers'].includes(formData.category) && (
+                  <div className="bg-zinc-800 p-3 border border-zinc-700">
+                    <p className="text-sm text-zinc-400">
+                      <strong>Inventory is managed via variants.</strong> Save the product first, then add variants with size/type, color, stock quantity, and images.
+                    </p>
+                  </div>
+                )}
+
+                {/* Only show base stock input for categories without variant-based inventory */}
+                {!['apparel', 'hats', 'stickers'].includes(formData.category) && variants.length === 0 && (
                   <Input
                     label="Stock Quantity"
                     type="number"
@@ -586,6 +589,8 @@ export default function AdminProductsPage() {
                     onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
                   />
                 )}
+
+                {/* Show total stock from variants when they exist */}
                 {variants.length > 0 && (
                   <div className="bg-zinc-800 p-3 border border-zinc-700">
                     <p className="text-sm text-zinc-400">Total Stock (from variants):</p>
