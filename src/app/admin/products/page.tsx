@@ -13,8 +13,8 @@ import { Product, ProductVariant } from '@/types'
 
 // Constants for sizes and colors by category
 const APPAREL_SIZES = ['S', 'M', 'L', 'XL', '2XL']
-const HAT_STYLES = ['Snapback', 'Fitted']
-const FITTED_SIZES = ['7', '7 1/8', '7 1/4', '7 3/8', '7 1/2', '7 5/8', '7 3/4', '7 7/8', '8']
+const HAT_TYPES = ['Snapback', 'Fitted']
+const STICKER_SIZES = ['Small', 'Medium', 'Large']
 const PRIMARY_COLORS = ['Black', 'White', 'Gray', 'Navy', 'Red', 'Gold', 'Green', 'Blue', 'Orange', 'Purple', 'Pink', 'Brown']
 
 // Get available sizes based on category
@@ -23,22 +23,28 @@ const getSizesForCategory = (category: string): string[] => {
     case 'apparel':
       return APPAREL_SIZES
     case 'hats':
-      return [...HAT_STYLES, ...FITTED_SIZES]
-    case 'accessories':
+      return HAT_TYPES
     case 'stickers':
+      return STICKER_SIZES
+    case 'accessories':
     default:
       return []
   }
 }
 
-// Check if category needs sizes (only apparel uses size/color at product level)
-const categoryNeedsSizes = (category: string): boolean => {
-  return category === 'apparel'
+// Check if category shows size selector
+const categoryHasSizes = (category: string): boolean => {
+  return category === 'apparel' || category === 'hats' || category === 'stickers'
+}
+
+// Check if category shows color selector
+const categoryHasColors = (category: string): boolean => {
+  return category === 'apparel' || category === 'hats'
 }
 
 // Check if category should only use variants (no size/color at product level)
 const categoryUsesVariantsOnly = (category: string): boolean => {
-  return category === 'hats' || category === 'stickers' || category === 'accessories'
+  return category === 'accessories'
 }
 
 // Generate SKU from product name
@@ -525,11 +531,11 @@ export default function AdminProductsPage() {
                     { value: 'other', label: 'Other' },
                   ]}
                 />
-                {/* Size Checkboxes - only for apparel */}
-                {categoryNeedsSizes(formData.category) && (
+                {/* Size/Type Checkboxes */}
+                {categoryHasSizes(formData.category) && (
                   <div>
                     <label className="block text-sm font-medium text-zinc-400 mb-2">
-                      Sizes
+                      {formData.category === 'hats' ? 'Hat Type' : formData.category === 'stickers' ? 'Sticker Size' : 'Sizes'}
                     </label>
                     <div className="flex flex-wrap gap-3">
                       {getSizesForCategory(formData.category).map((size) => (
@@ -553,8 +559,8 @@ export default function AdminProductsPage() {
                   </div>
                 )}
 
-                {/* Color Multi-Select - only for apparel */}
-                {categoryNeedsSizes(formData.category) && (
+                {/* Color Multi-Select - for apparel and hats */}
+                {categoryHasColors(formData.category) && (
                   <div>
                     <label className="block text-sm font-medium text-zinc-400 mb-2">
                       Colors
@@ -617,11 +623,11 @@ export default function AdminProductsPage() {
                   </div>
                 )}
 
-                {/* Note for variant-only categories */}
+                {/* Note for variant-only categories (accessories) */}
                 {categoryUsesVariantsOnly(formData.category) && (
                   <div className="bg-zinc-800 p-3 border border-zinc-700">
                     <p className="text-sm text-zinc-400">
-                      <strong>{formData.category === 'hats' ? 'Hats' : formData.category === 'stickers' ? 'Stickers' : 'Accessories'}</strong> use variants for inventory management.
+                      <strong>Accessories</strong> use variants for inventory management.
                       Save the product first, then add variants with specific options and stock levels.
                     </p>
                   </div>
@@ -678,11 +684,11 @@ export default function AdminProductsPage() {
                     {showVariantForm && (
                       <div className="bg-zinc-800 p-3 space-y-3">
                         <div className="grid grid-cols-2 gap-3">
-                          {/* Size Dropdown - only show for categories that need sizes */}
-                          {categoryNeedsSizes(formData.category) && (
+                          {/* Size/Type Dropdown - for categories with sizes */}
+                          {categoryHasSizes(formData.category) && (
                             <div>
                               <label className="block text-sm font-medium text-zinc-400 mb-1">
-                                {formData.category === 'hats' ? 'Style/Size' : 'Size'}
+                                {formData.category === 'hats' ? 'Type' : formData.category === 'stickers' ? 'Size' : 'Size'}
                               </label>
                               <select
                                 className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
@@ -696,35 +702,37 @@ export default function AdminProductsPage() {
                               </select>
                             </div>
                           )}
-                          {/* Color Dropdown */}
-                          <div>
-                            <label className="block text-sm font-medium text-zinc-400 mb-1">Color</label>
-                            <div className="flex gap-1">
-                              <select
-                                className="flex-1 bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
-                                value={variantFormData.color}
-                                onChange={(e) => setVariantFormData({ ...variantFormData, color: e.target.value })}
-                              >
-                                <option value="">Select color...</option>
-                                {PRIMARY_COLORS.map((color) => (
-                                  <option key={color} value={color}>{color}</option>
-                                ))}
-                                {customColor && !PRIMARY_COLORS.includes(customColor) && (
-                                  <option value={customColor}>{customColor}</option>
-                                )}
-                              </select>
-                              <input
-                                type="text"
-                                value={customColor}
-                                onChange={(e) => {
-                                  setCustomColor(e.target.value)
-                                  setVariantFormData({ ...variantFormData, color: e.target.value })
-                                }}
-                                placeholder="Custom"
-                                className="w-20 bg-zinc-700 border border-zinc-600 px-2 py-2 text-sm focus:outline-none focus:border-white"
-                              />
+                          {/* Color Dropdown - for categories with colors */}
+                          {categoryHasColors(formData.category) && (
+                            <div>
+                              <label className="block text-sm font-medium text-zinc-400 mb-1">Color</label>
+                              <div className="flex gap-1">
+                                <select
+                                  className="flex-1 bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
+                                  value={variantFormData.color}
+                                  onChange={(e) => setVariantFormData({ ...variantFormData, color: e.target.value })}
+                                >
+                                  <option value="">Select color...</option>
+                                  {PRIMARY_COLORS.map((color) => (
+                                    <option key={color} value={color}>{color}</option>
+                                  ))}
+                                  {customColor && !PRIMARY_COLORS.includes(customColor) && (
+                                    <option value={customColor}>{customColor}</option>
+                                  )}
+                                </select>
+                                <input
+                                  type="text"
+                                  value={customColor}
+                                  onChange={(e) => {
+                                    setCustomColor(e.target.value)
+                                    setVariantFormData({ ...variantFormData, color: e.target.value })
+                                  }}
+                                  placeholder="Custom"
+                                  className="w-20 bg-zinc-700 border border-zinc-600 px-2 py-2 text-sm focus:outline-none focus:border-white"
+                                />
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           <Input
