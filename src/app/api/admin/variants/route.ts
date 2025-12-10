@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     await requireAdmin()
 
     const body = await request.json()
-    const { productId, size, color, stockQuantity, priceAdjustment, sku } = body
+    const { productId, size, color, stockQuantity, priceAdjustment, sku, imageUrl } = body
 
     if (!productId) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
         stock_quantity: stockQuantity || 0,
         price_adjustment: priceAdjustment || 0,
         sku: sku || null,
+        image_url: imageUrl || null,
       })
       .select()
       .single()
@@ -99,7 +100,7 @@ export async function PUT(request: NextRequest) {
     await requireAdmin()
 
     const body = await request.json()
-    const { id, stockQuantity, priceAdjustment, sku, isActive } = body
+    const { id, stockQuantity, priceAdjustment, sku, isActive, imageUrl } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Variant ID required' }, { status: 400 })
@@ -110,6 +111,7 @@ export async function PUT(request: NextRequest) {
     if (priceAdjustment !== undefined) updateData.price_adjustment = priceAdjustment
     if (sku !== undefined) updateData.sku = sku
     if (isActive !== undefined) updateData.is_active = isActive
+    if (imageUrl !== undefined) updateData.image_url = imageUrl
 
     const { data: variant, error } = await supabaseAdmin
       .from('product_variants')

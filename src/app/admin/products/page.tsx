@@ -6,19 +6,19 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { Plus, Pencil, Trash2, X, Upload, Package } from 'lucide-react'
+import { Plus, Pencil, Trash2, X, Upload, Package, ImageIcon } from 'lucide-react'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
 import { Product, ProductVariant } from '@/types'
 
-// Constants for sizes and colors by category
-const APPAREL_SIZES = ['S', 'M', 'L', 'XL', '2XL']
+// Constants for variant options by category
+const APPAREL_SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL']
 const HAT_TYPES = ['Snapback', 'Fitted']
 const STICKER_SIZES = ['Small', 'Medium', 'Large']
 const PRIMARY_COLORS = ['Black', 'White', 'Gray', 'Navy', 'Red', 'Gold', 'Green', 'Blue', 'Orange', 'Purple', 'Pink', 'Brown']
 
-// Get available sizes based on category
-const getSizesForCategory = (category: string): string[] => {
+// Get available size options for variants based on category
+const getVariantSizesForCategory = (category: string): string[] => {
   switch (category) {
     case 'apparel':
       return APPAREL_SIZES
@@ -26,25 +26,31 @@ const getSizesForCategory = (category: string): string[] => {
       return HAT_TYPES
     case 'stickers':
       return STICKER_SIZES
-    case 'accessories':
     default:
       return []
   }
 }
 
-// Check if category shows size selector
-const categoryHasSizes = (category: string): boolean => {
-  return category === 'apparel' || category === 'hats' || category === 'stickers'
+// Get size label for category
+const getSizeLabelForCategory = (category: string): string => {
+  switch (category) {
+    case 'hats':
+      return 'Type'
+    case 'stickers':
+      return 'Size'
+    default:
+      return 'Size'
+  }
 }
 
-// Check if category shows color selector
-const categoryHasColors = (category: string): boolean => {
-  return category === 'apparel' || category === 'hats'
+// Check if category uses size/type variants
+const categoryHasSizeVariants = (category: string): boolean => {
+  return ['apparel', 'hats', 'stickers'].includes(category)
 }
 
-// Check if category should only use variants (no size/color at product level)
-const categoryUsesVariantsOnly = (category: string): boolean => {
-  return category === 'accessories'
+// Check if category uses color variants
+const categoryHasColorVariants = (category: string): boolean => {
+  return ['apparel', 'hats'].includes(category)
 }
 
 // Generate SKU from product name
@@ -77,9 +83,11 @@ export default function AdminProductsPage() {
     stockQuantity: '0',
     priceAdjustment: '0',
     sku: '',
+    imageUrl: '',
   })
   const [isSavingVariant, setIsSavingVariant] = useState(false)
   const [customColor, setCustomColor] = useState('')
+  const [isUploadingVariantImage, setIsUploadingVariantImage] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -89,13 +97,10 @@ export default function AdminProductsPage() {
     imageUrl: '',
     images: [] as string[],
     category: 'apparel',
-    sizes: [] as string[],
-    colors: [] as string[],
     stockQuantity: '0',
     isMembersOnly: false,
     sku: '',
   })
-  const [customProductColor, setCustomProductColor] = useState('')
 
   useEffect(() => {
     fetchProducts()
@@ -124,13 +129,10 @@ export default function AdminProductsPage() {
       imageUrl: '',
       images: [],
       category: 'apparel',
-      sizes: [],
-      colors: [],
       stockQuantity: '0',
       isMembersOnly: false,
       sku: '',
     })
-    setCustomProductColor('')
     setEditingProduct(null)
     setShowForm(false)
     setVariants([])
@@ -148,13 +150,10 @@ export default function AdminProductsPage() {
       imageUrl: product.image_url || '',
       images: product.images || [],
       category: product.category,
-      sizes: product.sizes || [],
-      colors: product.colors || [],
       stockQuantity: product.stock_quantity.toString(),
       isMembersOnly: product.is_members_only,
       sku: '',
     })
-    setCustomProductColor('')
     setShowForm(true)
 
     // Fetch variants for this product
@@ -186,8 +185,8 @@ export default function AdminProductsPage() {
         imageUrl: formData.imageUrl || formData.images[0] || null,
         images: formData.images,
         category: formData.category,
-        sizes: formData.sizes,
-        colors: formData.colors,
+        sizes: [],  // Managed via variants now
+        colors: [], // Managed via variants now
         stockQuantity: parseInt(formData.stockQuantity) || 0,
         isMembersOnly: formData.isMembersOnly,
       }
@@ -250,7 +249,50 @@ export default function AdminProductsPage() {
       stockQuantity: '0',
       priceAdjustment: '0',
       sku: '',
+      imageUrl: '',
     })
+    setCustomColor('')
+  }
+
+  // Handle variant image upload
+  const handleVariantImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be less than 5MB')
+      return
+    }
+
+    setIsUploadingVariantImage(true)
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+      uploadFormData.append('folder', 'products/variants')
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      if (res.ok) {
+        const { url } = await res.json()
+        setVariantFormData({ ...variantFormData, imageUrl: url })
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Upload failed')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload image')
+    } finally {
+      setIsUploadingVariantImage(false)
+    }
   }
 
   const handleVariantSubmit = async (e: React.FormEvent) => {
@@ -270,6 +312,7 @@ export default function AdminProductsPage() {
           stockQuantity: parseInt(variantFormData.stockQuantity) || 0,
           priceAdjustment: parseFloat(variantFormData.priceAdjustment) || 0,
           sku: variantFormData.sku || null,
+          imageUrl: variantFormData.imageUrl || null,
         }),
       })
 
@@ -518,11 +561,7 @@ export default function AdminProductsPage() {
                 <Select
                   label="Category"
                   value={formData.category}
-                  onChange={(e) => {
-                    const newCategory = e.target.value
-                    // Clear sizes when category changes since size options differ
-                    setFormData({ ...formData, category: newCategory, sizes: [] })
-                  }}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   options={[
                     { value: 'apparel', label: 'Apparel' },
                     { value: 'hats', label: 'Hats' },
@@ -531,107 +570,13 @@ export default function AdminProductsPage() {
                     { value: 'other', label: 'Other' },
                   ]}
                 />
-                {/* Size/Type Checkboxes */}
-                {categoryHasSizes(formData.category) && (
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-2">
-                      {formData.category === 'hats' ? 'Hat Type' : formData.category === 'stickers' ? 'Sticker Size' : 'Sizes'}
-                    </label>
-                    <div className="flex flex-wrap gap-3">
-                      {getSizesForCategory(formData.category).map((size) => (
-                        <label key={size} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.sizes.includes(size)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setFormData({ ...formData, sizes: [...formData.sizes, size] })
-                              } else {
-                                setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
-                              }
-                            }}
-                            className="w-4 h-4 accent-white"
-                          />
-                          <span className="text-sm">{size}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
-                {/* Color Multi-Select - for apparel and hats */}
-                {categoryHasColors(formData.category) && (
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-2">
-                      Colors
-                    </label>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {formData.colors.map((color) => (
-                        <span
-                          key={color}
-                          className="bg-zinc-700 text-white px-2 py-1 text-sm flex items-center gap-1"
-                        >
-                          {color}
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, colors: formData.colors.filter(c => c !== color) })}
-                            className="text-zinc-400 hover:text-red-500"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <select
-                        className="flex-1 bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm focus:outline-none focus:border-white"
-                        value=""
-                        onChange={(e) => {
-                          if (e.target.value && !formData.colors.includes(e.target.value)) {
-                            setFormData({ ...formData, colors: [...formData.colors, e.target.value] })
-                          }
-                        }}
-                      >
-                        <option value="">Add color...</option>
-                        {PRIMARY_COLORS.filter(c => !formData.colors.includes(c)).map((color) => (
-                          <option key={color} value={color}>{color}</option>
-                        ))}
-                      </select>
-                      <div className="flex gap-1">
-                        <input
-                          type="text"
-                          value={customProductColor}
-                          onChange={(e) => setCustomProductColor(e.target.value)}
-                          placeholder="Custom"
-                          className="w-24 bg-zinc-800 border border-zinc-700 px-2 py-2 text-sm focus:outline-none focus:border-white"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            if (customProductColor.trim() && !formData.colors.includes(customProductColor.trim())) {
-                              setFormData({ ...formData, colors: [...formData.colors, customProductColor.trim()] })
-                              setCustomProductColor('')
-                            }
-                          }}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Note for variant-only categories (accessories) */}
-                {categoryUsesVariantsOnly(formData.category) && (
-                  <div className="bg-zinc-800 p-3 border border-zinc-700">
-                    <p className="text-sm text-zinc-400">
-                      <strong>Accessories</strong> use variants for inventory management.
-                      Save the product first, then add variants with specific options and stock levels.
-                    </p>
-                  </div>
-                )}
+                {/* Info about variants */}
+                <div className="bg-zinc-800 p-3 border border-zinc-700">
+                  <p className="text-sm text-zinc-400">
+                    <strong>Inventory is managed via variants.</strong> Save the product first, then add variants with size/type, color, stock quantity, and images.
+                  </p>
+                </div>
                 {/* Only show base stock input if no variants exist */}
                 {variants.length === 0 && (
                   <Input
@@ -655,27 +600,29 @@ export default function AdminProductsPage() {
                   <div className="border border-zinc-700 p-4 space-y-3">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="font-bold text-white">Size/Color Inventory</h3>
-                        <p className="text-xs text-zinc-500">Track stock per size and color combination</p>
+                        <h3 className="font-bold text-white">Product Variants</h3>
+                        <p className="text-xs text-zinc-500">Add variants with size/type, color, stock, and images</p>
                       </div>
                       {!showVariantForm && (
                         <Button
                           type="button"
                           onClick={() => {
-                            // Auto-generate variant SKU based on product name
                             const baseSku = formData.sku || generateSKU(formData.name)
                             const variantNum = String(variants.length + 1).padStart(2, '0')
                             setVariantFormData({
-                              ...variantFormData,
-                              sku: `${baseSku.replace(/-\d+$/, '')}-${variantNum}`,
+                              size: '',
+                              color: '',
                               stockQuantity: '10',
+                              priceAdjustment: '0',
+                              sku: `${baseSku.replace(/-\d+$/, '')}-${variantNum}`,
+                              imageUrl: '',
                             })
                             setShowVariantForm(true)
                           }}
                           size="sm"
                         >
                           <Plus className="w-4 h-4 mr-1" />
-                          Add
+                          Add Variant
                         </Button>
                       )}
                     </div>
@@ -683,12 +630,47 @@ export default function AdminProductsPage() {
                     {/* Add Variant Form */}
                     {showVariantForm && (
                       <div className="bg-zinc-800 p-3 space-y-3">
+                        {/* Variant Image Upload */}
+                        <div>
+                          <label className="block text-sm font-medium text-zinc-400 mb-2">Variant Image</label>
+                          <div className="flex items-center gap-3">
+                            {variantFormData.imageUrl ? (
+                              <div className="relative w-16 h-16 bg-zinc-700 border border-zinc-600">
+                                <img src={variantFormData.imageUrl} alt="Variant" className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setVariantFormData({ ...variantFormData, imageUrl: '' })}
+                                  className="absolute -top-1 -right-1 bg-red-500 text-white p-0.5 rounded-full"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ) : (
+                              <label className={`w-16 h-16 bg-zinc-700 border border-dashed border-zinc-600 hover:border-white flex items-center justify-center cursor-pointer ${isUploadingVariantImage ? 'opacity-50' : ''}`}>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={handleVariantImageUpload}
+                                  className="hidden"
+                                  disabled={isUploadingVariantImage}
+                                />
+                                {isUploadingVariantImage ? (
+                                  <span className="text-xs text-zinc-500">...</span>
+                                ) : (
+                                  <ImageIcon className="w-6 h-6 text-zinc-500" />
+                                )}
+                              </label>
+                            )}
+                            <span className="text-xs text-zinc-500">Optional: Upload image for this variant</span>
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-3">
-                          {/* Size/Type Dropdown - for categories with sizes */}
-                          {categoryHasSizes(formData.category) && (
+                          {/* Size/Type Dropdown */}
+                          {categoryHasSizeVariants(formData.category) && (
                             <div>
                               <label className="block text-sm font-medium text-zinc-400 mb-1">
-                                {formData.category === 'hats' ? 'Type' : formData.category === 'stickers' ? 'Size' : 'Size'}
+                                {getSizeLabelForCategory(formData.category)}
                               </label>
                               <select
                                 className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
@@ -696,14 +678,14 @@ export default function AdminProductsPage() {
                                 onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
                               >
                                 <option value="">Select...</option>
-                                {getSizesForCategory(formData.category).map((size) => (
+                                {getVariantSizesForCategory(formData.category).map((size) => (
                                   <option key={size} value={size}>{size}</option>
                                 ))}
                               </select>
                             </div>
                           )}
-                          {/* Color Dropdown - for categories with colors */}
-                          {categoryHasColors(formData.category) && (
+                          {/* Color Dropdown */}
+                          {categoryHasColorVariants(formData.category) && (
                             <div>
                               <label className="block text-sm font-medium text-zinc-400 mb-1">Color</label>
                               <div className="flex gap-1">
@@ -733,6 +715,19 @@ export default function AdminProductsPage() {
                               </div>
                             </div>
                           )}
+                          {/* For accessories/other - free text option */}
+                          {!categoryHasSizeVariants(formData.category) && (
+                            <div>
+                              <label className="block text-sm font-medium text-zinc-400 mb-1">Option</label>
+                              <input
+                                type="text"
+                                className="w-full bg-zinc-700 border border-zinc-600 px-3 py-2 text-sm focus:outline-none focus:border-white"
+                                value={variantFormData.size}
+                                onChange={(e) => setVariantFormData({ ...variantFormData, size: e.target.value })}
+                                placeholder="e.g., Style A, Type 1"
+                              />
+                            </div>
+                          )}
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           <Input
@@ -760,7 +755,7 @@ export default function AdminProductsPage() {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => { setShowVariantForm(false); resetVariantForm(); setCustomColor(''); }}
+                            onClick={() => { setShowVariantForm(false); resetVariantForm(); }}
                           >
                             Cancel
                           </Button>
@@ -780,13 +775,31 @@ export default function AdminProductsPage() {
                     {isLoadingVariants ? (
                       <p className="text-sm text-zinc-500">Loading variants...</p>
                     ) : variants.length === 0 ? (
-                      <p className="text-sm text-zinc-500">No variants yet. Base stock quantity will be used.</p>
+                      <p className="text-sm text-zinc-500">No variants yet. Add variants to track inventory.</p>
                     ) : (
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         {variants.map((variant) => (
-                          <div key={variant.id} className="flex items-center gap-2 bg-zinc-800 p-2 text-sm">
-                            <span className="flex-1">
-                              {variant.size || '-'} / {variant.color || '-'}
+                          <div key={variant.id} className="flex items-center gap-3 bg-zinc-800 p-2">
+                            {/* Variant Image Thumbnail */}
+                            <div className="w-10 h-10 bg-zinc-700 border border-zinc-600 flex-shrink-0">
+                              {variant.image_url ? (
+                                <img src={variant.image_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <ImageIcon className="w-4 h-4 text-zinc-600" />
+                                </div>
+                              )}
+                            </div>
+                            <span className="flex-1 text-sm">
+                              {variant.size || variant.color ? (
+                                <>
+                                  {variant.size && <span className="font-medium">{variant.size}</span>}
+                                  {variant.size && variant.color && ' / '}
+                                  {variant.color && <span>{variant.color}</span>}
+                                </>
+                              ) : (
+                                <span className="text-zinc-500">No options</span>
+                              )}
                             </span>
                             <input
                               type="number"

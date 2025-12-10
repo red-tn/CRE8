@@ -79,6 +79,7 @@ export interface ProductVariant {
   stock_quantity: number
   price_adjustment: number
   sku?: string
+  image_url?: string
   is_active: boolean
   created_at: string
   updated_at: string
