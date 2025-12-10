@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { Search, Users, Check, X, Shield, Pencil } from 'lucide-react'
+import { Search, Users, Check, X, Shield, Pencil, KeyRound } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Member, TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
 
@@ -81,6 +81,29 @@ export default function AdminMembersPage() {
       }
     } catch (error) {
       console.error('Error updating member:', error)
+    }
+  }
+
+  const resetPassword = async (member: Member) => {
+    if (!confirm(`Send password reset email to ${member.email}?`)) return
+
+    try {
+      const res = await fetch('/api/admin/members/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memberId: member.id }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        alert(data.message || 'Password reset email sent!')
+      } else {
+        alert(data.error || 'Failed to send reset email')
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error)
+      alert('Failed to send reset email')
     }
   }
 
@@ -361,7 +384,7 @@ export default function AdminMembersPage() {
                               <p className="font-bold">
                                 {member.first_name} {member.last_name}
                                 {member.is_admin && (
-                                  <Shield className="w-4 h-4 text-white inline ml-2" />
+                                  <Shield className="w-4 h-4 text-green-500 inline ml-2" />
                                 )}
                               </p>
                               <p className="text-sm text-zinc-500">{member.email}</p>
@@ -398,10 +421,18 @@ export default function AdminMembersPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => resetPassword(member)}
+                              title="Send password reset"
+                            >
+                              <KeyRound className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => toggleAdmin(member)}
                               title={member.is_admin ? 'Remove admin' : 'Make admin'}
                             >
-                              <Shield className={`w-4 h-4 ${member.is_admin ? 'text-white' : ''}`} />
+                              <Shield className={`w-4 h-4 ${member.is_admin ? 'text-green-500' : ''}`} />
                             </Button>
                             <Button
                               variant="ghost"
@@ -444,7 +475,7 @@ export default function AdminMembersPage() {
                           <p className="font-bold truncate">
                             {member.first_name} {member.last_name}
                             {member.is_admin && (
-                              <Shield className="w-4 h-4 text-white inline ml-2" />
+                              <Shield className="w-4 h-4 text-green-500 inline ml-2" />
                             )}
                           </p>
                           <p className="text-sm text-zinc-500 truncate">{member.email}</p>
@@ -476,10 +507,18 @@ export default function AdminMembersPage() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => resetPassword(member)}
+                        title="Send password reset"
+                      >
+                        <KeyRound className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => toggleAdmin(member)}
                         title={member.is_admin ? 'Remove admin' : 'Make admin'}
                       >
-                        <Shield className={`w-4 h-4 ${member.is_admin ? 'text-white' : ''}`} />
+                        <Shield className={`w-4 h-4 ${member.is_admin ? 'text-green-500' : ''}`} />
                       </Button>
                       <Button
                         variant="ghost"

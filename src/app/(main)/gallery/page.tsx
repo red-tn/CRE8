@@ -119,16 +119,34 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
   return galleryItems
 }
 
+async function getFleetCounts() {
+  const { data: members } = await supabaseAdmin
+    .from('members')
+    .select('truck_make')
+    .eq('is_active', true)
+    .not('truck_make', 'is', null)
+
+  const counts: Record<string, number> = {}
+  members?.forEach(m => {
+    if (m.truck_make) {
+      const make = m.truck_make
+      counts[make] = (counts[make] || 0) + 1
+    }
+  })
+  return counts
+}
+
 export default async function GalleryPage() {
   const images = await getGalleryImages()
+  const fleetCounts = await getFleetCounts()
 
-  // Group by truck make for filtering
-  const chevyCount = images.filter(img => img.member?.truck_make === 'Chevy').length
-  const fordCount = images.filter(img => img.member?.truck_make === 'Ford').length
-  const dodgeCount = images.filter(img => img.member?.truck_make === 'Dodge').length
-  const toyotaCount = images.filter(img => img.member?.truck_make === 'Toyota').length
-  const nissanCount = images.filter(img => img.member?.truck_make === 'Nissan').length
-  const gmcCount = images.filter(img => img.member?.truck_make === 'GMC').length
+  // Count unique members by truck make
+  const chevyCount = fleetCounts['Chevy'] || 0
+  const fordCount = fleetCounts['Ford'] || 0
+  const dodgeCount = fleetCounts['Dodge'] || 0
+  const toyotaCount = fleetCounts['Toyota'] || 0
+  const nissanCount = fleetCounts['Nissan'] || 0
+  const gmcCount = fleetCounts['GMC'] || 0
 
   return (
     <div className="flex flex-col">

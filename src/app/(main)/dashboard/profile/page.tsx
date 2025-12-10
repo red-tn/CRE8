@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
-import { ArrowLeft, Save, Truck, User, Camera, Instagram, Upload, X, Play, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Save, Truck, User, Camera, Instagram, Upload, X, Play, Image as ImageIcon, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { MemberMedia, TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
 
@@ -34,6 +34,12 @@ export default function ProfilePage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [media, setMedia] = useState<MemberMedia[]>([])
   const [loadingMedia, setLoadingMedia] = useState(true)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  })
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -191,6 +197,47 @@ export default function ProfilePage() {
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to delete media' })
+    }
+  }
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMessage(null)
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setMessage({ type: 'error', text: 'New passwords do not match' })
+      return
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      setMessage({ type: 'error', text: 'Password must be at least 8 characters' })
+      return
+    }
+
+    setIsChangingPassword(true)
+
+    try {
+      const response = await fetch('/api/member/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'Password changed successfully!' })
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to change password' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Something went wrong' })
+    } finally {
+      setIsChangingPassword(false)
     }
   }
 
@@ -411,6 +458,46 @@ export default function ProfilePage() {
                 Save Changes
               </Button>
             </form>
+
+            {/* Change Password */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-white" />
+                  Change Password
+                </h2>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <Input
+                    label="Current Password"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    required
+                  />
+                  <Input
+                    label="New Password"
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    placeholder="At least 8 characters"
+                    required
+                  />
+                  <Input
+                    label="Confirm New Password"
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    required
+                  />
+                  <Button type="submit" variant="secondary" isLoading={isChangingPassword} className="w-full">
+                    <Lock className="w-4 h-4 mr-2" />
+                    Change Password
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Media Library Sidebar */}

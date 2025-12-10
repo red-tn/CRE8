@@ -27,6 +27,7 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
       })
 
       const data = await response.json()
@@ -109,6 +110,11 @@ export default function LoginPage() {
 
         {/* Links */}
         <div className="mt-8 space-y-4 text-center">
+          <p className="text-zinc-500 text-sm">
+            <Link href="/forgot-password" className="text-white hover:text-zinc-200">
+              Forgot your password?
+            </Link>
+          </p>
           <p className="text-zinc-500 text-sm">
             Not a member yet?{' '}
             <Link href="/signup" className="text-white hover:text-zinc-200">
