@@ -5,9 +5,14 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
-import { Package, Eye, X, Truck, Printer, MapPin, Copy } from 'lucide-react'
+import { Package, Eye, X, Truck, Printer, MapPin, Copy, Download } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Order } from '@/types'
+
+interface ServiceType {
+  value: string
+  label: string
+}
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -19,9 +24,29 @@ export default function AdminOrdersPage() {
   const [orderNotes, setOrderNotes] = useState('')
   const [isSavingNotes, setIsSavingNotes] = useState(false)
 
+  // FedEx label creation state
+  const [serviceTypes, setServiceTypes] = useState<ServiceType[]>([])
+  const [selectedServiceType, setSelectedServiceType] = useState('FEDEX_GROUND')
+  const [packageWeight, setPackageWeight] = useState('1')
+  const [isCreatingLabel, setIsCreatingLabel] = useState(false)
+  const [labelPdf, setLabelPdf] = useState<string | null>(null)
+
   useEffect(() => {
     fetchOrders()
+    fetchShippingConfig()
   }, [statusFilter])
+
+  const fetchShippingConfig = async () => {
+    try {
+      const res = await fetch('/api/admin/shipping')
+      if (res.ok) {
+        const data = await res.json()
+        setServiceTypes(data.serviceTypes || [])
+      }
+    } catch (error) {
+      console.error('Error fetching shipping config:', error)
+    }
+  }
 
   const fetchOrders = async () => {
     setIsLoading(true)
@@ -121,6 +146,69 @@ export default function AdminOrdersPage() {
     }
   }
 
+  const createShippingLabel = async () => {
+    if (!selectedOrder) return
+    setIsCreatingLabel(true)
+    setLabelPdf(null)
+
+    try {
+      const res = await fetch('/api/admin/shipping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          weight: parseFloat(packageWeight) || 1,
+          serviceType: selectedServiceType,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create label')
+      }
+
+      // Update tracking number in UI
+      setTrackingNumber(data.trackingNumber)
+      setSelectedOrder({ ...selectedOrder, tracking_number: data.trackingNumber, status: 'shipped' })
+
+      // Store label PDF for download
+      if (data.labelBase64) {
+        setLabelPdf(data.labelBase64)
+      }
+
+      fetchOrders()
+      alert(`Label created! Tracking: ${data.trackingNumber}`)
+    } catch (error) {
+      console.error('Error creating label:', error)
+      alert((error as Error).message || 'Failed to create shipping label')
+    } finally {
+      setIsCreatingLabel(false)
+    }
+  }
+
+  const downloadLabel = () => {
+    if (!labelPdf) return
+
+    // Convert base64 to blob and download
+    const byteCharacters = atob(labelPdf)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray], { type: 'application/pdf' })
+
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `shipping-label-${selectedOrder?.id.slice(0, 8)}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   const copyAddressToClipboard = () => {
     if (!selectedOrder?.shipping_address) return
     const addr = selectedOrder.shipping_address
@@ -130,11 +218,6 @@ ${addr.city}, ${addr.state} ${addr.postal_code}
 ${addr.country || 'USA'}`
     navigator.clipboard.writeText(text)
     alert('Address copied to clipboard!')
-  }
-
-  const openFedExShipManager = () => {
-    // FedEx Ship Manager URL - users will need to be logged in
-    window.open('https://www.fedex.com/shipping/shipEntryAction.do', '_blank')
   }
 
   const getStatusBadge = (status: string) => {
@@ -237,15 +320,9 @@ ${addr.country || 'USA'}`
                         <MapPin className="w-4 h-4" />
                         Shipping Address
                       </h3>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" onClick={copyAddressToClipboard} title="Copy address">
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                        <Button variant="secondary" size="sm" onClick={openFedExShipManager} title="Open FedEx Ship Manager">
-                          <Printer className="w-4 h-4 mr-1" />
-                          FedEx
-                        </Button>
-                      </div>
+                      <Button variant="ghost" size="sm" onClick={copyAddressToClipboard} title="Copy address">
+                        <Copy className="w-4 h-4" />
+                      </Button>
                     </div>
                     <div className="text-sm space-y-1">
                       <p className="font-medium text-white">{selectedOrder.shipping_address.name}</p>
@@ -262,14 +339,14 @@ ${addr.country || 'USA'}`
                   </div>
                 )}
 
-                {/* Tracking Number */}
+                {/* Shipping & Tracking */}
                 <div className="bg-zinc-800 p-4 border border-zinc-700">
                   <h3 className="font-bold flex items-center gap-2 mb-3">
                     <Truck className="w-4 h-4" />
                     Shipping & Tracking
                   </h3>
                   {selectedOrder.tracking_number ? (
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       <p className="text-sm text-zinc-400">Tracking Number:</p>
                       <div className="flex items-center gap-2">
                         <code className="bg-zinc-900 px-3 py-2 font-mono text-sm flex-1">
@@ -293,34 +370,103 @@ ${addr.country || 'USA'}`
                           Track
                         </Button>
                       </div>
+                      {labelPdf && (
+                        <Button variant="secondary" size="sm" onClick={downloadLabel}>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download Label PDF
+                        </Button>
+                      )}
                     </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-sm text-zinc-400">Add tracking number to mark as shipped:</p>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Enter tracking number"
-                          value={trackingNumber}
-                          onChange={(e) => setTrackingNumber(e.target.value)}
-                          className="flex-1"
-                        />
+                  ) : selectedOrder.shipping_address ? (
+                    <div className="space-y-4">
+                      {/* FedEx Label Creation */}
+                      <div className="space-y-3">
+                        <p className="text-sm text-zinc-400 font-medium">Create FedEx Shipping Label:</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs text-zinc-500 block mb-1">Weight (lbs)</label>
+                            <Input
+                              type="number"
+                              min="0.1"
+                              step="0.1"
+                              value={packageWeight}
+                              onChange={(e) => setPackageWeight(e.target.value)}
+                              placeholder="1"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-zinc-500 block mb-1">Service Type</label>
+                            <select
+                              className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-sm"
+                              value={selectedServiceType}
+                              onChange={(e) => setSelectedServiceType(e.target.value)}
+                            >
+                              {serviceTypes.length > 0 ? (
+                                serviceTypes.map((st) => (
+                                  <option key={st.value} value={st.value}>
+                                    {st.label}
+                                  </option>
+                                ))
+                              ) : (
+                                <>
+                                  <option value="FEDEX_GROUND">FedEx Ground (3-5 days)</option>
+                                  <option value="FEDEX_EXPRESS_SAVER">FedEx Express Saver (3 days)</option>
+                                  <option value="FEDEX_2_DAY">FedEx 2Day</option>
+                                  <option value="STANDARD_OVERNIGHT">FedEx Standard Overnight</option>
+                                  <option value="PRIORITY_OVERNIGHT">FedEx Priority Overnight</option>
+                                </>
+                              )}
+                            </select>
+                          </div>
+                        </div>
                         <Button
-                          onClick={() => saveTrackingNumber(true)}
-                          isLoading={isSavingTracking}
-                          disabled={!trackingNumber.trim()}
+                          onClick={createShippingLabel}
+                          isLoading={isCreatingLabel}
+                          className="w-full"
                         >
-                          Save & Email
+                          <Printer className="w-4 h-4 mr-2" />
+                          Create FedEx Label
                         </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={() => saveTrackingNumber(false)}
-                          isLoading={isSavingTracking}
-                          disabled={!trackingNumber.trim()}
-                        >
-                          Save Only
-                        </Button>
+                        {labelPdf && (
+                          <Button variant="secondary" className="w-full" onClick={downloadLabel}>
+                            <Download className="w-4 h-4 mr-2" />
+                            Download Label PDF
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Manual tracking number entry */}
+                      <div className="border-t border-zinc-700 pt-4">
+                        <p className="text-sm text-zinc-400 mb-3">Or enter tracking number manually:</p>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Enter tracking number"
+                            value={trackingNumber}
+                            onChange={(e) => setTrackingNumber(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button
+                            onClick={() => saveTrackingNumber(true)}
+                            isLoading={isSavingTracking}
+                            disabled={!trackingNumber.trim()}
+                            size="sm"
+                          >
+                            Save & Email
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => saveTrackingNumber(false)}
+                            isLoading={isSavingTracking}
+                            disabled={!trackingNumber.trim()}
+                            size="sm"
+                          >
+                            Save Only
+                          </Button>
+                        </div>
                       </div>
                     </div>
+                  ) : (
+                    <p className="text-sm text-zinc-500">No shipping address on this order.</p>
                   )}
                 </div>
 
