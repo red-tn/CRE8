@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { sendEmail, getNewOrderNotificationEmail } from '@/lib/sendgrid'
+import { sendEmail, getNewOrderNotificationEmail, getOrderConfirmationEmail } from '@/lib/sendgrid'
 import Stripe from 'stripe'
 
 export async function POST(request: NextRequest) {
@@ -176,6 +176,34 @@ export async function POST(request: NextRequest) {
                       .eq('id', item.productId)
                   }
                 }
+              }
+
+              // Send order confirmation email to customer
+              try {
+                const customerEmail = session.customer_email
+                const customerName = shippingDetails?.name || session.customer_email || 'Customer'
+
+                if (customerEmail) {
+                  const confirmationEmail = getOrderConfirmationEmail(
+                    order.id,
+                    customerName,
+                    order.total,
+                    order.subtotal,
+                    order.shipping,
+                    order.tax,
+                    orderItems as { product_name: string; quantity: number; size?: string; color?: string; unit_price: number; total_price: number }[],
+                    order.shipping_address as { name?: string; line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } | null
+                  )
+
+                  await sendEmail({
+                    to: customerEmail,
+                    subject: confirmationEmail.subject,
+                    html: confirmationEmail.html,
+                  })
+                  console.log(`Order confirmation sent to ${customerEmail}`)
+                }
+              } catch (emailError) {
+                console.error('Failed to send order confirmation:', emailError)
               }
 
               // Send order notification to admins who have notifications enabled

@@ -235,3 +235,173 @@ export function getNewOrderNotificationEmail(
     `,
   }
 }
+
+export function getOrderConfirmationEmail(
+  orderId: string,
+  customerName: string,
+  total: number,
+  subtotal: number,
+  shipping: number,
+  tax: number,
+  items: OrderItem[],
+  shippingAddress: ShippingAddress | null
+) {
+  const itemsHtml = items.map(item => `
+    <tr>
+      <td style="padding: 12px; border-bottom: 1px solid #333; color: #d4d4d8;">
+        ${item.product_name}
+        ${item.size ? `<br><small style="color: #71717a;">Size: ${item.size}</small>` : ''}
+        ${item.color ? `<small style="color: #71717a;"> • Color: ${item.color}</small>` : ''}
+      </td>
+      <td style="padding: 12px; border-bottom: 1px solid #333; color: #d4d4d8; text-align: center;">${item.quantity}</td>
+      <td style="padding: 12px; border-bottom: 1px solid #333; color: #d4d4d8; text-align: right;">$${item.total_price.toFixed(2)}</td>
+    </tr>
+  `).join('')
+
+  const addressHtml = shippingAddress ? `
+    <div style="background-color: #1a1a1a; padding: 20px; margin: 20px 0;">
+      <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 14px; letter-spacing: 1px;">SHIPPING TO:</h3>
+      <p style="color: #d4d4d8; margin: 0; line-height: 1.8;">
+        ${shippingAddress.name || customerName}<br>
+        ${shippingAddress.line1 || ''}${shippingAddress.line2 ? '<br>' + shippingAddress.line2 : ''}<br>
+        ${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.postal_code || ''}<br>
+        ${shippingAddress.country || 'USA'}
+      </p>
+    </div>
+  ` : ''
+
+  return {
+    subject: `Order Confirmed - CRE8 Truck Club #${orderId.slice(0, 8)}`,
+    html: `
+      <div style="background-color: #000; color: #fff; padding: 40px; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #fff; text-align: center; font-size: 32px; margin-bottom: 20px; letter-spacing: 2px;">
+            CRE8 TRUCK CLUB
+          </h1>
+          <h2 style="color: #22c55e; text-align: center;">Thanks for your order!</h2>
+
+          <p style="color: #d4d4d8; font-size: 16px; line-height: 1.6; text-align: center;">
+            Hey ${customerName.split(' ')[0]}, we got your order and we're getting it ready.
+          </p>
+
+          <div style="background-color: #1a1a1a; padding: 15px; margin: 20px 0; text-align: center;">
+            <p style="color: #71717a; margin: 0; font-size: 12px; letter-spacing: 1px;">ORDER NUMBER</p>
+            <p style="color: #fff; margin: 5px 0 0 0; font-family: monospace; font-size: 18px;">${orderId.slice(0, 8).toUpperCase()}</p>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+              <tr>
+                <th style="padding: 12px; border-bottom: 2px solid #333; text-align: left; color: #71717a; font-size: 12px; letter-spacing: 1px;">ITEM</th>
+                <th style="padding: 12px; border-bottom: 2px solid #333; text-align: center; color: #71717a; font-size: 12px; letter-spacing: 1px;">QTY</th>
+                <th style="padding: 12px; border-bottom: 2px solid #333; text-align: right; color: #71717a; font-size: 12px; letter-spacing: 1px;">PRICE</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+            </tbody>
+          </table>
+
+          <div style="border-top: 1px solid #333; padding-top: 15px; margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="color: #71717a;">Subtotal</span>
+              <span style="color: #d4d4d8;">$${subtotal.toFixed(2)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="color: #71717a;">Shipping</span>
+              <span style="color: #d4d4d8;">$${shipping.toFixed(2)}</span>
+            </div>
+            ${tax > 0 ? `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <span style="color: #71717a;">Tax</span>
+              <span style="color: #d4d4d8;">$${tax.toFixed(2)}</span>
+            </div>
+            ` : ''}
+            <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 1px solid #333;">
+              <span style="color: #fff; font-weight: bold; font-size: 18px;">Total</span>
+              <span style="color: #fff; font-weight: bold; font-size: 18px;">$${total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          ${addressHtml}
+
+          <p style="color: #d4d4d8; font-size: 14px; line-height: 1.6; text-align: center; margin-top: 30px;">
+            We'll send you another email with tracking info once your order ships.
+          </p>
+
+          <p style="color: #71717a; font-size: 12px; text-align: center; margin-top: 40px;">
+            Questions? Reply to this email or hit us up on Instagram @cre8truckclub
+          </p>
+        </div>
+      </div>
+    `,
+  }
+}
+
+export function getShippingNotificationEmail(
+  orderId: string,
+  customerName: string,
+  trackingNumber: string,
+  trackingUrl: string,
+  items: OrderItem[],
+  shippingAddress: ShippingAddress | null
+) {
+  const itemsHtml = items.map(item => `
+    <li style="color: #d4d4d8; margin-bottom: 5px;">
+      ${item.product_name}${item.size ? ` (${item.size})` : ''}${item.color ? ` - ${item.color}` : ''} x${item.quantity}
+    </li>
+  `).join('')
+
+  const addressHtml = shippingAddress ? `
+    <p style="color: #d4d4d8; margin: 0; line-height: 1.6;">
+      ${shippingAddress.name || customerName}<br>
+      ${shippingAddress.line1 || ''}${shippingAddress.line2 ? ', ' + shippingAddress.line2 : ''}<br>
+      ${shippingAddress.city || ''}, ${shippingAddress.state || ''} ${shippingAddress.postal_code || ''}
+    </p>
+  ` : ''
+
+  return {
+    subject: `Your order is on the way! - CRE8 Truck Club`,
+    html: `
+      <div style="background-color: #000; color: #fff; padding: 40px; font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto;">
+          <h1 style="color: #fff; text-align: center; font-size: 32px; margin-bottom: 20px; letter-spacing: 2px;">
+            CRE8 TRUCK CLUB
+          </h1>
+          <h2 style="color: #22c55e; text-align: center;">Your order has shipped!</h2>
+
+          <p style="color: #d4d4d8; font-size: 16px; line-height: 1.6; text-align: center;">
+            Hey ${customerName.split(' ')[0]}, great news - your order is on its way!
+          </p>
+
+          <div style="background-color: #1a1a1a; padding: 20px; margin: 25px 0; text-align: center;">
+            <p style="color: #71717a; margin: 0 0 10px 0; font-size: 12px; letter-spacing: 1px;">TRACKING NUMBER</p>
+            <p style="color: #fff; margin: 0; font-family: monospace; font-size: 18px; letter-spacing: 2px;">${trackingNumber}</p>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${trackingUrl}" style="background-color: #fff; color: #000; padding: 15px 40px; text-decoration: none; font-weight: bold; font-size: 16px;">
+              TRACK YOUR PACKAGE
+            </a>
+          </div>
+
+          <div style="background-color: #1a1a1a; padding: 20px; margin: 25px 0;">
+            <h3 style="color: #fff; margin: 0 0 15px 0; font-size: 14px; letter-spacing: 1px;">WHAT'S IN YOUR ORDER:</h3>
+            <ul style="margin: 0; padding-left: 20px;">
+              ${itemsHtml}
+            </ul>
+          </div>
+
+          <div style="background-color: #1a1a1a; padding: 20px; margin: 25px 0;">
+            <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 14px; letter-spacing: 1px;">SHIPPING TO:</h3>
+            ${addressHtml}
+          </div>
+
+          <p style="color: #71717a; font-size: 12px; text-align: center; margin-top: 40px;">
+            Questions about your order? Reply to this email or hit us up on Instagram @cre8truckclub
+          </p>
+        </div>
+      </div>
+    `,
+  }
+}

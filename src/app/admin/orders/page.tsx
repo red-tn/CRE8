@@ -16,6 +16,8 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [trackingNumber, setTrackingNumber] = useState('')
   const [isSavingTracking, setIsSavingTracking] = useState(false)
+  const [orderNotes, setOrderNotes] = useState('')
+  const [isSavingNotes, setIsSavingNotes] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -30,7 +32,12 @@ export default function AdminOrdersPage() {
       const res = await fetch(`/api/admin/orders?${params}`)
       if (res.ok) {
         const data = await res.json()
-        setOrders(data.orders)
+        // Map order_items to items for frontend consistency
+        const mappedOrders = data.orders.map((order: Order & { order_items?: Order['items'] }) => ({
+          ...order,
+          items: order.order_items || order.items || [],
+        }))
+        setOrders(mappedOrders)
       }
     } catch (error) {
       console.error('Error fetching orders:', error)
@@ -58,7 +65,7 @@ export default function AdminOrdersPage() {
     }
   }
 
-  const saveTrackingNumber = async () => {
+  const saveTrackingNumber = async (sendEmail: boolean = true) => {
     if (!selectedOrder || !trackingNumber.trim()) return
     setIsSavingTracking(true)
 
@@ -69,20 +76,48 @@ export default function AdminOrdersPage() {
         body: JSON.stringify({
           id: selectedOrder.id,
           tracking_number: trackingNumber.trim(),
-          status: 'shipped' // Auto-update status to shipped when tracking is added
+          status: 'shipped',
+          send_shipping_email: sendEmail
         }),
       })
 
       if (res.ok) {
         fetchOrders()
         setSelectedOrder({ ...selectedOrder, tracking_number: trackingNumber.trim(), status: 'shipped' })
-        alert('Tracking number saved!')
+        alert(sendEmail ? 'Tracking saved & shipping email sent!' : 'Tracking number saved!')
       }
     } catch (error) {
       console.error('Error saving tracking:', error)
       alert('Failed to save tracking number')
     } finally {
       setIsSavingTracking(false)
+    }
+  }
+
+  const saveOrderNotes = async () => {
+    if (!selectedOrder) return
+    setIsSavingNotes(true)
+
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedOrder.id,
+          notes: orderNotes.trim(),
+        }),
+      })
+
+      if (res.ok) {
+        fetchOrders()
+        setSelectedOrder({ ...selectedOrder, notes: orderNotes.trim() })
+        alert('Notes saved!')
+      }
+    } catch (error) {
+      console.error('Error saving notes:', error)
+      alert('Failed to save notes')
+    } finally {
+      setIsSavingNotes(false)
     }
   }
 
@@ -270,15 +305,44 @@ ${addr.country || 'USA'}`
                           className="flex-1"
                         />
                         <Button
-                          onClick={saveTrackingNumber}
+                          onClick={() => saveTrackingNumber(true)}
                           isLoading={isSavingTracking}
                           disabled={!trackingNumber.trim()}
                         >
-                          Save
+                          Save & Email
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() => saveTrackingNumber(false)}
+                          isLoading={isSavingTracking}
+                          disabled={!trackingNumber.trim()}
+                        >
+                          Save Only
                         </Button>
                       </div>
                     </div>
                   )}
+                </div>
+
+                {/* Order Notes */}
+                <div className="bg-zinc-800 p-4 border border-zinc-700">
+                  <h3 className="font-bold mb-3">Internal Notes</h3>
+                  <textarea
+                    className="w-full bg-zinc-900 border border-zinc-700 p-3 text-sm min-h-[80px] resize-y"
+                    placeholder="Add internal notes about this order..."
+                    value={orderNotes}
+                    onChange={(e) => setOrderNotes(e.target.value)}
+                  />
+                  <div className="flex justify-end mt-2">
+                    <Button
+                      size="sm"
+                      onClick={saveOrderNotes}
+                      isLoading={isSavingNotes}
+                      disabled={orderNotes === (selectedOrder.notes || '')}
+                    >
+                      Save Notes
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Order Items */}
@@ -388,6 +452,7 @@ ${addr.country || 'USA'}`
                         onClick={() => {
                           setSelectedOrder(order)
                           setTrackingNumber(order.tracking_number || '')
+                          setOrderNotes(order.notes || '')
                         }}
                       >
                         <Eye className="w-4 h-4" />

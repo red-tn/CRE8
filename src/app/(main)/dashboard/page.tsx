@@ -20,10 +20,12 @@ import {
   HelpCircle,
   XCircle,
   MapPin,
+  Package,
+  ExternalLink,
 } from 'lucide-react'
 import { formatDate, formatCurrency, getDuesStatus, formatTime } from '@/lib/utils'
 import Link from 'next/link'
-import { MembershipDues, Event, EventRSVP, MemberMedia } from '@/types'
+import { MembershipDues, Event, EventRSVP, MemberMedia, Order } from '@/types'
 
 function DashboardContent() {
   const router = useRouter()
@@ -38,6 +40,7 @@ function DashboardContent() {
   const [selectedEvent, setSelectedEvent] = useState<(Event & { rsvp?: EventRSVP }) | null>(null)
   const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false)
   const [guestCount, setGuestCount] = useState(0)
+  const [orders, setOrders] = useState<(Order & { items?: Order['items'] })[]>([])
 
   useEffect(() => {
     checkAuth()
@@ -64,10 +67,11 @@ function DashboardContent() {
 
   const fetchDashboardData = async () => {
     try {
-      const [duesRes, eventsRes, mediaRes] = await Promise.all([
+      const [duesRes, eventsRes, mediaRes, ordersRes] = await Promise.all([
         fetch('/api/member/dues'),
         fetch('/api/member/events'),
         fetch('/api/member/media'),
+        fetch('/api/member/orders'),
       ])
 
       if (duesRes.ok) {
@@ -87,6 +91,11 @@ function DashboardContent() {
         if (firstImage) {
           setTruckPhoto(firstImage.url)
         }
+      }
+
+      if (ordersRes.ok) {
+        const ordersData = await ordersRes.json()
+        setOrders(ordersData.orders || [])
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
@@ -308,6 +317,106 @@ function DashboardContent() {
                   <span className="text-zinc-400">Priority registration</span>
                 </li>
               </ul>
+            </CardContent>
+          </Card>
+
+          {/* My Orders */}
+          <Card>
+            <CardHeader>
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Package className="w-5 h-5 text-white" />
+                My Orders
+              </h2>
+            </CardHeader>
+            <CardContent>
+              {orders.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-zinc-500 text-sm">No orders yet</p>
+                  <Link href="/shop">
+                    <Button variant="outline" size="sm" className="mt-3">
+                      Browse Shop
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {orders.slice(0, 5).map((order) => (
+                    <div key={order.id} className="bg-zinc-800 p-4 border border-zinc-700">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <p className="text-xs text-zinc-500">{formatDate(order.created_at)}</p>
+                          <code className="text-xs font-mono text-zinc-400">#{order.id.slice(0, 8)}</code>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-white">{formatCurrency(order.total)}</p>
+                          <Badge
+                            variant={
+                              order.status === 'delivered' ? 'success' :
+                              order.status === 'shipped' ? 'amber' :
+                              order.status === 'paid' ? 'success' :
+                              order.status === 'cancelled' || order.status === 'refunded' ? 'danger' :
+                              'default'
+                            }
+                            className="text-xs"
+                          >
+                            {order.status}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Order Items */}
+                      {order.items && order.items.length > 0 && (
+                        <div className="text-sm text-zinc-400 mb-2">
+                          {order.items.map((item, idx) => (
+                            <div key={idx}>
+                              {item.product_name}
+                              {item.size && ` (${item.size})`}
+                              {item.quantity > 1 && ` x${item.quantity}`}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Tracking Info */}
+                      {order.tracking_number && (
+                        <div className="mt-3 pt-3 border-t border-zinc-700">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs text-zinc-500 mb-1">Tracking Number</p>
+                              <code className="text-sm bg-zinc-900 px-2 py-1">{order.tracking_number}</code>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => window.open(`https://www.fedex.com/fedextrack/?trknbr=${order.tracking_number}`, '_blank')}
+                            >
+                              <ExternalLink className="w-4 h-4 mr-1" />
+                              Track
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Status message for shipped items without tracking */}
+                      {order.status === 'shipped' && !order.tracking_number && (
+                        <div className="mt-3 pt-3 border-t border-zinc-700">
+                          <p className="text-sm text-amber-500">Your order has shipped! Tracking info coming soon.</p>
+                        </div>
+                      )}
+
+                      {/* Status message for paid items */}
+                      {order.status === 'paid' && (
+                        <div className="mt-3 pt-3 border-t border-zinc-700">
+                          <p className="text-sm text-zinc-400">Order confirmed - preparing for shipment</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  {orders.length > 5 && (
+                    <p className="text-center text-sm text-zinc-500">+ {orders.length - 5} more orders</p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 

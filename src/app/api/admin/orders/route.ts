@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
 import { stripe } from '@/lib/stripe'
+import { sendEmail, getShippingNotificationEmail } from '@/lib/sendgrid'
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,8 +10,9 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const status = searchParams.get('status') || ''
+    const memberId = searchParams.get('member_id') || ''
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = 20
+    const limit = memberId ? 100 : 20 // Get more results when filtering by member
     const offset = (page - 1) * limit
 
     let query = supabaseAdmin
@@ -19,6 +21,10 @@ export async function GET(request: NextRequest) {
 
     if (status) {
       query = query.eq('status', status)
+    }
+
+    if (memberId) {
+      query = query.eq('member_id', memberId)
     }
 
     const { data: orders, count } = await query
@@ -45,16 +51,16 @@ export async function PUT(request: NextRequest) {
     await requireAdmin()
 
     const body = await request.json()
-    const { id, status, tracking_number, notes } = body
+    const { id, status, tracking_number, notes, send_shipping_email } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Order ID required' }, { status: 400 })
     }
 
-    // Get current order to check payment intent
+    // Get current order with items and member info
     const { data: currentOrder } = await supabaseAdmin
       .from('orders')
-      .select('*')
+      .select('*, order_items(*), member:members(first_name, last_name, email)')
       .eq('id', id)
       .single()
 
@@ -91,6 +97,47 @@ export async function PUT(request: NextRequest) {
     if (error) {
       console.error('Error updating order:', error)
       return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
+    }
+
+    // Send shipping notification email if requested
+    if (send_shipping_email && tracking_number) {
+      try {
+        const customerEmail = (currentOrder.member as { email?: string } | null)?.email || currentOrder.guest_email
+        const customerName = (currentOrder.member as { first_name?: string; last_name?: string } | null)
+          ? `${(currentOrder.member as { first_name: string }).first_name} ${(currentOrder.member as { last_name: string }).last_name}`
+          : currentOrder.guest_name || 'Customer'
+
+        if (customerEmail) {
+          const trackingUrl = `https://www.fedex.com/fedextrack/?trknbr=${tracking_number}`
+          const items = (currentOrder.order_items || []).map((item: { product_name: string; quantity: number; size?: string; color?: string; unit_price: number; total_price: number }) => ({
+            product_name: item.product_name,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+            unit_price: item.unit_price,
+            total_price: item.total_price,
+          }))
+
+          const emailContent = getShippingNotificationEmail(
+            currentOrder.id,
+            customerName,
+            tracking_number,
+            trackingUrl,
+            items,
+            currentOrder.shipping_address as { name?: string; line1?: string; line2?: string; city?: string; state?: string; postal_code?: string; country?: string } | null
+          )
+
+          await sendEmail({
+            to: customerEmail,
+            subject: emailContent.subject,
+            html: emailContent.html,
+          })
+          console.log(`Shipping notification sent to ${customerEmail}`)
+        }
+      } catch (emailError) {
+        console.error('Failed to send shipping notification:', emailError)
+        // Don't fail the request if email fails
+      }
     }
 
     return NextResponse.json({ order })
