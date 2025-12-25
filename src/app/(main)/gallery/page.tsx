@@ -19,6 +19,7 @@ interface GalleryItem {
   member: {
     first_name: string
     last_name: string
+    member_number?: number
     instagram_handle?: string
     truck_year?: number
     truck_make?: string
@@ -30,7 +31,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
   // Get members with their media
   const { data: members } = await supabaseAdmin
     .from('members')
-    .select('id, first_name, last_name, instagram_handle, truck_year, truck_make, truck_model, profile_photo_url')
+    .select('id, first_name, last_name, member_number, instagram_handle, truck_year, truck_make, truck_model, profile_photo_url')
     .eq('is_active', true)
     .not('truck_make', 'is', null)
 
@@ -49,7 +50,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
   // Also get from fleet_gallery table
   const { data: fleetGallery } = await supabaseAdmin
     .from('fleet_gallery')
-    .select('*, member:members(first_name, last_name, instagram_handle, truck_year, truck_make, truck_model)')
+    .select('*, member:members(first_name, last_name, member_number, instagram_handle, truck_year, truck_make, truck_model)')
     .eq('is_approved', true)
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
@@ -69,6 +70,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
         member: {
           first_name: member.first_name,
           last_name: member.last_name,
+          member_number: member.member_number,
           instagram_handle: member.instagram_handle,
           truck_year: member.truck_year,
           truck_make: member.truck_make,
@@ -110,6 +112,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
         member: {
           first_name: member.first_name,
           last_name: member.last_name,
+          member_number: member.member_number,
           instagram_handle: member.instagram_handle,
           truck_year: member.truck_year,
           truck_make: member.truck_make,
@@ -237,6 +240,9 @@ export default async function GalleryPage() {
                   {/* Overlay on hover */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <div>
+                      {image.member?.member_number && (
+                        <p className="text-zinc-400 text-xs font-mono mb-1">Member #{image.member.member_number}</p>
+                      )}
                       {image.member?.truck_year && image.member?.truck_make && image.member?.truck_model && (
                         <p className="text-white font-bold">
                           {image.member.truck_year} {image.member.truck_make} {image.member.truck_model}
