@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
+import { headers } from 'next/headers'
 
 // Force dynamic rendering to always show fresh data
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
 
 export const metadata = {
   title: 'Fleet Gallery | CRE8 Truck Club',
@@ -32,6 +34,9 @@ interface GalleryItem {
 }
 
 async function getGalleryImages(): Promise<GalleryItem[]> {
+  // Force dynamic by reading headers
+  headers()
+
   // Get members with their media
   const { data: members } = await supabaseAdmin
     .from('members')

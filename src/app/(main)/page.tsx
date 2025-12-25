@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
+import { headers } from 'next/headers'
 
 // Force dynamic rendering to always show fresh data
 export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
 
 async function getHomePageData() {
+  // Force dynamic by reading headers
+  headers()
   // Get member count
   const { count: memberCount } = await supabaseAdmin
     .from('members')
