@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
 
@@ -52,9 +53,11 @@ async function getHomePageData() {
   // Combine member data with their first media item (or stock photo fallback)
   const fleetData = fleetMembers?.map(member => {
     const media = memberMedia?.find(m => m.member_id === member.id)
+    const hasOwnImage = !!(media?.url || member.profile_photo_url)
     return {
       ...member,
-      display_image: media?.url || member.profile_photo_url || getStockTruckPhoto(member.truck_make, member.truck_model)
+      display_image: media?.url || member.profile_photo_url || getStockTruckPhoto(member.truck_make, member.truck_model),
+      is_stock_photo: !hasOwnImage
     }
   }) || []
 
@@ -233,6 +236,14 @@ export default async function HomePage() {
                     alt={`${member.truck_year} ${member.truck_make} ${member.truck_model}`}
                     className="w-full h-full object-cover"
                   />
+                  {/* Stock photo badge */}
+                  {member.is_stock_photo && (
+                    <div className="absolute top-2 left-2">
+                      <Badge variant="default" className="text-xs">
+                        No Images Yet
+                      </Badge>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                     <div>
                       <p className="text-white font-bold text-sm">
