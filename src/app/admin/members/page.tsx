@@ -553,6 +553,9 @@ export default function AdminMembersPage() {
                             />
                             <div>
                               <p className="font-bold">
+                                {member.member_number && (
+                                  <span className="text-zinc-500 font-mono text-sm mr-2">#{member.member_number}</span>
+                                )}
                                 {member.first_name} {member.last_name}
                                 {member.is_admin && (
                                   <Shield className="w-4 h-4 text-green-500 inline ml-2" />
@@ -662,6 +665,9 @@ export default function AdminMembersPage() {
                         />
                         <div className="min-w-0">
                           <p className="font-bold truncate">
+                            {member.member_number && (
+                              <span className="text-zinc-500 font-mono text-sm mr-2">#{member.member_number}</span>
+                            )}
                             {member.first_name} {member.last_name}
                             {member.is_admin && (
                               <Shield className="w-4 h-4 text-green-500 inline ml-2" />

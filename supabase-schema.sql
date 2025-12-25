@@ -12,6 +12,7 @@ CREATE TABLE members (
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
   phone VARCHAR(20),
+  member_number INTEGER UNIQUE,
   truck_year INTEGER,
   truck_make VARCHAR(50) CHECK (truck_make IN ('Chevy', 'Ford', 'Dodge', 'Toyota', 'Nissan', 'GMC')),
   truck_model VARCHAR(100),

@@ -17,6 +17,7 @@ export interface Member {
   first_name: string
   last_name: string
   phone?: string
+  member_number?: number
   truck_year?: number
   truck_make?: TruckMake
   truck_model?: string

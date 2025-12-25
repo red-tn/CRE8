@@ -75,6 +75,17 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await hashPassword(password)
 
+    // Get next member number
+    const { data: maxMember } = await supabaseAdmin
+      .from('members')
+      .select('member_number')
+      .not('member_number', 'is', null)
+      .order('member_number', { ascending: false })
+      .limit(1)
+      .single()
+
+    const nextMemberNumber = (maxMember?.member_number || 0) + 1
+
     // Create member
     const { data: member, error: memberError } = await supabaseAdmin
       .from('members')
@@ -89,6 +100,7 @@ export async function POST(request: NextRequest) {
         truck_model: truckModel || null,
         instagram_handle: instagram || null,
         invite_code_id: invite.id,
+        member_number: nextMemberNumber,
         is_admin: false,
         is_active: true,
       })
