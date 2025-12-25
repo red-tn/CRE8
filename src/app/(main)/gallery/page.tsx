@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
 
+// Revalidate every 60 seconds to pick up new members
+export const revalidate = 60
+
 export const metadata = {
   title: 'Fleet Gallery | CRE8 Truck Club',
   description: 'Check out the CRE8 Truck Club fleet - Chevy, Ford, Dodge, Toyota, Nissan, and GMC trucks from our members.',
