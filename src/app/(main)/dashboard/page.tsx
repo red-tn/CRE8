@@ -339,8 +339,8 @@ function DashboardContent() {
                   </Link>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {orders.slice(0, 5).map((order) => (
+                <div className={`space-y-4 ${orders.length > 2 ? 'max-h-96 overflow-y-auto pr-2' : ''}`}>
+                  {orders.map((order) => (
                     <div key={order.id} className="bg-zinc-800 p-4 border border-zinc-700">
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -412,9 +412,6 @@ function DashboardContent() {
                       )}
                     </div>
                   ))}
-                  {orders.length > 5 && (
-                    <p className="text-center text-sm text-zinc-500">+ {orders.length - 5} more orders</p>
-                  )}
                 </div>
               )}
             </CardContent>
