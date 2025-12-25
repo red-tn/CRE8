@@ -32,6 +32,8 @@ export default function SignupPage() {
     truckMake: '',
     truckModel: '',
     instagram: '',
+    tiktok: '',
+    snapchat: '',
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -92,6 +94,26 @@ export default function SignupPage() {
       setError('First and last name are required')
       return false
     }
+    if (!formData.phone) {
+      setError('Phone number is required')
+      return false
+    }
+    return true
+  }
+
+  const validateStep4 = () => {
+    if (!formData.truckYear) {
+      setError('Truck year is required')
+      return false
+    }
+    if (!formData.truckMake) {
+      setError('Truck make is required')
+      return false
+    }
+    if (!formData.truckModel) {
+      setError('Truck model is required')
+      return false
+    }
     return true
   }
 
@@ -108,6 +130,12 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate step 4 before submitting
+    if (!validateStep4()) {
+      return
+    }
+
     setIsLoading(true)
     setError('')
 
@@ -122,10 +150,12 @@ export default function SignupPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
-          truckYear: formData.truckYear ? parseInt(formData.truckYear) : null,
-          truckMake: formData.truckMake || null,
-          truckModel: formData.truckModel || null,
-          instagram: formData.instagram,
+          truckYear: parseInt(formData.truckYear),
+          truckMake: formData.truckMake,
+          truckModel: formData.truckModel,
+          instagram: formData.instagram || null,
+          tiktok: formData.tiktok || null,
+          snapchat: formData.snapchat || null,
         }),
       })
 
@@ -272,6 +302,7 @@ export default function SignupPage() {
                   placeholder="John"
                   value={formData.firstName}
                   onChange={handleChange}
+                  required
                 />
                 <Input
                   label="Last Name"
@@ -279,21 +310,37 @@ export default function SignupPage() {
                   placeholder="Doe"
                   value={formData.lastName}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <Input
-                label="Phone (optional)"
+                label="Phone"
                 name="phone"
                 type="tel"
                 placeholder="(555) 123-4567"
                 value={formData.phone}
                 onChange={handleChange}
+                required
               />
               <Input
-                label="Instagram Handle (optional)"
+                label="Instagram (optional)"
                 name="instagram"
                 placeholder="@yourusername"
                 value={formData.instagram}
+                onChange={handleChange}
+              />
+              <Input
+                label="TikTok (optional)"
+                name="tiktok"
+                placeholder="@yourusername"
+                value={formData.tiktok}
+                onChange={handleChange}
+              />
+              <Input
+                label="Snapchat (optional)"
+                name="snapchat"
+                placeholder="yourusername"
+                value={formData.snapchat}
                 onChange={handleChange}
               />
               <div className="flex gap-4">
@@ -318,19 +365,20 @@ export default function SignupPage() {
               <div>
                 <h2 className="text-xl font-bold mb-2">Your truck</h2>
                 <p className="text-zinc-500 text-sm mb-4">
-                  Tell us what you&apos;re rolling in. This is optional but helps us feature your build.
+                  Tell us what you&apos;re rolling in so we can feature your build.
                 </p>
               </div>
               <Input
-                label="Year (optional)"
+                label="Year"
                 name="truckYear"
                 type="number"
                 placeholder="2023"
                 value={formData.truckYear}
                 onChange={handleChange}
+                required
               />
               <Select
-                label="Make (optional)"
+                label="Make"
                 name="truckMake"
                 value={formData.truckMake}
                 onChange={(e) => {
@@ -345,9 +393,10 @@ export default function SignupPage() {
                   { value: '', label: 'Select make...' },
                   ...TRUCK_MAKES.map(make => ({ value: make, label: make }))
                 ]}
+                required
               />
               <Select
-                label="Model (optional)"
+                label="Model"
                 name="truckModel"
                 value={formData.truckModel}
                 onChange={handleChange}
@@ -358,6 +407,7 @@ export default function SignupPage() {
                     ? TRUCK_MODELS[formData.truckMake as TruckMake].map(model => ({ value: model, label: model }))
                     : [])
                 ]}
+                required
               />
               <div className="flex gap-4">
                 <Button

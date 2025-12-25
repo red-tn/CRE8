@@ -16,11 +16,13 @@ export async function POST(request: NextRequest) {
       truckMake,
       truckModel,
       instagram,
+      tiktok,
+      snapchat,
       inviteCode,
     } = body
 
     // Validate required fields
-    if (!email || !password || !firstName || !lastName || !inviteCode) {
+    if (!email || !password || !firstName || !lastName || !phone || !truckYear || !truckMake || !truckModel || !inviteCode) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -94,11 +96,13 @@ export async function POST(request: NextRequest) {
         password_hash: passwordHash,
         first_name: firstName,
         last_name: lastName,
-        phone: phone || null,
-        truck_year: truckYear || null,
-        truck_make: truckMake || null,
-        truck_model: truckModel || null,
+        phone: phone,
+        truck_year: truckYear,
+        truck_make: truckMake,
+        truck_model: truckModel,
         instagram_handle: instagram || null,
+        tiktok_handle: tiktok || null,
+        snapchat_handle: snapchat || null,
         invite_code_id: invite.id,
         member_number: nextMemberNumber,
         is_admin: false,

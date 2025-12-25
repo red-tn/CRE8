@@ -186,6 +186,30 @@ function DashboardContent() {
           </div>
         )}
 
+        {/* New Member Photo Prompt */}
+        {!truckPhoto && (
+          <div className="bg-gradient-to-r from-white/10 to-white/5 border border-white/20 p-6 mb-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <Camera className="w-7 h-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white mb-1">Show Off Your Build!</h3>
+                <p className="text-zinc-400 text-sm">
+                  Add photos to your Truck Library to be featured in the fleet gallery and on your member profile.
+                  Let the crew see what you&apos;re rolling in!
+                </p>
+              </div>
+              <Link href="/dashboard/profile" className="flex-shrink-0">
+                <Button>
+                  <Camera className="w-4 h-4 mr-2" />
+                  Add Photos
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div className="flex items-center gap-4">
