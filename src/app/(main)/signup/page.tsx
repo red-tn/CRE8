@@ -17,6 +17,7 @@ export default function SignupPage() {
 
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const [isValidating, setIsValidating] = useState(false)
   const [error, setError] = useState('')
 
   const [formData, setFormData] = useState({
@@ -38,12 +39,36 @@ export default function SignupPage() {
     setError('')
   }
 
-  const validateStep1 = () => {
+  const validateStep1 = async () => {
     if (!formData.inviteCode) {
       setError('Invite code is required')
       return false
     }
-    return true
+
+    setIsValidating(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/invite/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: formData.inviteCode }),
+      })
+
+      const data = await response.json()
+
+      if (!data.valid) {
+        setError(data.error || 'Invalid invite code')
+        return false
+      }
+
+      return true
+    } catch (err) {
+      setError('Failed to validate invite code. Please try again.')
+      return false
+    } finally {
+      setIsValidating(false)
+    }
   }
 
   const validateStep2 = () => {
@@ -70,10 +95,15 @@ export default function SignupPage() {
     return true
   }
 
-  const handleNext = () => {
-    if (step === 1 && validateStep1()) setStep(2)
-    else if (step === 2 && validateStep2()) setStep(3)
-    else if (step === 3 && validateStep3()) setStep(4)
+  const handleNext = async () => {
+    if (step === 1) {
+      const isValid = await validateStep1()
+      if (isValid) setStep(2)
+    } else if (step === 2 && validateStep2()) {
+      setStep(3)
+    } else if (step === 3 && validateStep3()) {
+      setStep(4)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,7 +201,7 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="uppercase"
               />
-              <Button type="button" onClick={handleNext} className="w-full">
+              <Button type="button" onClick={handleNext} isLoading={isValidating} className="w-full">
                 Verify Code <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
