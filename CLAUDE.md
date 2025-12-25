@@ -34,6 +34,7 @@ Required in Vercel dashboard:
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 - `SENDGRID_API_KEY`
+- `SENDGRID_FROM_EMAIL` (set to info@cre8trucks.com)
 - `NEXT_PUBLIC_APP_URL` (set to https://cre8truckclub.vercel.app)
 - `SESSION_SECRET`
 

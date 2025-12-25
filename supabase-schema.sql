@@ -16,11 +16,15 @@ CREATE TABLE members (
   truck_make VARCHAR(50) CHECK (truck_make IN ('Chevy', 'Ford', 'Dodge', 'Toyota', 'Nissan', 'GMC')),
   truck_model VARCHAR(100),
   truck_photo_url TEXT,
+  profile_photo_url TEXT,
   bio TEXT,
   instagram_handle VARCHAR(100),
+  snapchat_handle VARCHAR(100),
+  tiktok_handle VARCHAR(100),
   invite_code_id UUID REFERENCES invite_codes(id),
   is_admin BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
+  receive_order_notifications BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -71,6 +75,22 @@ CREATE TABLE products (
   stripe_product_id VARCHAR(255),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Product variants table (for size/color combinations with stock)
+CREATE TABLE product_variants (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  size VARCHAR(50),
+  color VARCHAR(50),
+  stock_quantity INTEGER DEFAULT 0,
+  price_adjustment DECIMAL(10,2) DEFAULT 0,
+  sku VARCHAR(100),
+  image_url TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(product_id, size, color)
 );
 
 -- Orders table
@@ -147,6 +167,17 @@ CREATE TABLE fleet_gallery (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Member media table (photos and videos)
+CREATE TABLE member_media (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  member_id UUID REFERENCES members(id) ON DELETE CASCADE NOT NULL,
+  url TEXT NOT NULL,
+  type VARCHAR(20) DEFAULT 'image' CHECK (type IN ('image', 'video')),
+  caption TEXT,
+  is_profile BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Email logs table (for dues reminders)
 CREATE TABLE email_logs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -191,6 +222,10 @@ CREATE INDEX idx_event_rsvps_event ON event_rsvps(event_id);
 CREATE INDEX idx_fleet_gallery_member ON fleet_gallery(member_id);
 CREATE INDEX idx_sessions_token ON sessions(token);
 CREATE INDEX idx_sessions_member ON sessions(member_id);
+CREATE INDEX idx_product_variants_product ON product_variants(product_id);
+CREATE INDEX idx_product_variants_active ON product_variants(is_active);
+CREATE INDEX idx_member_media_member ON member_media(member_id);
+CREATE INDEX idx_member_media_type ON member_media(type);
 
 -- Insert default site settings
 INSERT INTO site_settings (key, value) VALUES
@@ -221,6 +256,9 @@ CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
 CREATE TRIGGER update_events_updated_at BEFORE UPDATE ON events
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_product_variants_updated_at BEFORE UPDATE ON product_variants
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Row Level Security (RLS) Policies
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invite_codes ENABLE ROW LEVEL SECURITY;
@@ -234,12 +272,16 @@ ALTER TABLE fleet_gallery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE email_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_variants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE member_media ENABLE ROW LEVEL SECURITY;
 
 -- Public read policies
 CREATE POLICY "Products are viewable by everyone" ON products FOR SELECT USING (is_active = true);
 CREATE POLICY "Events are viewable by everyone" ON events FOR SELECT USING (is_active = true);
 CREATE POLICY "Featured gallery images are public" ON fleet_gallery FOR SELECT USING (is_approved = true);
 CREATE POLICY "Site settings are public" ON site_settings FOR SELECT USING (true);
+CREATE POLICY "Product variants viewable by everyone" ON product_variants FOR SELECT USING (is_active = true);
+CREATE POLICY "Member media viewable by everyone" ON member_media FOR SELECT USING (true);
 
 -- Service role has full access (for API routes)
 CREATE POLICY "Service role full access members" ON members FOR ALL USING (true);
@@ -254,6 +296,8 @@ CREATE POLICY "Service role full access fleet_gallery" ON fleet_gallery FOR ALL 
 CREATE POLICY "Service role full access email_logs" ON email_logs FOR ALL USING (true);
 CREATE POLICY "Service role full access sessions" ON sessions FOR ALL USING (true);
 CREATE POLICY "Service role full access site_settings" ON site_settings FOR ALL USING (true);
+CREATE POLICY "Service role full access product_variants" ON product_variants FOR ALL USING (true);
+CREATE POLICY "Service role full access member_media" ON member_media FOR ALL USING (true);
 
 -- Insert sample data for testing
 INSERT INTO products (name, description, price, member_price, category, sizes, is_members_only, is_active, image_url) VALUES
