@@ -33,8 +33,29 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
-    // Remove password hashes
-    const sanitizedMembers = (members || []).map(({ password_hash, ...member }) => member)
+    // Fetch member_media for all members (first image per member)
+    const memberIds = (members || []).map(m => m.id)
+    const { data: allMedia } = await supabaseAdmin
+      .from('member_media')
+      .select('member_id, url, type')
+      .in('member_id', memberIds)
+      .eq('type', 'image')
+      .order('created_at', { ascending: false })
+
+    // Group media by member_id (take first/most recent per member)
+    const mediaByMember: Record<string, { url: string }[]> = {}
+    allMedia?.forEach(m => {
+      if (!mediaByMember[m.member_id]) {
+        mediaByMember[m.member_id] = []
+      }
+      mediaByMember[m.member_id].push({ url: m.url })
+    })
+
+    // Remove password hashes and add media
+    const sanitizedMembers = (members || []).map(({ password_hash, ...member }) => ({
+      ...member,
+      member_media: mediaByMember[member.id] || [],
+    }))
 
     return NextResponse.json({
       members: sanitizedMembers,

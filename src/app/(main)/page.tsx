@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getStockTruckPhoto } from '@/lib/stockPhotos'
 
 // Revalidate every 60 seconds to pick up changes
 export const revalidate = 60
@@ -48,12 +49,12 @@ async function getHomePageData() {
     .eq('type', 'image')
     .order('created_at', { ascending: false })
 
-  // Combine member data with their first media item
+  // Combine member data with their first media item (or stock photo fallback)
   const fleetData = fleetMembers?.map(member => {
     const media = memberMedia?.find(m => m.member_id === member.id)
     return {
       ...member,
-      display_image: media?.url || member.profile_photo_url || null
+      display_image: media?.url || member.profile_photo_url || getStockTruckPhoto(member.truck_make, member.truck_model)
     }
   }) || []
 
@@ -227,17 +228,11 @@ export default async function HomePage() {
                   href={`/member/${member.id}`}
                   className="aspect-square bg-zinc-800 border border-zinc-700 hover:border-white/50 transition-colors relative group overflow-hidden block"
                 >
-                  {member.display_image ? (
-                    <img
-                      src={member.display_image}
-                      alt={`${member.truck_year} ${member.truck_make} ${member.truck_model}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                      <Truck className="w-12 h-12" />
-                    </div>
-                  )}
+                  <img
+                    src={member.display_image}
+                    alt={`${member.truck_year} ${member.truck_make} ${member.truck_model}`}
+                    className="w-full h-full object-cover"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                     <div>
                       <p className="text-white font-bold text-sm">

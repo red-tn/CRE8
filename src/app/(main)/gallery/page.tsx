@@ -3,6 +3,7 @@ import { Truck, Crown } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { getStockTruckPhoto } from '@/lib/stockPhotos'
 
 export const metadata = {
   title: 'Fleet Gallery | CRE8 Truck Club',
@@ -91,17 +92,19 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
     }
   })
 
-  // Add members with profile photos but no media uploads
+  // Add ALL members with truck info - use uploaded photos, profile photo, or stock photo
   members.forEach(member => {
     const hasMedia = galleryItems.some(item =>
       item.member.first_name === member.first_name &&
       item.member.last_name === member.last_name
     )
-    if (!hasMedia && member.profile_photo_url) {
+    if (!hasMedia) {
+      // Use profile photo if available, otherwise use stock photo based on truck make/model
+      const imageUrl = member.profile_photo_url || getStockTruckPhoto(member.truck_make, member.truck_model)
       galleryItems.push({
         id: member.id,
         member_id: member.id,
-        image_url: member.profile_photo_url,
+        image_url: imageUrl,
         caption: undefined,
         is_featured: false,
         member: {
