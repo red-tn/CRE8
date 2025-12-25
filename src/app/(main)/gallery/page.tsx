@@ -48,7 +48,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
 
   const memberIds = members.map(m => m.id)
 
-  // Get media from member_media table
+  // Get media from member_media table (most recent first)
   const { data: memberMedia } = await supabaseAdmin
     .from('member_media')
     .select('*')
@@ -56,82 +56,50 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
     .eq('type', 'image')
     .order('created_at', { ascending: false })
 
-  // Also get from fleet_gallery table
-  const { data: fleetGallery } = await supabaseAdmin
-    .from('fleet_gallery')
-    .select('*, member:members(first_name, last_name, member_number, instagram_handle, truck_year, truck_make, truck_model)')
-    .eq('is_approved', true)
-    .order('is_featured', { ascending: false })
-    .order('created_at', { ascending: false })
-
-  const galleryItems: GalleryItem[] = []
-
-  // Add member media items
+  // Create a map of member_id to their first (most recent) image
+  const memberImageMap: Record<string, { url: string; caption?: string }> = {}
   memberMedia?.forEach(media => {
-    const member = members.find(m => m.id === media.member_id)
-    if (member) {
-      galleryItems.push({
-        id: media.id,
-        member_id: member.id,
-        image_url: media.url,
-        caption: media.caption,
-        is_featured: false,
-        is_stock_photo: false,
-        member: {
-          first_name: member.first_name,
-          last_name: member.last_name,
-          member_number: member.member_number,
-          instagram_handle: member.instagram_handle,
-          truck_year: member.truck_year,
-          truck_make: member.truck_make,
-          truck_model: member.truck_model,
-        }
-      })
+    // Only keep the first (most recent) image per member
+    if (!memberImageMap[media.member_id]) {
+      memberImageMap[media.member_id] = { url: media.url, caption: media.caption }
     }
   })
 
-  // Add fleet gallery items (avoiding duplicates)
-  fleetGallery?.forEach(item => {
-    if (item.member) {
-      galleryItems.push({
-        id: item.id,
-        member_id: item.member_id,
-        image_url: item.image_url,
-        caption: item.caption,
-        is_featured: item.is_featured,
-        is_stock_photo: false,
-        member: item.member
-      })
-    }
-  })
+  // Build gallery items - ONE per member
+  const galleryItems: GalleryItem[] = members.map(member => {
+    const memberImage = memberImageMap[member.id]
+    const hasUploadedImage = !!memberImage
+    const hasProfilePhoto = !!member.profile_photo_url
 
-  // Add ALL members with truck info - use uploaded photos, profile photo, or stock photo
-  members.forEach(member => {
-    const hasMedia = galleryItems.some(item =>
-      item.member.first_name === member.first_name &&
-      item.member.last_name === member.last_name
-    )
-    if (!hasMedia) {
-      // Use profile photo if available, otherwise use stock photo based on truck make/model
-      const hasProfilePhoto = !!member.profile_photo_url
-      const imageUrl = member.profile_photo_url || getStockTruckPhoto(member.truck_make, member.truck_model)
-      galleryItems.push({
-        id: member.id,
-        member_id: member.id,
-        image_url: imageUrl,
-        caption: undefined,
-        is_featured: false,
-        is_stock_photo: !hasProfilePhoto,
-        member: {
-          first_name: member.first_name,
-          last_name: member.last_name,
-          member_number: member.member_number,
-          instagram_handle: member.instagram_handle,
-          truck_year: member.truck_year,
-          truck_make: member.truck_make,
-          truck_model: member.truck_model,
-        }
-      })
+    // Priority: uploaded image > profile photo > stock photo
+    let imageUrl: string
+    let isStockPhoto = false
+
+    if (hasUploadedImage) {
+      imageUrl = memberImage.url
+    } else if (hasProfilePhoto) {
+      imageUrl = member.profile_photo_url!
+    } else {
+      imageUrl = getStockTruckPhoto(member.truck_make, member.truck_model)
+      isStockPhoto = true
+    }
+
+    return {
+      id: member.id,
+      member_id: member.id,
+      image_url: imageUrl,
+      caption: memberImage?.caption,
+      is_featured: false,
+      is_stock_photo: isStockPhoto,
+      member: {
+        first_name: member.first_name,
+        last_name: member.last_name,
+        member_number: member.member_number,
+        instagram_handle: member.instagram_handle,
+        truck_year: member.truck_year,
+        truck_make: member.truck_make,
+        truck_model: member.truck_model,
+      }
     }
   })
 
