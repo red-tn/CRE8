@@ -6,8 +6,8 @@ import { Badge } from '@/components/ui/Badge'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
 
-// Revalidate every 60 seconds to pick up changes
-export const revalidate = 60
+// Force dynamic rendering to always show fresh data
+export const dynamic = 'force-dynamic'
 
 async function getHomePageData() {
   // Get member count

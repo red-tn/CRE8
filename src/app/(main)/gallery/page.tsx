@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
 
-// Revalidate every 60 seconds to pick up new members
-export const revalidate = 60
+// Force dynamic rendering to always show fresh data
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: 'Fleet Gallery | CRE8 Truck Club',
