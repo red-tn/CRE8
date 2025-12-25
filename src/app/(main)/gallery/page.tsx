@@ -16,6 +16,7 @@ interface GalleryItem {
   image_url: string
   caption?: string
   is_featured: boolean
+  is_stock_photo: boolean
   member: {
     first_name: string
     last_name: string
@@ -67,6 +68,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
         image_url: media.url,
         caption: media.caption,
         is_featured: false,
+        is_stock_photo: false,
         member: {
           first_name: member.first_name,
           last_name: member.last_name,
@@ -89,6 +91,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
         image_url: item.image_url,
         caption: item.caption,
         is_featured: item.is_featured,
+        is_stock_photo: false,
         member: item.member
       })
     }
@@ -102,6 +105,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
     )
     if (!hasMedia) {
       // Use profile photo if available, otherwise use stock photo based on truck make/model
+      const hasProfilePhoto = !!member.profile_photo_url
       const imageUrl = member.profile_photo_url || getStockTruckPhoto(member.truck_make, member.truck_model)
       galleryItems.push({
         id: member.id,
@@ -109,6 +113,7 @@ async function getGalleryImages(): Promise<GalleryItem[]> {
         image_url: imageUrl,
         caption: undefined,
         is_featured: false,
+        is_stock_photo: !hasProfilePhoto,
         member: {
           first_name: member.first_name,
           last_name: member.last_name,
@@ -225,6 +230,15 @@ export default async function GalleryPage() {
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-zinc-700">
                       <Truck className="w-12 h-12" />
+                    </div>
+                  )}
+
+                  {/* Stock photo badge */}
+                  {image.is_stock_photo && (
+                    <div className="absolute top-2 left-2">
+                      <Badge variant="default" className="text-xs">
+                        No Images Yet
+                      </Badge>
                     </div>
                   )}
 
