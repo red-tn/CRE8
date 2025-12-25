@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { Member } from '@/types'
+import { useCartStore } from './cart'
 
 interface AuthStore {
   member: Member | null
@@ -20,6 +21,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
   logout: async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      // Clear cart on logout to prevent cart data leaking between accounts
+      useCartStore.getState().clearCart()
       set({ member: null })
     } catch (error) {
       console.error('Logout error:', error)
