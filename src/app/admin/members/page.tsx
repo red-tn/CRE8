@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Badge } from '@/components/ui/Badge'
-import { Search, Users, Check, X, Shield, Pencil, KeyRound, ShoppingBag, Eye, Package } from 'lucide-react'
+import { Search, Users, Check, X, Shield, Pencil, KeyRound, ShoppingBag, Eye, Package, Trash2, ChevronUp, ChevronDown } from 'lucide-react'
 import { formatDate, formatCurrency } from '@/lib/utils'
 import { getMemberDisplayPhoto } from '@/lib/stockPhotos'
 import { Member, MembershipDues, Order, TRUCK_MAKES, TRUCK_MODELS, TruckMake } from '@/types'
@@ -50,6 +50,9 @@ export default function AdminMembersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('')
+  const [sortBy, setSortBy] = useState('joined')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [isDeleting, setIsDeleting] = useState(false)
   const [editingMember, setEditingMember] = useState<Member | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -70,7 +73,7 @@ export default function AdminMembersPage() {
 
   useEffect(() => {
     fetchMembers()
-  }, [search, filter])
+  }, [search, filter, sortBy, sortOrder])
 
   const fetchMembers = async () => {
     setIsLoading(true)
@@ -78,6 +81,8 @@ export default function AdminMembersPage() {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
       if (filter) params.set('filter', filter)
+      params.set('sortBy', sortBy)
+      params.set('sortOrder', sortOrder)
 
       const res = await fetch(`/api/admin/members?${params}`)
       if (res.ok) {
@@ -142,6 +147,49 @@ export default function AdminMembersPage() {
     } catch (error) {
       console.error('Error updating member:', error)
     }
+  }
+
+  const deleteMember = async (member: Member) => {
+    const confirmMessage = `Are you sure you want to PERMANENTLY DELETE ${member.first_name} ${member.last_name}?\n\nThis will delete:\n- All photos and media\n- Order history\n- Membership dues records\n- Event RSVPs\n- All other member data\n\nThis action cannot be undone!`
+
+    if (!confirm(confirmMessage)) return
+
+    setIsDeleting(true)
+    try {
+      const res = await fetch(`/api/admin/members?id=${member.id}`, {
+        method: 'DELETE',
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        alert(data.message || 'Member deleted successfully')
+        fetchMembers()
+      } else {
+        alert(data.error || 'Failed to delete member')
+      }
+    } catch (error) {
+      console.error('Error deleting member:', error)
+      alert('Failed to delete member')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(column)
+      setSortOrder('asc')
+    }
+  }
+
+  const SortIcon = ({ column }: { column: string }) => {
+    if (sortBy !== column) return null
+    return sortOrder === 'asc'
+      ? <ChevronUp className="w-4 h-4 inline ml-1" />
+      : <ChevronDown className="w-4 h-4 inline ml-1" />
   }
 
   const resetPassword = async (member: Member) => {
@@ -527,11 +575,36 @@ export default function AdminMembersPage() {
                 <table className="w-full">
                   <thead className="bg-zinc-800">
                     <tr>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Member</th>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Truck</th>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Joined</th>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Account</th>
-                      <th className="text-left p-4 text-sm font-bold text-zinc-400">Dues Status</th>
+                      <th
+                        className="text-left p-4 text-sm font-bold text-zinc-400 cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('member')}
+                      >
+                        Member <SortIcon column="member" />
+                      </th>
+                      <th
+                        className="text-left p-4 text-sm font-bold text-zinc-400 cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('truck')}
+                      >
+                        Truck <SortIcon column="truck" />
+                      </th>
+                      <th
+                        className="text-left p-4 text-sm font-bold text-zinc-400 cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('joined')}
+                      >
+                        Joined <SortIcon column="joined" />
+                      </th>
+                      <th
+                        className="text-left p-4 text-sm font-bold text-zinc-400 cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('account')}
+                      >
+                        Account <SortIcon column="account" />
+                      </th>
+                      <th
+                        className="text-left p-4 text-sm font-bold text-zinc-400 cursor-pointer hover:text-white transition-colors"
+                        onClick={() => handleSort('dues')}
+                      >
+                        Dues Status <SortIcon column="dues" />
+                      </th>
                       <th className="text-right p-4 text-sm font-bold text-zinc-400">Actions</th>
                     </tr>
                   </thead>
@@ -626,18 +699,36 @@ export default function AdminMembersPage() {
                             >
                               <Shield className={`w-4 h-4 ${member.is_admin ? 'text-green-500' : ''}`} />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => toggleActive(member)}
-                              title={member.is_active ? 'Deactivate' : 'Activate'}
-                            >
-                              {member.is_active ? (
+                            {member.is_active ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => toggleActive(member)}
+                                title="Deactivate"
+                              >
                                 <X className="w-4 h-4 text-red-500" />
-                              ) : (
-                                <Check className="w-4 h-4 text-green-500" />
-                              )}
-                            </Button>
+                              </Button>
+                            ) : (
+                              <>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleActive(member)}
+                                  title="Reactivate"
+                                >
+                                  <Check className="w-4 h-4 text-green-500" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => deleteMember(member)}
+                                  title="Delete permanently"
+                                  disabled={isDeleting}
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-500" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -733,18 +824,36 @@ export default function AdminMembersPage() {
                       >
                         <Shield className={`w-4 h-4 ${member.is_admin ? 'text-green-500' : ''}`} />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleActive(member)}
-                        title={member.is_active ? 'Deactivate' : 'Activate'}
-                      >
-                        {member.is_active ? (
+                      {member.is_active ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleActive(member)}
+                          title="Deactivate"
+                        >
                           <X className="w-4 h-4 text-red-500" />
-                        ) : (
-                          <Check className="w-4 h-4 text-green-500" />
-                        )}
-                      </Button>
+                        </Button>
+                      ) : (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleActive(member)}
+                            title="Reactivate"
+                          >
+                            <Check className="w-4 h-4 text-green-500" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteMember(member)}
+                            title="Delete permanently"
+                            disabled={isDeleting}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
