@@ -28,7 +28,7 @@ export default function MainLayout({
       {/* Footer Ad Leaderboard */}
       <div className="bg-zinc-900 border-t border-zinc-800 py-6 relative z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AdBanner slot="0987654321" format="horizontal" />
+          <AdBanner slot="4217299724" format="auto" />
         </div>
       </div>
       <Footer />

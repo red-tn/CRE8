@@ -216,7 +216,7 @@ export default async function HomePage() {
       {/* Ad Section - Between Features and Fleet */}
       <section className="py-8 bg-black border-y border-zinc-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AdBanner slot="1234567890" format="horizontal" />
+          <AdBanner slot="9516253089" format="auto" />
         </div>
       </section>
 
