@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AdBanner } from "@/components/ads/AdBanner";
 
 export default function MainLayout({
   children,
@@ -24,6 +25,12 @@ export default function MainLayout({
       <main className="flex-1 pt-20 relative z-10">
         {children}
       </main>
+      {/* Footer Ad Leaderboard */}
+      <div className="bg-zinc-900 border-t border-zinc-800 py-6 relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AdBanner slot="0987654321" format="horizontal" />
+        </div>
+      </div>
       <Footer />
     </div>
   );

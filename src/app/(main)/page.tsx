@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
 import { headers } from 'next/headers'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 // Force dynamic rendering to always show fresh data
 export const dynamic = 'force-dynamic'
@@ -209,6 +210,13 @@ export default async function HomePage() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Ad Section - Between Features and Fleet */}
+      <section className="py-8 bg-black border-y border-zinc-800">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AdBanner slot="1234567890" format="horizontal" />
         </div>
       </section>
 

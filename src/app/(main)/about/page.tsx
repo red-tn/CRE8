@@ -147,6 +147,10 @@ export default function AboutPage() {
                   <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
                   <span className="text-zinc-400">Voting rights on club decisions</span>
                 </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full mt-2" />
+                  <span className="text-zinc-400">Ad-free browsing experience on the website</span>
+                </li>
               </ul>
             </div>
 
