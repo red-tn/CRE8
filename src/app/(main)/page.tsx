@@ -14,7 +14,7 @@ export const fetchCache = 'force-no-store'
 
 async function getHomePageData() {
   // Force dynamic by reading headers
-  headers()
+  await headers()
   // Get member count
   const { count: memberCount } = await supabaseAdmin
     .from('members')

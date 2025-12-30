@@ -35,7 +35,7 @@ interface GalleryItem {
 
 async function getGalleryImages(): Promise<GalleryItem[]> {
   // Force dynamic by reading headers
-  headers()
+  await headers()
 
   // Get members with their media
   const { data: members } = await supabaseAdmin
