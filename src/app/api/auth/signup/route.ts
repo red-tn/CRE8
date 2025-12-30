@@ -151,14 +151,11 @@ export async function POST(request: NextRequest) {
       status: 'sent',
     })
 
+    // Return full member object (without password_hash)
+    const { password_hash, ...safeMember } = member
     return NextResponse.json({
       success: true,
-      member: {
-        id: member.id,
-        email: member.email,
-        first_name: member.first_name,
-        last_name: member.last_name,
-      },
+      member: safeMember,
     })
   } catch (error) {
     console.error('Signup error:', error)
