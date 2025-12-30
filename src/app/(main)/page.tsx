@@ -110,7 +110,7 @@ export default async function HomePage() {
               alt="CRE8 Truck Club"
               width={400}
               height={200}
-              className="h-48 md:h-64 lg:h-80 w-auto"
+              className="h-56 md:h-72 lg:h-96 w-auto"
               priority
             />
           </div>
