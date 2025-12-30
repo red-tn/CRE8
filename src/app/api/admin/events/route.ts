@@ -127,17 +127,36 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
+    const permanent = searchParams.get('permanent') === 'true'
 
     if (!id) {
       return NextResponse.json({ error: 'ID required' }, { status: 400 })
     }
 
-    await supabaseAdmin
-      .from('events')
-      .update({ is_active: false })
-      .eq('id', id)
+    if (permanent) {
+      // Permanent delete - remove from database
+      // First delete RSVPs associated with this event
+      await supabaseAdmin
+        .from('event_rsvps')
+        .delete()
+        .eq('event_id', id)
 
-    return NextResponse.json({ success: true })
+      // Then delete the event
+      await supabaseAdmin
+        .from('events')
+        .delete()
+        .eq('id', id)
+
+      return NextResponse.json({ success: true, permanent: true })
+    } else {
+      // Soft delete - just set inactive
+      await supabaseAdmin
+        .from('events')
+        .update({ is_active: false })
+        .eq('id', id)
+
+      return NextResponse.json({ success: true, permanent: false })
+    }
   } catch (error) {
     if ((error as Error).message === 'Unauthorized' || (error as Error).message === 'Forbidden') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

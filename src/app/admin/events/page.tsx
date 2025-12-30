@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
-import { Calendar, Plus, Pencil, Trash2, X, MapPin, Users, Upload, Image as ImageIcon } from 'lucide-react'
+import { Calendar, Plus, Pencil, Trash2, X, MapPin, Users, Upload, Image as ImageIcon, RotateCcw } from 'lucide-react'
 import { formatDate, formatTime } from '@/lib/utils'
 import { Event } from '@/types'
 
@@ -118,11 +118,16 @@ export default function AdminEventsPage() {
     }
   }
 
-  const deleteEvent = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this event?')) return
+  const deleteEvent = async (id: string, isCurrentlyActive: boolean) => {
+    const message = isCurrentlyActive
+      ? 'Are you sure you want to delete this event? It will be marked as inactive.'
+      : 'Are you sure you want to PERMANENTLY delete this event? This cannot be undone!'
+
+    if (!confirm(message)) return
 
     try {
-      const res = await fetch(`/api/admin/events?id=${id}`, {
+      const permanent = !isCurrentlyActive
+      const res = await fetch(`/api/admin/events?id=${id}&permanent=${permanent}`, {
         method: 'DELETE',
       })
 
@@ -131,6 +136,22 @@ export default function AdminEventsPage() {
       }
     } catch (error) {
       console.error('Error deleting event:', error)
+    }
+  }
+
+  const restoreEvent = async (id: string) => {
+    try {
+      const res = await fetch('/api/admin/events', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, isActive: true }),
+      })
+
+      if (res.ok) {
+        fetchEvents()
+      }
+    } catch (error) {
+      console.error('Error restoring event:', error)
     }
   }
 
@@ -360,8 +381,18 @@ export default function AdminEventsPage() {
                         <Button variant="ghost" size="sm" onClick={() => startEdit(event)}>
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => deleteEvent(event.id)}>
-                          <Trash2 className="w-4 h-4 text-red-500" />
+                        {!event.is_active && (
+                          <Button variant="ghost" size="sm" onClick={() => restoreEvent(event.id)} title="Restore event">
+                            <RotateCcw className="w-4 h-4 text-green-500" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteEvent(event.id, event.is_active)}
+                          title={event.is_active ? 'Delete event' : 'Delete permanently'}
+                        >
+                          <Trash2 className={`w-4 h-4 ${event.is_active ? 'text-red-500' : 'text-red-700'}`} />
                         </Button>
                       </div>
                     </div>
