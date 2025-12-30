@@ -24,6 +24,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'w-full px-4 py-3 bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-500',
             'focus:outline-none focus:border-white focus:ring-1 focus:ring-white',
             'transition-colors duration-200',
+            // Style date/time inputs for dark theme
+            '[&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert',
+            '[&::-webkit-datetime-edit]:text-white',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
             className
           )}
