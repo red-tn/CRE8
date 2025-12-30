@@ -11,26 +11,37 @@ export const metadata = {
   description: 'Check out upcoming CRE8 Truck Club events, meets, and cruises.',
 }
 
-// Revalidate every 60 seconds to show new/updated events
-export const revalidate = 60
+// Force dynamic rendering to always show fresh data
+export const dynamic = 'force-dynamic'
+
+// Get today's date in local timezone (YYYY-MM-DD format)
+function getTodayLocal(): string {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 async function getEvents() {
+  const today = getTodayLocal()
   const { data } = await supabaseAdmin
     .from('events')
     .select('*')
     .eq('is_active', true)
-    .gte('event_date', new Date().toISOString().split('T')[0])
+    .gte('event_date', today)
     .order('event_date', { ascending: true })
 
   return (data || []) as Event[]
 }
 
 async function getPastEvents() {
+  const today = getTodayLocal()
   const { data } = await supabaseAdmin
     .from('events')
     .select('*')
     .eq('is_active', true)
-    .lt('event_date', new Date().toISOString().split('T')[0])
+    .lt('event_date', today)
     .order('event_date', { ascending: false })
     .limit(6)
 
