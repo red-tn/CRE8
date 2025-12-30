@@ -18,10 +18,6 @@ export function Footer() {
                 className="h-10 w-auto"
               />
             </Link>
-            <p className="text-zinc-500 text-sm max-w-md mb-6">
-              The edgiest truck club for enthusiasts. Chevy, Ford, Dodge, Toyota, Nissan, GMC - we don&apos;t discriminate.
-              Just bring your build and your passion.
-            </p>
             <div className="flex gap-4">
               <a href="https://instagram.com/cre8truckclub" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors">
                 <Instagram className="w-5 h-5" />
