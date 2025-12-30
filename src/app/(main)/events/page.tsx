@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Event } from '@/types'
 import { EventsList } from './EventsList'
+import { parseLocalDate } from '@/lib/utils'
 
 export const metadata = {
   title: 'Events | CRE8 Truck Club',
@@ -96,10 +97,10 @@ export default async function EventsPage() {
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-zinc-800 text-zinc-400 flex flex-col items-center justify-center text-xs">
                       <span className="font-bold uppercase">
-                        {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                        {parseLocalDate(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                       </span>
                       <span className="text-lg font-black">
-                        {new Date(event.event_date).getDate()}
+                        {parseLocalDate(event.event_date).getDate()}
                       </span>
                     </div>
                     <div>

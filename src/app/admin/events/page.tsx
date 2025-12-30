@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Calendar, Plus, Pencil, Trash2, X, MapPin, Users, Upload, Image as ImageIcon, RotateCcw } from 'lucide-react'
-import { formatDate, formatTime } from '@/lib/utils'
+import { formatDate, formatTime, parseLocalDate } from '@/lib/utils'
 import { Event } from '@/types'
 
 export default function AdminEventsPage() {
@@ -155,7 +155,12 @@ export default function AdminEventsPage() {
     }
   }
 
-  const isPastEvent = (date: string) => new Date(date) < new Date()
+  const isPastEvent = (date: string) => {
+    const eventDate = parseLocalDate(date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return eventDate < today
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -353,10 +358,10 @@ export default function AdminEventsPage() {
                   {/* Date Box */}
                   <div className="flex-shrink-0 w-20 h-20 bg-white text-black flex flex-col items-center justify-center">
                     <span className="text-sm font-bold uppercase">
-                      {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                      {parseLocalDate(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                     </span>
                     <span className="text-2xl font-black">
-                      {new Date(event.event_date).getDate()}
+                      {parseLocalDate(event.event_date).getDate()}
                     </span>
                   </div>
 

@@ -23,6 +23,12 @@ export function formatDate(date: string | Date | null | undefined): string {
   }).format(d)
 }
 
+// Parse date string (YYYY-MM-DD) without timezone issues
+export function parseLocalDate(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
 export function formatTime(time: string): string {
   const [hours, minutes] = time.split(':')
   const hour = parseInt(hours)

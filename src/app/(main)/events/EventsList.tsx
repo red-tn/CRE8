@@ -6,7 +6,7 @@ import { Calendar, MapPin, Clock, Users, Lock, X, Check, HelpCircle, XCircle } f
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardContent, CardHeader } from '@/components/ui/Card'
-import { formatTime } from '@/lib/utils'
+import { formatTime, parseLocalDate } from '@/lib/utils'
 import { Event, EventRSVP } from '@/types'
 import { useAuthStore } from '@/store/auth'
 
@@ -119,10 +119,10 @@ export function EventsList({ events }: EventsListProps) {
               {/* Date Box */}
               <div className="flex-shrink-0 w-24 h-24 bg-white text-black flex flex-col items-center justify-center">
                 <span className="text-sm font-bold uppercase">
-                  {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                  {parseLocalDate(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                 </span>
                 <span className="text-3xl font-black">
-                  {new Date(event.event_date).getDate()}
+                  {parseLocalDate(event.event_date).getDate()}
                 </span>
               </div>
 
@@ -186,7 +186,7 @@ export function EventsList({ events }: EventsListProps) {
                 <div>
                   <h2 className="text-xl font-bold">{selectedEvent.title}</h2>
                   <p className="text-sm text-zinc-500 mt-1">
-                    {new Date(selectedEvent.event_date).toLocaleDateString('en-US', {
+                    {parseLocalDate(selectedEvent.event_date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
                       day: 'numeric',

@@ -23,7 +23,7 @@ import {
   Package,
   ExternalLink,
 } from 'lucide-react'
-import { formatDate, formatCurrency, getDuesStatus, formatTime } from '@/lib/utils'
+import { formatDate, formatCurrency, getDuesStatus, formatTime, parseLocalDate } from '@/lib/utils'
 import Link from 'next/link'
 import { MembershipDues, Event, EventRSVP, MemberMedia, Order } from '@/types'
 
@@ -514,9 +514,9 @@ function DashboardContent() {
                     >
                       <div className="w-12 h-12 bg-white text-black flex flex-col items-center justify-center text-xs font-bold">
                         <span>
-                          {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
+                          {parseLocalDate(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                         </span>
-                        <span className="text-lg">{new Date(event.event_date).getDate()}</span>
+                        <span className="text-lg">{parseLocalDate(event.event_date).getDate()}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold truncate">{event.title}</p>
@@ -552,7 +552,7 @@ function DashboardContent() {
                 <div>
                   <h2 className="text-xl font-bold">{selectedEvent.title}</h2>
                   <p className="text-sm text-zinc-500 mt-1">
-                    {new Date(selectedEvent.event_date).toLocaleDateString('en-US', {
+                    {parseLocalDate(selectedEvent.event_date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
                       day: 'numeric',
