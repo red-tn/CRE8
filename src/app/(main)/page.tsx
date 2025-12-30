@@ -114,10 +114,6 @@ export default async function HomePage() {
               priority
             />
           </div>
-          <p className="text-lg md:text-xl text-zinc-500 mb-10 max-w-2xl mx-auto">
-            The edgiest truck club for young enthusiasts.
-            Chevy. Ford. Dodge. We don&apos;t discriminate.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
               <Button size="lg" className="w-full sm:w-auto">
