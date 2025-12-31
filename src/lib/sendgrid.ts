@@ -66,9 +66,10 @@ export function getDuesReminderEmail(memberName: string, dueDate: string, paymen
   }
 }
 
-export function getWelcomeEmail(memberName: string, loginLink: string) {
+export function getWelcomeEmail(memberName: string, dashboardLink: string) {
+  const duesLink = `${dashboardLink}` // Dashboard will prompt for dues
   return {
-    subject: 'Welcome to CRE8 Truck Club!',
+    subject: 'Welcome to CRE8 Truck Club - Activate Your Membership!',
     html: `
       <div style="background-color: #000; color: #fff; padding: 40px; font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto;">
@@ -80,25 +81,37 @@ export function getWelcomeEmail(memberName: string, loginLink: string) {
             What's up ${memberName},
           </p>
           <p style="color: #d4d4d8; font-size: 16px; line-height: 1.6;">
-            You're officially part of CRE8 Truck Club. Welcome to the crew.
+            You're officially part of CRE8 Truck Club. Welcome to the crew!
           </p>
           <p style="color: #d4d4d8; font-size: 16px; line-height: 1.6;">
-            Here's what you get as a member:
+            <strong style="color: #fff;">One more step:</strong> Pay your annual dues ($50/year) to unlock your full membership benefits.
           </p>
-          <ul style="color: #d4d4d8; font-size: 16px; line-height: 1.8;">
-            <li>Access to exclusive member-only events</li>
-            <li>Discounted pricing on all merch</li>
-            <li>Your truck featured in our gallery</li>
-            <li>Connect with fellow truck enthusiasts</li>
-          </ul>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${loginLink}" style="background-color: #fff; color: #000; padding: 15px 40px; text-decoration: none; font-weight: bold; font-size: 18px;">
-              GO TO YOUR DASHBOARD
+
+          <div style="background-color: #1a1a1a; padding: 25px; margin: 25px 0; border-left: 4px solid #fff;">
+            <h3 style="color: #fff; margin: 0 0 15px 0; font-size: 18px;">PAID MEMBER BENEFITS:</h3>
+            <ul style="color: #d4d4d8; font-size: 16px; line-height: 2; margin: 0; padding-left: 20px;">
+              <li><strong style="color: #fff;">Exclusive Events Access</strong> - Member-only meets, cruises, and gatherings</li>
+              <li><strong style="color: #fff;">Member Merch Pricing</strong> - Discounted prices on all CRE8 gear</li>
+              <li><strong style="color: #fff;">Fleet Gallery Feature</strong> - Your truck showcased on our site</li>
+              <li><strong style="color: #fff;">Priority Registration</strong> - First dibs on popular events</li>
+            </ul>
+          </div>
+
+          <div style="text-align: center; margin: 35px 0;">
+            <a href="${duesLink}" style="background-color: #fff; color: #000; padding: 18px 50px; text-decoration: none; font-weight: bold; font-size: 18px; display: inline-block;">
+              PAY DUES & ACTIVATE - $50/YEAR
             </a>
           </div>
-          <p style="color: #71717a; font-size: 14px; text-align: center; margin-top: 40px;">
-            Follow us on Instagram @cre8truckclub
+
+          <p style="color: #71717a; font-size: 14px; text-align: center;">
+            Already paid? You're all set! Log in to access your dashboard.
           </p>
+
+          <div style="border-top: 1px solid #333; margin-top: 40px; padding-top: 20px;">
+            <p style="color: #71717a; font-size: 14px; text-align: center;">
+              Questions? Reply to this email or hit us up on Instagram @cre8truckclub
+            </p>
+          </div>
         </div>
       </div>
     `,

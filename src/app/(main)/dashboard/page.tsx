@@ -26,6 +26,7 @@ import {
 import { formatDate, formatCurrency, getDuesStatus, formatTime, parseLocalDate } from '@/lib/utils'
 import Link from 'next/link'
 import { MembershipDues, Event, EventRSVP, MemberMedia, Order } from '@/types'
+import { DuesPopup } from '@/components/DuesPopup'
 
 function DashboardContent() {
   const router = useRouter()
@@ -33,9 +34,11 @@ function DashboardContent() {
   const { member, isLoading, checkAuth, logout } = useAuthStore()
 
   const [dues, setDues] = useState<MembershipDues | null>(null)
+  const [duesLoaded, setDuesLoaded] = useState(false)
   const [upcomingEvents, setUpcomingEvents] = useState<(Event & { rsvp?: EventRSVP })[]>([])
   const [isPayingDues, setIsPayingDues] = useState(false)
   const [showDuesSuccess, setShowDuesSuccess] = useState(false)
+  const [showDuesPopup, setShowDuesPopup] = useState(false)
   const [truckPhoto, setTruckPhoto] = useState<string | null>(null)
   const [selectedEvent, setSelectedEvent] = useState<(Event & { rsvp?: EventRSVP }) | null>(null)
   const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false)
@@ -74,9 +77,17 @@ function DashboardContent() {
         fetch('/api/member/orders'),
       ])
 
+      let hasPaidDues = false
       if (duesRes.ok) {
         const duesData = await duesRes.json()
         setDues(duesData.dues)
+        hasPaidDues = duesData.dues?.status === 'paid'
+      }
+      setDuesLoaded(true)
+
+      // Show dues popup if not paid (and not coming from successful payment)
+      if (!hasPaidDues && searchParams.get('dues') !== 'success') {
+        setShowDuesPopup(true)
       }
 
       if (eventsRes.ok) {
@@ -649,6 +660,14 @@ function DashboardContent() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Dues Payment Popup for non-paid members */}
+      {showDuesPopup && duesLoaded && (
+        <DuesPopup
+          onPayDues={handlePayDues}
+          isLoading={isPayingDues}
+        />
       )}
     </div>
   )
