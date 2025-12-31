@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CRE8 Truck Club | The Edgiest Truck Club",
-  description: "CRE8 Truck Club - The edgiest truck club for enthusiasts driving Chevy, Ford, Dodge, Toyota, Nissan, and GMC pickups. Join the crew.",
+  title: "CRE8 Truck Club",
+  description: "CRE8 Truck Club - A truck club for enthusiasts driving Chevy, Ford, Dodge, Toyota, Nissan, and GMC pickups. Join the crew.",
   keywords: ["truck club", "chevy trucks", "ford trucks", "dodge trucks", "toyota trucks", "nissan trucks", "truck enthusiasts", "car club"],
   openGraph: {
     title: "CRE8 Truck Club",
-    description: "The edgiest truck club for truck enthusiasts",
+    description: "A truck club for truck enthusiasts",
     type: "website",
   },
 };
