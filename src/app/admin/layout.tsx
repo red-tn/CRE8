@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Home,
+  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -26,6 +27,7 @@ const adminLinks = [
   { href: '/admin/products', label: 'Products', icon: ShoppingBag },
   { href: '/admin/orders', label: 'Orders', icon: Package },
   { href: '/admin/events', label: 'Events', icon: Calendar },
+  { href: '/admin/blog', label: 'Blog', icon: FileText },
 ]
 
 export default function AdminLayout({

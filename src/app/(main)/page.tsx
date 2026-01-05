@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { Users, Calendar, ShoppingBag, Truck, ChevronRight } from 'lucide-react'
+import { Users, Calendar, ShoppingBag, Truck, ChevronRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getStockTruckPhoto } from '@/lib/stockPhotos'
 import { headers } from 'next/headers'
 import { AdBanner } from '@/components/ads/AdBanner'
+import { formatDate } from '@/lib/utils'
 
 // Force dynamic rendering to always show fresh data
 export const dynamic = 'force-dynamic'
@@ -74,11 +75,20 @@ async function getHomePageData() {
     .order('created_at', { ascending: false })
     .limit(10)
 
+  // Get latest blog posts
+  const { data: blogPosts } = await supabaseAdmin
+    .from('blog_posts')
+    .select('id, title, slug, excerpt, content, image_url, published_at')
+    .eq('is_published', true)
+    .order('published_at', { ascending: false })
+    .limit(5)
+
   return {
     memberCount: memberCount || 0,
     brandCounts,
     fleetData,
     products: products || [],
+    blogPosts: blogPosts || [],
   }
 }
 
@@ -90,7 +100,7 @@ function formatCurrency(amount: number): string {
 }
 
 export default async function HomePage() {
-  const { memberCount, brandCounts, fleetData, products } = await getHomePageData()
+  const { memberCount, brandCounts, fleetData, products, blogPosts } = await getHomePageData()
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -208,6 +218,90 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Latest News Section */}
+      {blogPosts.length > 0 && (
+        <section className="py-16 bg-zinc-900/50 border-t border-zinc-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-end mb-8">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black mb-1">
+                  LATEST <span className="text-white">NEWS</span>
+                </h2>
+                <p className="text-zinc-500 text-sm">Updates from the CRE8 community</p>
+              </div>
+              <Link href="/blog" className="text-white hover:text-zinc-200 font-bold text-sm uppercase tracking-wider hidden sm:flex items-center gap-2">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {blogPosts.slice(0, 3).map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="bg-black border border-zinc-800 hover:border-zinc-700 transition-colors group block"
+                >
+                  {post.image_url && (
+                    <div className="aspect-video overflow-hidden">
+                      <img
+                        src={post.image_url}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <p className="text-xs text-zinc-500 mb-2">{formatDate(post.published_at)}</p>
+                    <h3 className="font-bold text-white group-hover:text-zinc-200 transition-colors line-clamp-2 mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-sm text-zinc-400 line-clamp-2">
+                      {post.excerpt || post.content.substring(0, 100)}...
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* Additional posts - smaller */}
+            {blogPosts.length > 3 && (
+              <div className="grid md:grid-cols-2 gap-4 mt-6">
+                {blogPosts.slice(3, 5).map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="flex gap-4 bg-black border border-zinc-800 hover:border-zinc-700 transition-colors p-4 group"
+                  >
+                    {post.image_url && (
+                      <div className="w-24 h-24 flex-shrink-0 overflow-hidden">
+                        <img
+                          src={post.image_url}
+                          alt={post.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-zinc-500 mb-1">{formatDate(post.published_at)}</p>
+                      <h3 className="font-bold text-white group-hover:text-zinc-200 transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Mobile View All */}
+            <div className="mt-6 sm:hidden">
+              <Link href="/blog" className="text-white hover:text-zinc-200 font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2">
+                View All News <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Ad Section - Between Features and Fleet */}
       <section className="py-8 bg-black border-y border-zinc-800">

@@ -203,3 +203,32 @@ export interface SiteSetting {
   value: unknown
   updated_at: string
 }
+
+export interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  content: string
+  excerpt?: string
+  image_url?: string
+  author_id?: string
+  is_published: boolean
+  is_pinned: boolean
+  published_at?: string
+  created_at: string
+  updated_at: string
+  author?: Member
+}
+
+export interface BlogComment {
+  id: string
+  post_id: string
+  member_id?: string
+  guest_name?: string
+  guest_email?: string
+  content: string
+  is_approved: boolean
+  created_at: string
+  member?: Member
+  post?: BlogPost
+}
